@@ -3,6 +3,7 @@
 @using HtmlAgilityPack
 @using System.Web
 @using System.Threading.Tasks
+
 @functions {
     [Component(
         Type = ComptType.Page_Template,
@@ -27,9 +28,9 @@
         public VM_Blog[] count { get; set; }
 
         public int Id { get; set; }
-
+        public VM_Blog PreviousPost { get; set; }
+        public VM_Blog NextPost { get; set; }
         public PP_Category[] cat { get; set; }
-
         public static ViewModel Default => new ViewModel()
         {
 
@@ -38,6 +39,8 @@
     private ViewModel _data;
     private ViewModel Data => _data ?? (_data = ViewModel.Default);
     private MyTranslator Text => new MyTranslator(Data?.Phrases);
+
+
 }
 @{
 
@@ -45,130 +48,153 @@
     var slug = ToneRemover.MakeSlug(keyword);
 
     _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
-    {
+{
 
 
 
-        model = model ?? (from cat_blog in Db.Table<PP_Category_details>()
-                          join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
-                          join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
-                          where node.NodeType == "post" && node.NodePath == NodeSlug && catnew.NodeType == "post"
-                          select new ViewModel
-                          {
-                              Content = node.Content,
-                              Title = node.Title,
-                              Path = node.NodePath,
-                              Summary = node.Summary,
-                              ImageUrl = node.ImageUrl,
-                              CreatedTime = node.CreatedTime,
-                              CategoryId = catnew.Id,
-                              MetaDescription = node.MetaDescription,
-                              MetaKeywords = node.MetaKeywords,
-                              CategoryName = catnew.Title,
-                              CategoryPath = catnew.CategoryPath,
-                              catid = catnew.Id,
-                              idnode = cat_blog.Idproduct,
-                              Featured = node.Featured,
-                              listcat = node.listcat,
-                          }).FirstOrDefault();
+    model = model ?? (from cat_blog in Db.Table<PP_Category_details>()
+                      join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                      join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+                      where node.NodeType == "post" && node.NodePath == NodeSlug && catnew.NodeType == "post"
+                      select new ViewModel
+                      {
+                          Content = node.Content,
+                          Title = node.Title,
+                          Path = node.NodePath,
+                          Summary = node.Summary,
+                          ImageUrl = node.ImageUrl,
+                          CreatedTime = node.CreatedTime,
+                          CategoryId = catnew.Id,
+                          MetaDescription = node.MetaDescription,
+                          MetaKeywords = node.MetaKeywords,
+                          CategoryName = catnew.Title,
+                          CategoryPath = catnew.CategoryPath,
+                          catid = catnew.Id,
+                          idnode = cat_blog.Idproduct,
+                          Featured = node.Featured,
+                          listcat = node.listcat,
+                      }).FirstOrDefault();
 
-        var category = Db.GetOne<PP_Category>(t => t.CategoryPath == model.CategoryPath);
+    var category = Db.GetOne<PP_Category>(t => t.CategoryPath == model.CategoryPath);
 
 
-        model.Breadcrumbs = Newtonsoft.Json.JsonConvert.DeserializeObject<KeyValuePair<string, string>[]>(category.Breadcrumb);
-        var arrCategory = Root.CategoryIndexes[category.Id].ToList();
+    model.Breadcrumbs = Newtonsoft.Json.JsonConvert.DeserializeObject<KeyValuePair<string, string>[]>(category.Breadcrumb);
+    var arrCategory = Root.CategoryIndexes[category.Id].ToList();
 
-        model.cat = Db.Table<PP_Category>().Where(x => x.NodeType == "post").ToArray();
+    model.cat = Db.Table<PP_Category>().Where(x => x.NodeType == "post").ToArray();
 
-        var count =
+    var count =
 (from cat_blog in Db.Table<PP_Category_details>()
- join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
- join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
- where node.NodeType == "post"
- select new VM_Blog
- {
-     JsonContent = node.Content,
-     Title = node.Title,
-     Path = node.NodePath,
-     Summary = node.Summary,
-     ImageUrl = node.ImageUrl,
-     CreatedTime = node.CreatedTime,
-     CategoryId = catnew.Id,
-     CategoryName = catnew.Title,
-     CategoryPath = catnew.CategoryPath,
-     catid = catnew.Id,
-     idnode = cat_blog.Idproduct,
-     Featured = node.Featured,
-     listcat = node.listcat,
- })
+join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+where node.NodeType == "post"
+select new VM_Blog
+{
+ JsonContent = node.Content,
+ Title = node.Title,
+ Path = node.NodePath,
+ Summary = node.Summary,
+ ImageUrl = node.ImageUrl,
+ CreatedTime = node.CreatedTime,
+ CategoryId = catnew.Id,
+ CategoryName = catnew.Title,
+ CategoryPath = catnew.CategoryPath,
+ catid = catnew.Id,
+ idnode = cat_blog.Idproduct,
+ Featured = node.Featured,
+ listcat = node.listcat,
+})
 .OrderByDescending(b => b.CreatedTime)
 .ToArray();
-        model.count = count;
+    model.count = count;
 
 
-        var news =
+    var news =
 (from cat_blog in Db.Table<PP_Category_details>()
- join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
- join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
- where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0)
- select new VM_Blog
- {
-     JsonContent = node.Content,
-     Title = node.Title,
-     Path = node.NodePath,
-     Summary = node.Summary,
-     ImageUrl = node.ImageUrl,
-     CreatedTime = node.CreatedTime,
-     CategoryId = catnew.Id,
-     CategoryName = catnew.Title,
-     CategoryPath = catnew.CategoryPath,
-     catid = catnew.Id,
-     idnode = cat_blog.Idproduct,
-     Featured = node.Featured,
-     listcat = node.listcat,
- }).AsEnumerable()
+join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0)
+select new VM_Blog
+{
+ JsonContent = node.Content,
+ Title = node.Title,
+ Path = node.NodePath,
+ Summary = node.Summary,
+ ImageUrl = node.ImageUrl,
+ CreatedTime = node.CreatedTime,
+ CategoryId = catnew.Id,
+ CategoryName = catnew.Title,
+ CategoryPath = catnew.CategoryPath,
+ catid = catnew.Id,
+ idnode = cat_blog.Idproduct,
+ Featured = node.Featured,
+ listcat = node.listcat,
+}).AsEnumerable()
 .OrderByDescending(b => b.CreatedTime)
 .ToArray();
-        model.RecentItems = (from cat_blog in Db.Table<PP_Category_details>()
-                             join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
-                             join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
-                             where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0) && catnew.NodeType == "post" && node.Id != model.idnode
-                             select new VM_Blog
-                             {
-                                 JsonContent = node.Content,
-                                 Title = node.Title,
-                                 Path = node.NodePath,
-                                 Summary = node.Summary,
-                                 ImageUrl = node.ImageUrl,
-                                 CreatedTime = node.CreatedTime,
-                                 CategoryId = catnew.Id,
-                                 CategoryName = catnew.Title,
-                                 CategoryPath = catnew.CategoryPath,
-                                 catid = catnew.Id,
-                                 idnode = cat_blog.Idproduct,
-                                 Featured = node.Featured,
-                                 listcat = node.listcat,
-                             }).AsEnumerable().GroupBy(b => b.Title)
+    model.RecentItems = (from cat_blog in Db.Table<PP_Category_details>()
+                         join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                         join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+                         where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0) && catnew.NodeType == "post" && node.Id != model.idnode
+                         select new VM_Blog
+                         {
+                             JsonContent = node.Content,
+                             Title = node.Title,
+                             Path = node.NodePath,
+                             Summary = node.Summary,
+                             ImageUrl = node.ImageUrl,
+                             CreatedTime = node.CreatedTime,
+                             CategoryId = catnew.Id,
+                             CategoryName = catnew.Title,
+                             CategoryPath = catnew.CategoryPath,
+                             catid = catnew.Id,
+                             idnode = cat_blog.Idproduct,
+                             Featured = node.Featured,
+                             listcat = node.listcat,
+                         }).AsEnumerable().GroupBy(b => b.Title)
 .Select(g => g.OrderByDescending(b => b.CreatedTime).First())
 .OrderByDescending(b => b.CreatedTime)
 .ToArray();
+    model.PreviousPost = (from cat_blog in Db.Table<PP_Category_details>()
+                          join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                          join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+                          where node.NodeType == "post" && node.CreatedTime < model.CreatedTime
+                          orderby node.CreatedTime descending
+                          select new VM_Blog
+                          {
+                              Title = node.Title,
+                              Path = node.NodePath,
+                              CreatedTime = node.CreatedTime
+                          }).FirstOrDefault();
 
-        if (model == null)
-        {
-            HttpContext.Current.Response.Redirect("/404.html", true);
-            return null;
-        }
-        return model;
-    });
+    // Truy vấn bài viết sau
+    model.NextPost = (from cat_blog in Db.Table<PP_Category_details>()
+                      join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                      join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+                      where node.NodeType == "post" && node.CreatedTime > model.CreatedTime
+                      orderby node.CreatedTime ascending
+                      select new VM_Blog
+                      {
+                          Title = node.Title,
+                          Path = node.NodePath,
+                          CreatedTime = node.CreatedTime
+                      }).FirstOrDefault();
+    if (model == null)
+    {
+        HttpContext.Current.Response.Redirect("/404.html", true);
+        return null;
+    }
+    return model;
+});
 
     Layout = $"~/_layouts/_layout.cshtml";
     Page.Title = Data.Title;
     Page.Description = Data.MetaDescription;
     Page.Keywords = Data.MetaKeywords;
+
+
 }
-@{
-    var tocHtml =  HtmlDocumentAsync.GenerateTOCAsync(Data.Content);
-}
+
 
 <div class="page_content_wrap">
     <div class="content_wrap">
@@ -211,64 +237,180 @@
                             </span>
                         </div>
                         <nav>
-                            @tocHtml
+                            <div class="autoContents">
+                            </div>
                         </nav>
                     </div>
-                    </div>
-                   @Data.Content
+                </div>
+                <div class="contentss">
+                    @Data.Content
+                </div>
                 <div class="post_footer post_footer_single entry-footer">
-                    <div class="post_tags_single"><span class="post_meta_label">Tags:</span> <a href="../tag/han-viet/index.htm" rel="tag">hàn việt</a><a href="../tag/viet-han/index.htm" rel="tag">việt hàn</a></div><div class="post_meta post_meta_single"><a href="#" class="post_meta_item post_meta_likes trx_addons_icon-heart-empty enabled inited" title="Like" data-postid="4179" data-likes="0" data-title-like="Like" data-title-dislike="Dislike"><span class="post_meta_number">0</span><span class="post_meta_label">Likes</span></a><span class="post_meta_item post_share"><span class="socials_share socials_size_tiny socials_type_block socials_dir_horizontal socials_wrap"><span class="social_items inited"><a class="social_item social_item_popup" href="//twitter.com/intent/tweet?text=Mua+G%C3%AC+%E1%BB%9E+S%C3%A2n+Bay+H%C3%A0n+Qu%E1%BB%91c%3F+G%E1%BB%A3i+%C3%9D+Nh%E1%BB%AFng+M%C3%B3n+Qu%C3%A0+%C3%9D+Ngh%C4%A9a+%26%23038%3B+%C4%90%C3%A1ng+Ti%E1%BB%81n+Kh%C3%B4ng+N%C3%AAn+B%E1%BB%8F+Qua&amp;url=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-link="//twitter.com/intent/tweet?text=Mua Gì Ở Sân Bay Hàn Quốc? Gợi Ý Những Món Quà Ý Nghĩa &amp; Đáng Tiền Không Nên Bỏ Qua&amp;url=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-count="twitter-new"><span class="social_icon social_icon_twitter-new sc_icon_type_icons" style=""><span class="icon-twitter-new"></span></span></a><a class="social_item social_item_popup" href="//www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-link="//www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-count="facebook-1"><span class="social_icon social_icon_facebook-1 sc_icon_type_icons" style=""><span class="icon-facebook-1"></span></span></a><a class="social_item" href="mailto:test@fwe.com?subject=Mua%20Gì%20Ở%20Sân%20Bay%20Hàn%20Quốc?%20Gợi%20Ý%20Những%20Món%20Quà%20Ý%20Nghĩa%20&amp;%20Đáng%20Tiền%20Không%20Nên%20Bỏ%20Qua&amp;body=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" target="_blank" data-count="share-email"><span class="social_icon social_icon_share-email sc_icon_type_icons" style=""><span class="icon-share-email"></span></span></a><a class="social_item" title="Copy URL to clipboard" data-message="Copied!" data-copy-link-url="https://nhblogistics.com/mua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia/" nopopup="true" href="#" target="_blank" data-count="link"><span class="social_icon social_icon_link sc_icon_type_icons" style=""><span class="icon-link"></span></span></a></span></span></span></div>					<div class="nav-links-single">
-
+                    @if (!String.IsNullOrEmpty(Data.MetaKeywords))
+                    {
+                        <div class="post_tags_single">
+                            <span class="post_meta_label">Tags:</span>
+                            @foreach (var item in Data.MetaKeywords.Split(','))
+                            {
+                                <a href="/" rel="tag">@item</a>
+                            }
+                        </div>
+                    }
+                    <div class="post_meta post_meta_single"><a href="#" class="post_meta_item post_meta_likes trx_addons_icon-heart-empty enabled inited" title="Like" data-postid="4179" data-likes="0" data-title-like="Like" data-title-dislike="Dislike"><span class="post_meta_number">0</span><span class="post_meta_label">Likes</span></a><span class="post_meta_item post_share"><span class="socials_share socials_size_tiny socials_type_block socials_dir_horizontal socials_wrap"><span class="social_items inited"><a class="social_item social_item_popup" href="//twitter.com/intent/tweet?text=Mua+G%C3%AC+%E1%BB%9E+S%C3%A2n+Bay+H%C3%A0n+Qu%E1%BB%91c%3F+G%E1%BB%A3i+%C3%9D+Nh%E1%BB%AFng+M%C3%B3n+Qu%C3%A0+%C3%9D+Ngh%C4%A9a+%26%23038%3B+%C4%90%C3%A1ng+Ti%E1%BB%81n+Kh%C3%B4ng+N%C3%AAn+B%E1%BB%8F+Qua&amp;url=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-link="//twitter.com/intent/tweet?text=Mua Gì Ở Sân Bay Hàn Quốc? Gợi Ý Những Món Quà Ý Nghĩa &amp; Đáng Tiền Không Nên Bỏ Qua&amp;url=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-count="twitter-new"><span class="social_icon social_icon_twitter-new sc_icon_type_icons" style=""><span class="icon-twitter-new"></span></span></a><a class="social_item social_item_popup" href="//www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-link="//www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" data-count="facebook-1"><span class="social_icon social_icon_facebook-1 sc_icon_type_icons" style=""><span class="icon-facebook-1"></span></span></a><a class="social_item" href="mailto:test@fwe.com?subject=Mua%20Gì%20Ở%20Sân%20Bay%20Hàn%20Quốc?%20Gợi%20Ý%20Những%20Món%20Quà%20Ý%20Nghĩa%20&amp;%20Đáng%20Tiền%20Không%20Nên%20Bỏ%20Qua&amp;body=https%3A%2F%2Fnhblogistics.com%2Fmua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia%2F" target="_blank" data-count="share-email"><span class="social_icon social_icon_share-email sc_icon_type_icons" style=""><span class="icon-share-email"></span></span></a><a class="social_item" title="Copy URL to clipboard" data-message="Copied!" data-copy-link-url="https://nhblogistics.com/mua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia/" nopopup="true" href="#" target="_blank" data-count="link"><span class="social_icon social_icon_link sc_icon_type_icons" style=""><span class="icon-link"></span></span></a></span></span></span></div>                   <div class="nav-links-single">
                         <nav class="navigation post-navigation" aria-label="Bài viết">
                             <h2 class="screen-reader-text">Điều hướng bài viết</h2>
-                            <div class="nav-links"><div class="nav-previous"><a href="../dat-my-pham-han-quoc-chinh-hang-ve-viet-nam/index.htm" rel="prev"><span class="nav-arrow-label">Previous</span> <h6 class="post-title">Đặt mỹ phẩm Hàn Quốc chính hãng về Việt Nam nhanh chóng</h6><span class="post_date">2 Tháng 5, 2025</span></a></div><div class="nav-next"><a href="../gui-hang-tu-han-quoc-ve-viet-nam-gia-re-nhat/index.htm" rel="next"><span class="nav-arrow-label">Next</span> <h6 class="post-title">Gửi hàng từ Hàn Quốc về Việt Nam giá rẻ nhất – Giải pháp tối ưu cùng NHB Logistics</h6><span class="post_date">4 Tháng 5, 2025</span></a></div></div>
+                            <div class="nav-links">
+                                <div class="nav-previous">
+                                    @if (Data.PreviousPost != null)
+                                    {
+                                        <a href="@Data.PreviousPost.Path" rel="prev">
+                                            <span class="nav-arrow-label">@(LangId == "en" ? "Previous" : "Trước")</span> <h6 class="post-title">@Data.PreviousPost.Title</h6><span class="post_date">@Data.PreviousPost.CreatedTime.ToString("dd/MM/yyyy")</span>
+                                        </a>
+                                    }
+                                </div>
+                                <div class="nav-next">
+                                    @if (@Data.NextPost != null)
+                                    {
+                                        <a href="@Data.NextPost.Path" rel="next">
+                                            <span class="nav-arrow-label">@(LangId == "en" ? "Next" : "Tiếp theo")</span> <h6 class="post-title">@Data.NextPost.Title</h6><span class="post_date">@Data.NextPost.CreatedTime.ToString("dd/MM/yyyy")</span>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
                         </nav>
                     </div>
                 </div>
             </article>
             <section class="related_wrap related_position_below_content related_style_classic">
-
-
-                <h3 class="section_title related_wrap_title">You May Also Like</h3><div class="columns_wrap posts_container columns_padding_bottom inited_open_full_post">
-                    <div class="column-1_2">
-                        <div id="post-3115" class="related_item post_format_standard post-3115 post type-post status-publish format-standard has-post-thumbnail hentry category-tin-tuc tag-dich-vu-gui-hang-tu-han-quoc-ve-viet-nam" data-post-id="3115">
-                            <div class="post_featured with_thumb hover_link">
-                                <img width="664" height="664" src="../wp-content/uploads/2024/08/1-768x768-1.jpg" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="" decoding="async" srcset="../wp-content/uploads/2024/08/1-768x768-1.jpg 768w, ../wp-content/uploads/2024/08/1-768x768-1-300x300.jpg 300w, ../wp-content/uploads/2024/08/1-768x768-1-150x150.jpg 150w" sizes="(max-width: 664px) 100vw, 664px">						<div class="mask"></div>
-                                <a href="../dich-vu-gui-hang-tu-han-quoc-ve-viet-nam/index.htm" aria-hidden="true" class="link"></a>
-                            </div>	<div class="post_header entry-header">
-                                <div class="post_meta post_meta_categories"><span class="post_meta_item post_categories cat_sep"><a href="../category/tin-tuc/index.htm" rel="category tag">Tin tức</a></span></div>		<h6 class="post_title entry-title"><a href="../dich-vu-gui-hang-tu-han-quoc-ve-viet-nam/index.htm">Dịch vụ gửi hàng từ Hàn Quốc về Việt Nam</a></h6>
+                <h3 class="section_title related_wrap_title">@(LangId == "en" ? "You May Also Like" : "Có thể bạn sẽ thích")</h3><div class="columns_wrap posts_container columns_padding_bottom inited_open_full_post">
+                    @foreach (var item in Data.RecentItems.EmptyIfNull())
+                    {
+                        <div class="column-1_2">
+                            <div id="post-3115" class="related_item post_format_standard post-3115 post type-post status-publish format-standard has-post-thumbnail hentry category-tin-tuc tag-dich-vu-gui-hang-tu-han-quoc-ve-viet-nam" data-post-id="3115">
+                                <div class="post_featured with_thumb hover_link">
+                                    <img width="664" height="664" src="@item.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.Title" decoding="async"><div class="mask"></div>
+                                    <a href="@item.Path" aria-hidden="true" class="link"></a>
+                                </div>  <div class="post_header entry-header">
+                                    <div class="post_meta post_meta_categories"><span class="post_meta_item post_categories cat_sep"><a href="@item.CategoryPath" rel="category tag">@item.CategoryName</a></span></div><h6 class="post_title entry-title"><a href="@item.Path">@item.Title</a></h6>
+                                </div>
                             </div>
                         </div>
-                    </div><div class="column-1_2">
-                        <div id="post-1468" class="related_item post_format_standard post-1468 post type-post status-publish format-standard has-post-thumbnail hentry category-van-chuyen-hiwexpress category-van-chuyen-viet-han-2" data-post-id="1468">
-                            <div class="post_featured with_thumb hover_link">
-                                <img width="500" height="500" src="../wp-content/uploads/2021/02/bang-gia-1.png" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="" decoding="async" srcset="../wp-content/uploads/2021/02/bang-gia-1.png 500w, ../wp-content/uploads/2021/02/bang-gia-1-300x300.png 300w, ../wp-content/uploads/2021/02/bang-gia-1-150x150.png 150w" sizes="(max-width: 600px) 100vw, 500px">						<div class="mask"></div>
-                                <a href="../bang-gia/index.htm" aria-hidden="true" class="link"></a>
-                            </div>	<div class="post_header entry-header">
-                                <div class="post_meta post_meta_categories"><span class="post_meta_item post_categories cat_sep"><a href="../category/van-chuyen-hiwexpress/index.htm" rel="category tag">Vận chuyển Hiwexpress</a><span class="post_meta_item_cat_separator">, </span><a href="../category/van-chuyen-viet-han-2/index.htm" rel="category tag">Vận chuyển Việt Hàn 2</a></span></div>		<h6 class="post_title entry-title"><a href="../bang-gia/index.htm">Bảng giá</a></h6>
-                            </div>
-                        </div>
-                    </div><div class="column-1_2">
-                        <div id="post-3202" class="related_item post_format_standard post-3202 post type-post status-publish format-standard has-post-thumbnail hentry category-tin-tuc category-van-chuyen-viet-han-1 tag-huong-dan-dong-goi-hang-hoa" data-post-id="3202">
-                            <div class="post_featured with_thumb hover_link">
-                                <img width="890" height="466" src="../wp-content/uploads/2024/08/huong-dan-dong-goi-hang-hoa-2-1.jpg" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="" decoding="async" srcset="../wp-content/uploads/2024/08/huong-dan-dong-goi-hang-hoa-2-1.jpg 1200w, ../wp-content/uploads/2024/08/huong-dan-dong-goi-hang-hoa-2-1-300x157.jpg 300w, ../wp-content/uploads/2024/08/huong-dan-dong-goi-hang-hoa-2-1-1024x536.jpg 1024w, ../wp-content/uploads/2024/08/huong-dan-dong-goi-hang-hoa-2-1-768x402.jpg 768w" sizes="(max-width: 890px) 100vw, 890px">						<div class="mask"></div>
-                                <a href="../huong-dan-dong-goi-hang-hoa-an-toan-de-van-chuyen-hang-hoa-di-han-quoc/index.htm" aria-hidden="true" class="link"></a>
-                            </div>	<div class="post_header entry-header">
-                                <div class="post_meta post_meta_categories"><span class="post_meta_item post_categories cat_sep"><a href="../category/tin-tuc/index.htm" rel="category tag">Tin tức</a><span class="post_meta_item_cat_separator">, </span><a href="../category/van-chuyen-viet-han-1/index.htm" rel="category tag">Vận chuyển Việt Hàn 1</a></span></div>		<h6 class="post_title entry-title"><a href="../huong-dan-dong-goi-hang-hoa-an-toan-de-van-chuyen-hang-hoa-di-han-quoc/index.htm">Hướng dẫn đóng gói hàng hóa an toàn để vận chuyển hàng hóa đi Hàn Quốc</a></h6>
-                            </div>
-                        </div>
-                    </div><div class="column-1_2">
-                        <div id="post-3173" class="related_item post_format_standard post-3173 post type-post status-publish format-standard has-post-thumbnail hentry category-tin-tuc category-van-hoa-han-quoc tag-invoice" data-post-id="3173">
-                            <div class="post_featured with_thumb hover_link">
-                                <img width="890" height="466" src="../wp-content/uploads/2024/08/anh-bia-invoice.jpg" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="" decoding="async" srcset="../wp-content/uploads/2024/08/anh-bia-invoice.jpg 1200w, ../wp-content/uploads/2024/08/anh-bia-invoice-300x157.jpg 300w, ../wp-content/uploads/2024/08/anh-bia-invoice-1024x536.jpg 1024w, ../wp-content/uploads/2024/08/anh-bia-invoice-768x402.jpg 768w" sizes="(max-width: 890px) 100vw, 890px">						<div class="mask"></div>
-                                <a href="../ho-tro-dong-invoice-ti-gia-tot-nhat-cho-du-hoc-sinh-han-quoc/index.htm" aria-hidden="true" class="link"></a>
-                            </div>	<div class="post_header entry-header">
-                                <div class="post_meta post_meta_categories"><span class="post_meta_item post_categories cat_sep"><a href="../category/tin-tuc/index.htm" rel="category tag">Tin tức</a><span class="post_meta_item_cat_separator">, </span><a href="../category/van-hoa-han-quoc/index.htm" rel="category tag">Văn Hóa Hàn Quốc</a></span></div>		<h6 class="post_title entry-title"><a href="../ho-tro-dong-invoice-ti-gia-tot-nhat-cho-du-hoc-sinh-han-quoc/index.htm">Hỗ trợ đóng Invoice tỉ giá tốt nhất cho du học sinh Hàn Quốc</a></h6>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </section>
         </div>
     </div>
 </div>
+
+@section scripts{
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="~/assets/wp-includes/js/jquery.toc.js"></script>
+    <script src="~/assets/wp-includes/js/jquery.toc.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        $('.contentss').autoContents({
+            contentsElement: $('.autoContents')
+        });
+    });
+
+    (function ($) {
+        $.fn.autoContents = function (settingsOverrides) {
+
+            // Options
+            var settings = $.extend({
+                'contentsElement': $('.autoContents'),
+            }, settingsOverrides);
+
+            var contents = [];
+            var ulStack = [];
+            var lastLevel = 0;
+
+            $(this).find('h1, h2, h3').each(function () {
+                var headingContent = $(this).text().trim();
+                var headingId = generateUniqueID(headingContent);
+                var currLevel = parseInt(this.nodeName.substring(1)); // Lấy số từ h1/h2/h3 → 1/2/3
+
+                $(this).attr('id', headingId); // Gán id cho heading
+
+                // Đóng ul nếu cấp độ giảm
+                while (currLevel < lastLevel) {
+                    contents.push('</li></ul>');
+                    ulStack.pop();
+                    lastLevel--;
+                }
+
+                // Nếu cấp tăng → mở ul mới
+                if (currLevel > lastLevel) {
+                    contents.push('<ul>');
+                    ulStack.push(currLevel);
+                    lastLevel = currLevel;
+                } else if (currLevel === lastLevel && contents.length > 0) {
+                    contents.push('</li>');
+                }
+
+                // Tạo item
+                contents.push('<li><a href="@Data.Path#' + headingId + '">' + headingContent + '</a>');
+
+            });
+
+            // Đóng các ul còn lại
+            while (ulStack.length > 0) {
+                contents.push('</li></ul>');
+                ulStack.pop();
+            }
+
+            // Gán HTML vào khối mục lục
+            $(settings.contentsElement).html(contents.join(''));
+
+            // Hàm sinh ID duy nhất
+            function generateUniqueID(text) {
+                return text
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[^\w\s-]/g, '')  // loại ký tự đặc biệt
+                    .replace(/\s+/g, '-') + '-' + Math.random().toString(36).substr(2, 6);
+            }
+        };
+    })(jQuery);
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            // Toggle khi click vào nút
+            $('.ez-toc-title-toggle a').on('click', function (e) {
+                e.preventDefault();
+                $('.autoContents').slideToggle(200); // Ẩn/hiện mượt mà
+            });
+        });
+    </script>
+    <script>
+        function toggleContents() {
+            $('.sidenav').toggle();
+        }
+
+        function openNav() {
+            var mySidenav = document.getElementById("mySidenav");
+            var mainContent = document.getElementById("main");
+            if (window.innerWidth <= 678) {
+                mySidenav.style.width = "100%";
+                mySidenav.style.height = "100%";
+
+            } else {
+                mySidenav.style.width = "300px";
+                mainContent.style.marginLeft = "300px";
+            }
+        }
+
+        function closeNav() {
+            var mySidenav = document.getElementById("mySidenav");
+            var mainContent = document.getElementById("main");
+            if (window.innerWidth <= 678) {
+                mySidenav.style.width = "0";
+                mainContent.style.marginLeft = "0";
+            } else {
+                mySidenav.style.width = "0";
+                mainContent.style.marginLeft = "120px";
+            }
+        }
+    </script>
+}

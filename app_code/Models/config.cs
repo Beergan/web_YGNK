@@ -63,13 +63,19 @@ public class Config
         Title = "Google Gtag",
         Required = false,
         Control = InputControlType.TextBox)]
-    public string GoogleGtag { get; set; }    
+    public string GoogleGtag { get; set; }
 
     [Field(
        Title = "Link facebook",
        Required = false,
        Control = InputControlType.TextBox)]
     public string LinkFacebook { get; set; }
+
+    [Field(
+       Title = "Link twitter",
+       Required = false,
+       Control = InputControlType.TextBox)]
+    public string LinkTwitter { get; set; }
 
     [Field(
       Title = "Link Titok",

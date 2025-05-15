@@ -20,15 +20,10 @@
         public class Contact
         {
             [Field(
-Title = "Tiêu đề",
+Title = "Hình ảnh",
 Required = false,
-Control = InputControlType.TextBox)]
-            public string Title { get; set; }
-            [Field(
-Title = "Nội dung",
-Required = false,
-Control = InputControlType.RichTextBox)]
-            public string Content { get; set; }
+Control = InputControlType.Image)]
+            public string Iamge { get; set; }
 
         }
         [Field(
@@ -73,8 +68,7 @@ Title = "Liên hệ")]
                 model.Name = Request.Form[field.GetName(t => t.Name)].NullIfWhiteSpace();
                 model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
                 model.Message = Request.Form[field.GetName(t => t.Message)].NullIfWhiteSpace();
-
-                model.ProcessNote = "Chưa xử lý";
+                model.ProcessNote = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
                 Db.Insert<PP_Contact>(model);
                 SendMail sm = new SendMail();
                 string body = @"
@@ -166,60 +160,108 @@ Title = "Liên hệ")]
     Page.Description = Data.MetaDescription;
     Page.Keywords = Data.MetaKeywords;
 }
-<div class="container-fluid page-header py-5 "  style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost);">
-    <h1 class="text-center  display-6">@Data.Title</h1>
-    <ol class="breadcrumb justify-content-center mb-0">
-        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.First().Href">@Root.Config.MainMenus.First().Title</a></li>
-        <li class="breadcrumb-item active ">@Data.Title</li>
-    </ol>
-</div>
-<div class="container-fluid contact py-5">
-    <div class="container py-5">
-        <div class="p-5 bg-light rounded">
-            <div class="row g-4">
-                <div class="col-12">
-                    <div class="text-center mx-auto" style="max-width: 700px;">
-                        <h1 class="text-primary">@Data.contact.Title</h1>
-                        <p class="mb-4">@Data.contact.Content</p>
+<div class="page_content_wrap p-0 ">
+    <div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal  border-bottom">
+        <div class="content_wrap">
+            <div class="sc_layouts_column sc_layouts_column_align_center">
+                <div class="sc_layouts_item">
+                    <div class="sc_layouts_title sc_align_center">
+                        <div class="sc_layouts_title_title">
+                            <h1 itemprop="headline" class="sc_layouts_title_caption">
+                                @Data.Title
+                            </h1>
+                        </div>
+                        <div class="sc_layouts_title_breadcrumbs"><div class="breadcrumbs"><a class="breadcrumbs_item home underline_hover" href="@Root.Config.MainMenus.FirstOrDefault().Href">@Root.Config.MainMenus.FirstOrDefault().Title</a><span class="breadcrumbs_delimiter"></span><span class="breadcrumbs_item current">@Data.Title</span></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content_wrap pb-lg-3 pb-2">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-12">
+                    <div class="wrapper">
+                        <div class="row no-gutters">
+                            <div class="col-lg-6">
+                                <div class="contact-wrap w-100 p-md-5 p-4">
+                                    <div id="form-message-success" class="mb-4">
+                                        Your message was sent, thank you!
+                                    </div>
+                                    <div class="row mb-4">
+
+                                        <div class="col-md-6">
+                                            <div class="dbox w-100 d-flex align-items-start">
+                                                <div class="text">
+                                                    <p><span>Email:</span> <a href="mailto:@Root.Config.Company.Email">@Root.Config.Company.Email</a></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="dbox w-100 d-flex align-items-start">
+                                                <div class="text">
+                                                    <p><span>@(LangId == "en" ?  "Phone" :"SĐT"):</span> <a href="tel:@Root.Config.Company.ContactPhone"> @Root.Config.Company.ContactPhone </a></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="dbox w-100 d-flex align-items-start">
+                                                <div class="text">
+                                                    <p><span>@(LangId == "en" ? "Address" : "Địa chỉ"):</span>@Root.Config.Company.Address</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <form method="POST" id="contactForm" name="contactForm" class="contactForm" novalidate="novalidate">
+                                        @AntiForgery.GetHtml()
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" name="@field.GetName(x=>x.Name)" id="name" placeholder="@(LangId == "en" ? "Name" : "Tên")" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="email" class="form-control" name="@field.GetName(x=>x.Email)" id="email" placeholder="Email" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" name="@field.GetName(x=>x.ProcessNote)" id="subject" placeholder="@(LangId == "en" ? "Subject" : "Tiêu đề")" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <textarea name="@field.GetName(x=>x.Message)" class="form-control" id="message" cols="30" rows="4" placeholder="@(LangId == "en" ? "Message" : "Ghi chú")" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="submit" value="@(LangId == "en" ? "Send Message" : "Gửi")" class="btn btn-primary">
+                                                    <div class="submitting"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <div class="w-100 social-media mt-5">
+                                        <h3>@(LangId == "en" ? "Follow us here" : "Theo dõi chúng tôi")</h3>
+                                        <p>
+                                            <a href="@Root.Config.LinkFacebook">Facebook</a>
+                                            <a href="@Root.Config.LinkTwitter">Twitter</a>
+                                            <a href="@Root.Config.LinkInstagram">Instagram</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 d-flex align-items-stretch">
+                                <div class="info-wrap w-100 p-5 img" style="background-image: url(@Data.contact.Iamge);">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-12">
-                    <div class="h-100 rounded">
-                        <iframe class="rounded w-100"
-                                style="height: 400px;" src="@Root.Config.Company.Map"
-                                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <form id="contact-form" action="?contact" method="post">
-                        <input type="text" class="w-100 form-control border-0 py-3 mb-4" id="name" name="@field.GetName(x=>x.Name)" placeholder="Họ và tên" required>
-                        <input type="email" class="w-100 form-control border-0 py-3 mb-4" id="email" name="@field.GetName(x=>x.Email)" placeholder="Email" required>
-                        <textarea class="w-100 form-control border-0 mb-4" rows="5" cols="10" id="subject" name="@field.GetName(x=>x.Message)" placeholder="Nội dung" required></textarea>
-                        <button class="w-100 btn form-control border-secondary py-3 contact-button bg-white text-primary" type="submit">Gửi</button>
-                    </form>
-                </div>
-                <div class="col-lg-5">
-                    <div class="d-flex p-4 rounded mb-4 bg-white">
-                        <i class="fas fa-map-marker-alt fa-2x text-primary me-4"></i>
-                        <div>
-                            <h4>Địa chỉ</h4>
-                            <p class="mb-2">@Root.Config.Company.Address</p>
-                        </div>
-                    </div>
-                    <div class="d-flex p-4 rounded mb-4 bg-white">
-                        <i class="fas fa-envelope fa-2x text-primary me-4"></i>
-                        <div>
-                            <h4>Email</h4>
-                            <p class="mb-2">@Root.Config.Company.Email</p>
-                        </div>
-                    </div>
-                    <div class="d-flex p-4 rounded bg-white">
-                        <i class="fa fa-phone-alt fa-2x text-primary me-4"></i>
-                        <div>
-                            <h4>Phone</h4>
-                            <p class="mb-2">@Root.Config.Company.ContactPhone</p>
-                        </div>
-                    </div>
+                    <iframe src="@Root.Config.Company.Map" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
             </div>
         </div>
@@ -227,6 +269,63 @@ Title = "Liên hệ")]
 </div>
 
 @section scripts{
+    <script>
+          $(document).ready(function () {
+      $(document).on("click", ".contact-button", function () {
+              event.preventDefault();
+              Swal.fire({
+               title: 'Nhập mã captcha',
+         input: 'text',
+         inputAttributes: {
+             autocapitalize: 'off'
+         },
+         imageUrl: '/captcha.ashx',
+         imageWidth: 300,
+         imageHeight: 150,
+               showCancelButton: true,
+               confirmButtonText: 'Ok',
+                  showLoaderOnConfirm: true,
+               preConfirm: (value) => {
+                $("input[name='captcha']", this).val(value);
+                      return value;
+               },
+               allowOutsideClick: () => !Swal.isLoading()
+              }).then((result) => {
+               if (!result.isConfirmed)
+                return;
 
+                  Swal.fire({
+             title: 'Xin chờ đợi!',
+             html: 'Hệ thống đang ghi nhận thông tin ..',
+             didOpen: () => { Swal.showLoading(); },
+                  });
+
+                  $.post(window.location.pathname + "?contact",
+                  {
+                      __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()",
+                      Name: $("input[name='Name']").val(),
+                      Email: $("input[name='Email']").val(),
+                      ProcessNote: $("input[name='ProcessNote']").val(),
+                      Message: $("textarea[name='Message']").val(),
+                      captcha: result.value
+                  },
+                  function (data) {
+             Swal.fire({
+                 title: 'Chúc mừng!',
+                 text: data,
+                 type: "success"
+             });
+         })
+         .fail(function (error) {
+             Swal.fire({
+                 title: 'Thôi xong!',
+                 text: error.responseText,
+                 type: "error"
+             });
+         });
+              })
+          });
+  });
+    </script>
 
 }

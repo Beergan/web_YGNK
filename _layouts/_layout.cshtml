@@ -31,22 +31,6 @@
 
     <link rel="icon" href="@Root.Config.Favicon" sizes="32x32">
     <link rel="icon" href="@Root.Config.Favicon" sizes="192x192">
-    <script type="application/ld+json">
-{
-  "@@context": "https://schema.org",
-  "@@type": "Organization",
-  "name": "@Root.Config.WebTitle",
-  "url": "@Request.Url.AbsoluteUri",
-  "logo": "@Root.Config.Favicon",
-  "contactPoint": {
-    "@@type": "ContactPoint",
-    "telephone": "@Root.Config.Company.ContactPhone",
-    "email": "@Root.Config.Company.Email",
-    "Description": "@Page.Description",
-      "areaServed": "@Root.Config.Company.Address"
-  }
-}
-    </script>
     <script>
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
@@ -82,6 +66,7 @@
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=@Root.Config.GoogleGtag">
     </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
 
     <script type="text/javascript" src="assets/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
@@ -1024,6 +1009,9 @@
             }
         }
     </style>
+    <link href="~/assets/wp-content/themes/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/assets/wp-content/themes/globallogistics/js/codejquery.js"></script>
+    <script src="~/assets/wp-content/themes/globallogistics/js/men.js"></script>
     <link property="stylesheet" rel='stylesheet' id='globallogistics-style-css' href='assets/wp-content/themes/globallogistics/style.css' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='mediaelement-css' href='assets/wp-includes/js/mediaelement/mediaelementplayer-legacy.min.css?ver=4.2.17' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='wp-mediaelement-css' href='assets/wp-includes/js/mediaelement/wp-mediaelement.min.css?ver=6.7.2' type='text/css' media='all'>
@@ -1236,61 +1224,7 @@
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/wpforms/assets/js/share/utils.min.js"></script>
 
     @*<script>
-         $(document).ready(function () {
-             $(document).on("click", ".contact-button", function () {
-                     event.preventDefault();
-                     Swal.fire({
-                      title: 'Nhập mã captcha',
-                input: 'text',
-                inputAttributes: {
-                    autocapitalize: 'off'
-                },
-                imageUrl: '/captcha.ashx',
-                imageWidth: 300,
-                imageHeight: 150,
-                      showCancelButton: true,
-                      confirmButtonText: 'Ok',
-                         showLoaderOnConfirm: true,
-                      preConfirm: (value) => {
-                       $("input[name='captcha']", this).val(value);
-                             return value;
-                      },
-                      allowOutsideClick: () => !Swal.isLoading()
-                     }).then((result) => {
-                      if (!result.isConfirmed)
-                       return;
-
-                         Swal.fire({
-                    title: 'Xin chờ đợi!',
-                    html: 'Hệ thống đang ghi nhận thông tin ..',
-                    didOpen: () => { Swal.showLoading(); },
-                         });
-
-                         $.post(window.location.pathname + "?contact",
-                         {
-                             __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()",
-                             Name: $("input[name='Name']").val(),
-                             Email: $("input[name='Email']").val(),
-                             Message: $("textarea[name='Message']").val(),
-                             captcha: result.value
-                         },
-                         function (data) {
-                    Swal.fire({
-                        title: 'Chúc mừng!',
-                        text: data,
-                        type: "success"
-                    });
-                })
-                .fail(function (error) {
-                    Swal.fire({
-                        title: 'Thôi xong!',
-                        text: error.responseText,
-                        type: "error"
-                    });
-                });
-                     })
-                 });
-         });
+       
         </script>
 
         <script>
@@ -1403,7 +1337,29 @@
 
 
 
+
     @RenderSection("scripts", required: false)
+
+<script>
+    let lastScrollTop = 0;
+    const header = document.querySelector('.top_panel');
+
+    window.addEventListener('scroll', function () {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (scrollTop > lastScrollTop) {
+            // Đang cuộn xuống
+            header.classList.remove('show-on-scroll');
+            header.classList.add('hide-on-scroll');
+        } else {
+            // Đang cuộn lên
+            header.classList.remove('hide-on-scroll');
+            header.classList.add('show-on-scroll');
+        }
+
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    });
+</script>
 
 </body>
 </html>
