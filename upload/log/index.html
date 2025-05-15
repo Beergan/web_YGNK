@@ -10183,4 +10183,455 @@ MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
    at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
    at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
    at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 15:57:01 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:02:48 INF] System boot 0,7977549
+<br/><br/>[250515 16:02:50 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:03:01 ERR] /lien-he
+System.Web.HttpCompileException (0x80004005): D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml(129): error CS4033: The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.
+   at System.Web.Compilation.AssemblyBuilder.Compile()
+   at System.Web.Compilation.BuildProvidersCompiler.PerformBuild()
+   at System.Web.Compilation.BuildManager.CompileWebFile(VirtualPath virtualPath)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultInternal(VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultWithNoAssert(HttpContext context, VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVirtualPathObjectFactory(VirtualPath virtualPath, HttpContext context, Boolean allowCrossApp, Boolean throwIfNotFound)
+   at System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath(VirtualPath virtualPath, Type requiredBaseType, HttpContext context, Boolean allowCrossApp)
+   at System.Web.WebPages.BuildManagerWrapper.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.VirtualPathFactoryManager.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.WebPageHttpHandler.CreateFromVirtualPath(String virtualPath, IVirtualPathFactory virtualPathFactory)
+   at WebPagesRouteHandler.GetHttpHandler(RequestContext requestContext) in D:\SLK\web_YGNK\web_YGNK\App_Code\Routing\WebPageRouteHandler.cs:line 36
+   at System.Web.Routing.UrlRoutingModule.PostResolveRequestCache(HttpContextBase context)
+   at System.Web.HttpApplication.SyncEventExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+<br/><br/>[250515 16:17:56 INF] System boot 0,611067
+<br/><br/>[250515 16:17:57 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:18:00 ERR] /_compt/contact.cshtml
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ASP._Page__compt_contact_cshtml.Execute() in D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml:line 255
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy(IEnumerable`1 executors)
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+   at System.Web.WebPages.WebPageHttpHandler.ProcessRequestInternal(HttpContextBase httpContext)
+<br/><br/>[250515 16:18:00 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:18:03 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:21:01 INF] System boot 0,7293211
+<br/><br/>[250515 16:21:02 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:21:10 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:23:05 INF] System boot 0,7007856
+<br/><br/>[250515 16:23:14 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:24:50 INF] System boot 0,8156551
+<br/><br/>[250515 16:24:51 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:32:03 INF] System boot 0,6268341
+<br/><br/>[250515 16:32:04 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:32:17 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:35:13 INF] System boot 0,697919
+<br/><br/>[250515 16:35:14 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:39:57 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:44:00 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:44:02 ERR] /_compt/contact.cshtml
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ASP._Page__compt_contact_cshtml.Execute() in D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml:line 256
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy(IEnumerable`1 executors)
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+   at System.Web.WebPages.WebPageHttpHandler.ProcessRequestInternal(HttpContextBase httpContext)
+<br/><br/>[250515 16:59:42 INF] System boot 0,5817045
+<br/><br/>[250515 16:59:43 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 16:59:54 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:00:45 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:07:58 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:08:02 ERR] /_compt/contact.cshtml
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ASP._Page__compt_contact_cshtml.Execute() in D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml:line 255
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy(IEnumerable`1 executors)
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+   at System.Web.WebPages.WebPageHttpHandler.ProcessRequestInternal(HttpContextBase httpContext)
+<br/><br/>[250515 17:16:05 ERR] /_compt/contact.cshtml
+System.Web.HttpCompileException (0x80004005): D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml(148): error CS4033: The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.
+   at System.Web.Compilation.AssemblyBuilder.Compile()
+   at System.Web.Compilation.BuildProvidersCompiler.PerformBuild()
+   at System.Web.Compilation.BuildManager.CompileWebFile(VirtualPath virtualPath)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultInternal(VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultWithNoAssert(HttpContext context, VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVirtualPathObjectFactory(VirtualPath virtualPath, HttpContext context, Boolean allowCrossApp, Boolean throwIfNotFound)
+   at System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath(VirtualPath virtualPath, Type requiredBaseType, HttpContext context, Boolean allowCrossApp)
+   at System.Web.WebPages.BuildManagerWrapper.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.VirtualPathFactoryManager.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.WebPageHttpHandler.CreateFromVirtualPath(String virtualPath, IVirtualPathFactory virtualPathFactory)
+   at System.Web.WebPages.WebPageRoute.DoPostResolveRequestCache(HttpContextBase context)
+   at System.Web.HttpApplication.SyncEventExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+<br/><br/>[250515 17:16:08 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:16:20 ERR] /lien-he
+System.Web.HttpCompileException (0x80004005): D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml(148): error CS4033: The 'await' operator can only be used within an async method. Consider marking this method with the 'async' modifier and changing its return type to 'Task'.
+   at System.Web.Compilation.BuildManager.PostProcessFoundBuildResult(BuildResult result, Boolean keyFromVPP, VirtualPath virtualPath)
+   at System.Web.Compilation.BuildManager.GetBuildResultFromCacheInternal(String cacheKey, Boolean keyFromVPP, VirtualPath virtualPath, Int64 hashCode, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultFromCacheInternal(VirtualPath virtualPath, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultInternal(VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVPathBuildResultWithNoAssert(HttpContext context, VirtualPath virtualPath, Boolean noBuild, Boolean allowCrossApp, Boolean allowBuildInPrecompile, Boolean throwIfNotFound, Boolean ensureIsUpToDate)
+   at System.Web.Compilation.BuildManager.GetVirtualPathObjectFactory(VirtualPath virtualPath, HttpContext context, Boolean allowCrossApp, Boolean throwIfNotFound)
+   at System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath(VirtualPath virtualPath, Type requiredBaseType, HttpContext context, Boolean allowCrossApp)
+   at System.Web.WebPages.BuildManagerWrapper.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.VirtualPathFactoryManager.CreateInstanceOfType[T](String virtualPath)
+   at System.Web.WebPages.WebPageHttpHandler.CreateFromVirtualPath(String virtualPath, IVirtualPathFactory virtualPathFactory)
+   at WebPagesRouteHandler.GetHttpHandler(RequestContext requestContext) in D:\SLK\web_YGNK\web_YGNK\App_Code\Routing\WebPageRouteHandler.cs:line 36
+   at System.Web.Routing.UrlRoutingModule.PostResolveRequestCache(HttpContextBase context)
+   at System.Web.HttpApplication.SyncEventExecutionStep.System.Web.HttpApplication.IExecutionStep.Execute()
+   at System.Web.HttpApplication.ExecuteStepImpl(IExecutionStep step)
+   at System.Web.HttpApplication.ExecuteStep(IExecutionStep step, Boolean& completedSynchronously)
+<br/><br/>[250515 17:16:38 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:18:25 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:26:46 INF] System boot 0,6590476
+<br/><br/>[250515 17:26:47 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:26:51 ERR] /_compt/contact.cshtml
+System.NullReferenceException: Object reference not set to an instance of an object.
+   at ASP._Page__compt_contact_cshtml.Execute() in D:\SLK\web_YGNK\web_YGNK\_compt\contact.cshtml:line 247
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy(IEnumerable`1 executors)
+   at System.Web.WebPages.WebPage.ExecutePageHierarchy()
+   at System.Web.WebPages.WebPageBase.ExecutePageHierarchy(WebPageContext pageContext, TextWriter writer, WebPageRenderingBase startPage)
+   at System.Web.WebPages.WebPageHttpHandler.ProcessRequestInternal(HttpContextBase httpContext)
+<br/><br/>[250515 17:26:56 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
+<br/><br/>[250515 17:27:17 ERR] OnRequestBegin_New
+MySql.Data.MySqlClient.MySqlException (0x80004005): Column 'Ip' cannot be null
+   at MySql.Data.MySqlClient.MySqlStream.ReadPacket()
+   at MySql.Data.MySqlClient.NativeDriver.GetResult(Int32& affectedRow, Int64& insertedId)
+   at MySql.Data.MySqlClient.Driver.NextResult(Int32 statementId, Boolean force)
+   at MySql.Data.MySqlClient.MySqlDataReader.NextResult()
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteReader(CommandBehavior behavior)
+   at MySql.Data.MySqlClient.MySqlCommand.ExecuteScalar()
+   at PetaPoco.DatabaseProvider.ExecuteScalarHelper(Database db, IDbCommand cmd) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 5112
+   at PetaPoco.DatabaseProvider.ExecuteInsert(Database database, IDbCommand cmd, String primaryKeyName) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 4934
+   at PetaPoco.Database.ExecuteInsert(String tableName, String primaryKeyName, Boolean autoIncrement, Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1381
+   at PetaPoco.Database.Insert(Object poco) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\PetaPoco.cs:line 1291
+   at BaseDataService.Insert[T](T model) in D:\SLK\web_YGNK\web_YGNK\App_Code\DbConnect\BaseDataService.cs:line 68
+   at VisitCounter.OnRequestBegin_New() in D:\SLK\web_YGNK\web_YGNK\App_Code\VisitCouter.cs:line 177
+   at Global.Application_AcquireRequestState(Object sender, EventArgs e) in D:\SLK\web_YGNK\web_YGNK\App_Code\Global.asax.cs:line 127
 <br/><br/>

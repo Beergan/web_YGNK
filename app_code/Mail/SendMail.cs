@@ -24,7 +24,6 @@ public class SendMail : System.Web.UI.Page
         // TODO: Add constructor logic here
         //
     }
-
     public string Send_Mail(string subject, string body, string to)
     {
         try

@@ -217,7 +217,7 @@ margin: 0 auto; /* Căn giữa hình ảnh */
 
 </body>
 </html>";
-            string results = sm.Send_Mail("Khách hàng liên hệ", body, Root.Config.Company.Email);
+            string results = await sm.Send_MailAsync("Khách hàng liên hệ", body, Root.Config.Company.Email);
             Db.Insert<PP_Order>(order);
             HttpContext.Current.Session["makeOrder"] = true;
             cart.Clear();
