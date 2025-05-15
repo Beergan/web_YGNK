@@ -1,0 +1,159 @@
+﻿@inherits MyAdminPage
+@functions{
+    private FieldExtractor<PP_Node> field = new FieldExtractor<PP_Node>();
+    private PP_Node model = null;
+
+    private Action ProcessPost()
+    {
+        AntiForgery.Validate();
+
+        //Validation.RequireField(field.GetName(t => t.Title), "Tiêu đề không thể để trống!");
+        //Validation.RequireField(field.GetName(t => t.Alias), "Alias không thể để trống!");
+        //Validation.Add(field.GetName(t => t.Alias), Validator.Regex(@"^[a-z]+(\-[a-z0-9]+)*$"));
+
+        model.ImageUrl = Request.Form[field.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+
+        if (!Validation.IsValid())
+        {
+            ModelState.AddFormError("Dữ liệu không hợp lệ!");
+            return EmptyAction;
+        }
+
+        Db.Update<PP_Node>(model);
+        Root.ClearCache();
+        return () => Response.Redirect($"{Constants.Admin_Url}/post?CategoryId={model.CategoryId}");
+    }
+}
+@{
+	CheckAuthen()();
+	int itemId;
+	if (!int.TryParse(Request.QueryString[field.GetName(t => t.Id)], out itemId))
+	{
+		Response.Redirect($"{Constants.Admin_Url}/post");
+	}
+
+	model = Db.GetOne<PP_Node>(itemId);
+
+	if (model == null || model.NodeType != "post")
+	{
+		Response.Redirect($"{Constants.Admin_Url}/post");
+	}
+
+	if (IsPost)
+	{
+		try
+		{
+			ProcessPost().Invoke();
+		}
+		catch (Exception ex)
+		{
+			ModelState.AddFormError(ex.Message);
+		}
+	}
+
+	var category = Db.GetOne<PP_Category>(model.CategoryId ?? 0);
+	Page.Title = Text["MODIFY A POST", "HIỆU CHỈNH BÀI VIẾT"];
+	Page.Menu = "post";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách bài viết" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+			<div class="card-box table-responsive">
+				<ul class="nav nav-tabs">
+					<li class="nav-item">
+						<a href="@Constants.Admin_Url/group?type=page" aria-expanded="false" class="nav-link">
+							<i class="fe-folder"></i> @Text["Categories", "Các chuyên mục"]
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="@Constants.Admin_Url/post?groupId=@model.CategoryId" aria-expanded="true" class="nav-link">
+							<i class="fas fa-list-ol"></i> @Text["All of posts", "Tất cả bài viết"]
+						</a>
+					</li>
+					@if (@model.CategoryId > 0)
+					{
+						<li class="nav-item">
+							<a href="@Constants.Admin_Url/post?categoryId=@model.CategoryId" aria-expanded="true" class="nav-link">
+								<i class="fas fa-list-ol"></i> @category.Title
+							</a>
+						</li>
+					}
+					<li class="nav-item">
+						<a href="#edit" data-toggle="tab" aria-expanded="false" class="nav-link active">
+							<i class="fe-edit"></i> @Text["Modify a post", "Hiệu chỉnh bài viết"]
+						</a>
+					</li>
+				</ul>
+
+				<div class="tab-content">
+					<div class="tab-pane show active" id="edit">
+						<form class="form-horizontal validable" role="form" method="post">
+
+							@AntiForgery.GetHtml()
+
+							@if (ModelState.Any())
+							{
+								<div class="alert alert-danger" role="alert">
+									@Html.ValidationSummary("Thao tác không thành công!", excludeFieldErrors: true, htmlAttributes: null)
+								</div>
+							}
+
+
+							@MyHtml.TextBoxFor(field[t => t.Title], value: model.Title, disabled: true)
+							@MyHtml.ImagePickerFor(field[t => t.ImageUrl], value: model.ImageUrl)
+							<hr />
+
+							<div class="form-group mb-0">
+								<div>
+									<button type="submit" class="btn btn-gradient waves-effect waves-light">
+										@Text["Submit", "Xác nhận"]
+									</button>
+									<button type="button" class="btn btn-light waves-effect ml-1" onclick="window.history.back()">
+										@Text["Back", "Quay lại"]
+									</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+        </div>
+    </div> <!-- end row -->
+    <!-- end row -->
+</div>
+
+@section head{
+}
+
+@section scripts{
+    <script src="@Constants.Admin_Url/ckfinder/ckfinder.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $(document).on("click",".btn-ckfinder-popup",function(e) {
+                event.preventDefault();
+                var targetId=$(this).attr('target');
+
+                window["callback_"+targetId]=function(fileUrl) {
+                    var url = new URL(fileUrl);
+                    $('#'+targetId).val(url.pathname);
+                    $('#img-'+targetId).attr("src", url.pathname);
+                }
+
+                CKFinder.popup({
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    selectActionFunction: window["callback_"+targetId]
+                });
+            });
+        });
+
+    </script>
+}

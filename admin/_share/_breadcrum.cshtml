@@ -1,0 +1,13 @@
+﻿@inherits MyAdminPage
+<div class="page-title-box">
+    <div class="page-title-right">
+        <ol class="breadcrumb m-0">
+            <li class="breadcrumb-item"><a href="@Constants.Admin_Url">SLK Admin</a></li>
+            @if (@Page.CurrentBreadcrumb != null)
+            {
+                <li class="breadcrumb-item active">@Page.CurrentBreadcrumb</li>
+            }
+        </ol>
+    </div>
+    <h4 class="page-title">@MyHtml.ComposeLanguageSwitch2() @Page.Title</h4>
+</div>

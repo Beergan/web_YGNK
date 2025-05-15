@@ -1,0 +1,180 @@
+﻿@using SLK.Common
+@inherits MyWebPage
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        ComptName = "en:Search all|vi:Mẫu tìm kiếm tất cả")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public long TotalPages { get; set; }
+
+        public long CurrentPage { get; set; }
+
+        public string CategoryPath { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string key { get; set; }
+
+        [Field(
+            Title = "en:Title banner|vi:Tiêu đề banner",
+            Required = false,
+            Control = InputControlType.TextBox)]
+        public string TitleBanner { get; set; }
+
+        [Field(
+            Title = "en:Banner image|vi:Hình nền banner",
+            Required = false,
+            Control = InputControlType.Image)]
+        public string BannerImage { get; set; }
+
+        public SearchAll[] Items { get; set; }
+
+        public class SearchAll
+        {
+            public string Title { get; set; }
+
+            public string Path { get; set; }
+
+            public string Image { get; set; }
+        }
+
+        public static ViewModel Default => new ViewModel()
+        {
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    string keyword = Request.QueryString[nameof(keyword)];
+    var slug = ToneRemover.MakeSlug(keyword);
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{slug}-{CurrentPage}", setup: (model) =>
+    {
+
+        var page = Db.GetOne<PP_Page>(t => t.PathPattern == NodeSlug);
+        if (page != null)
+        {
+            model.Title = page.Title;
+        }
+        var query = Db.Query<PP_Node>(t => t.NodeType == "post" && t.LangId == LangId && (t.NodePath.Contains(slug)));
+
+        var pageOfPosts = query
+        .OrderByDescending(t => t.CreatedTime)
+        .Skip((this.CurrentPage - 1) * 9)
+        .Take(9)
+        .GroupBy(p => new { Total = query.Count() })
+        .FirstOrDefault();
+
+        if (pageOfPosts != null)
+        {
+            model.TotalPages = (long)Math.Ceiling((decimal)pageOfPosts.Key.Total / 9);
+            model.Items = pageOfPosts.Select(i => new ViewModel.SearchAll
+            {
+                Image = i.ImageUrl,
+                Title = i.Title,
+                Path = i.NodePath
+            }).ToArray();
+        }
+        else
+        {
+            model.TotalPages = 1;
+            model.Items = new ViewModel.SearchAll[] { };
+        }
+
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+        model.CurrentPage = this.CurrentPage;
+        model.key = slug;
+        model.CategoryPath = NodeSlug;
+
+        return model;
+    });
+
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+
+}
+      
+<div class="main-content">
+    <!-- Breadcrumbs Start -->
+    <div class="rs-breadcrumbs breadcrumbs-overlay">
+        <div class="breadcrumbs-img">
+            <img src="@(Data.BannerImage??"https://keenitsolutions.com/products/html/educavo/assets/images/breadcrumbs/1.jpg")" alt="Breadcrumbs Image" style="width: 100%">
+        </div>
+        <div class="breadcrumbs-text" style="padding: 12px 0 0 12px">
+            <h4 style="color: black!important" class="page-title">@Data.TitleBanner: <span style="font-size: 18px">@Data.Items.Count() @(LangId == "vi" ? "kết quả" : "result")</span></h4>
+            @*<ul>
+                <li>
+                    <a href="/">Trang chủ</a>
+                </li>
+                    <li>@Data.Title</li>
+            </ul>*@
+        </div>
+    </div>
+    <!-- Breadcrumbs End -->            
+
+    <!-- Popular Course Section Start -->
+    <div class="rs-popular-courses style1 course-view-style orange-color rs-inner-blog white-bg pt-100 pb-100 md-pt-70 md-pb-70">
+        <div class="container">
+            <div class="row">
+                @if (!string.IsNullOrEmpty(slug) && Data.Items.Count() == 0)
+                {
+                    <div class="col-lg-12 mb-50">
+                        <div class="w-100 search-null">
+                            @(LangId == "vi" ? "Rất tiếc, không tìm thấy kết quả nào phù hợp với từ khóa: " : "Sorry, we couldn't find any results for your keyword: ")<b>"@keyword"</b>
+                        </div>
+                    </div>
+                }
+                <div class="col-12 col-lg-12 pr-50 md-pr-15">                            
+                    <div class="row search-all">
+                        @foreach (var item in Data.Items.EmptyIfNull())
+                        {
+                            <div class=" col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
+                                <div class="card p-30 h-100">
+                                    <div class="img-part">
+                                        <img src="@(item.Image??"/assets/images/courses/1.jpg")" alt="@item.Title" style="width: 100%">
+                                    </div>
+                                    <div class="content-part">
+                                        <h3 class="title">
+                                            <a href="@item.Path">@item.Title</a>
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    @if (Data.Items.Count() > 0)
+                    {
+                        <div class="paging text-center mt-30 md-mt-0">
+                            @for (int idx = 1; idx <= Data.TotalPages; idx++)
+                            {
+                                <span class="@(Data.CurrentPage == idx ? "active" : "")"><a href="@Data.CategoryPath?page=@(idx)">@idx</a></span>
+                            }
+                            @if (Data.CurrentPage < Data.TotalPages)
+                            {
+                                <span>
+                                    <a style="color: black" href="@Data.CategoryPath?page=@(Data.CurrentPage + 1)">
+                                        Next <i class="fa fa-long-arrow-right"></i>
+                                    </a>
+                                </span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Popular Course Section End -->
+</div>

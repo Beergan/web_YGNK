@@ -1,0 +1,107 @@
+/* Sc Skills */
+.sc_skills_digits .sc_skills_digit .sc_skills_digit_placeholder {
+  padding: 0 1px;
+}
+
+/* Icons */
+/* Style 'Figure' */
+.sc_icons.sc_icons_figure .sc_icons_icon:after {
+  display: none;
+}
+.sc_icons.sc_icons_figure .sc_icons_item_title {
+  font-size: 1.647em;
+  line-height: 1.2em;
+}
+.sc_icons.sc_icons_figure .sc_icons_item_title + .sc_icons_item_description {
+  margin-top: 0.9em;
+  font-size: 1em;
+}
+
+/* Contact Form 7*/
+div.wpcf7 .form-style-6 .wpcf7-submit-style .submit-style-in,
+div.wpcf7 .form-style-7 .wpcf7-submit-style .submit-style-in {
+  background-color: var(--theme-color-text_link);
+}
+
+div.wpcf7 .form-style-6 .wpcf7-submit-style:active .wpcf7-submit + .submit-style-in, div.wpcf7 .form-style-6 .wpcf7-submit-style:focus .wpcf7-submit + .submit-style-in, div.wpcf7 .form-style-6 .wpcf7-submit-style:hover .wpcf7-submit + .submit-style-in,
+div.wpcf7 .form-style-7 .wpcf7-submit-style:active .wpcf7-submit + .submit-style-in,
+div.wpcf7 .form-style-7 .wpcf7-submit-style:focus .wpcf7-submit + .submit-style-in,
+div.wpcf7 .form-style-7 .wpcf7-submit-style:hover .wpcf7-submit + .submit-style-in {
+  background-color: var(--theme-color-text_hover);
+}
+
+.btn_accent_3 div.wpcf7 [class*="form-style-"] .wpcf7-submit-style .submit-style-in {
+  background-color: var(--theme-color-text_link3);
+}
+
+.btn_accent_3 div.wpcf7 [class*="form-style-"] .wpcf7-submit-style:active .wpcf7-submit + .submit-style-in,
+.btn_accent_3 div.wpcf7 [class*="form-style-"] .wpcf7-submit-style:focus .wpcf7-submit + .submit-style-in,
+.btn_accent_3 div.wpcf7 [class*="form-style-"] .wpcf7-submit-style:hover .wpcf7-submit + .submit-style-in {
+  background-color: var(--theme-color-text_hover3);
+}
+
+/* Alter Text */
+.trx_addons_alter_text {
+  font-size: 19px;
+  line-height: 1.5em;
+  font-weight: 500;
+}
+
+/* Dropcap */
+.trx_addons_dropcap_style_1 {
+  background-color: var(--theme-color-text_link);
+}
+
+div.wpcf7 .form-style-2 .ajax-loader + .acceptance,
+div.wpcf7 .form-style-2 .wpcf7-spinner + .acceptance {
+  display: block;
+  margin: 20px 0 0 0;
+}
+div.wpcf7 .form-style-2 .acceptance + .wpcf7-submit-style {
+  margin: 20px 0 0 0;
+}
+
+/* scroll to top */
+.scroll_to_top_style_default {
+  width: 3.5em;
+  height: 3.5em;
+  line-height: 3.5em;
+  -webkit-border-radius: 0;
+  -ms-border-radius: 0;
+  border-radius: 0;
+}
+
+@media (max-width: 1439px) {
+  div.wpcf7 .form-style-7 .wpcf7-spinner + .acceptance,
+  div.wpcf7 .form-style-7 .ajax-loader + .acceptance {
+    display: block;
+    margin: 15px 0 0 0;
+  }
+}
+@media (max-width: 1279px) {
+  /* Pricing Table */
+  /* Metro */
+  .sc_price_metro .sc_price_item_description, .sc_price_metro .sc_price_item_details {
+    font-size: 16px;
+  }
+
+  /* Elementor Tabs */
+  .elementor-toggle .elementor-tab-content {
+    font-size: 16px;
+  }
+
+  /* Blogger */
+  /* Default */
+  .sc_blogger_default.sc_blogger_default_over_centered_hover .sc_item_featured [class*="post_info_"] .sc_blogger_item_excerpt {
+    font-size: 16px;
+  }
+
+  /* scroll to top */
+  .scroll_to_top_style_default {
+    width: 3em;
+    height: 3em;
+    line-height: 3em;
+  }
+}
+
+/*# sourceMappingURL=extra-style.css.map */

@@ -1,0 +1,755 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        PathPostfix = "/{0}/{1}.html",
+        ComptName = "en:Product single template|vi:Mẫu thông tin sản phẩm",
+        PageType = "item", NodeType = "product")]
+    public class ViewModel : VM_Product
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public KeyValuePair<string, string>[] Breadcrumbs { get; set; }
+
+        public string Banner { get; set; }
+
+
+        public string JsonBreadcrumb { get; set; }
+
+        public int Id { get; set; }
+
+
+        public VM_Product[] RecentItems { get; set; }
+        public VM_Product[] count { get; set; }
+        public PP_Comment[] check { get; set; }
+        public PP_Comment[] comnet { get; set; }
+        public PP_Comment[] commenheck { get; set; }
+
+        double star { get; set; }
+
+        public PP_Category[] cat { get; set; }
+
+        public static ViewModel Default => new ViewModel()
+        {
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+    private FieldExtractor<PP_Comment> field = new FieldExtractor<PP_Comment>();
+    private PP_Comment model = new PP_Comment() { Status = "NEW" };
+}
+@{
+
+    string keyword = Request.QueryString[nameof(keyword)];
+    var slug = ToneRemover.MakeSlug(keyword);
+    var query = Request.Url.Query;
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? (from cat_blog in Db.Table<PP_Category_details>()
+                          join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                          join node in Db.Table<PP_Product>() on cat_blog.Idproduct equals node.Id
+                          where node.NodeType == "product" && node.NodePath == NodeSlug && catnew.NodeType == "product"
+                          select new ViewModel
+                          {
+                              Id = node.Id,
+                              JsonContent = node.Content,
+                              Title = node.Title,
+                              Path = node.NodePath,
+                              Summary = node.Content,
+                              ImageUrl = node.ImageUrl,
+                              CreatedTime = node.CreatedTime,
+                              CategoryId = catnew.Id,
+                              Des = node.Des,
+                              MetaDescription = node.MetaDescription,
+                              MetaKeywords = node.MetaKeywords,
+                              CategoryName = catnew.Title,
+                              CategoryPath = catnew.CategoryPath,
+                              catid = catnew.Id,
+                              ImagesJson = node.ImagesJson,
+                              listcat = node.listcat,
+                              Price = node.Price,
+                              idnode = cat_blog.Idproduct,
+                              PromotionPrice = node.PromotionPrice,
+                              PromotionEnabled = node.PromotionEnabled,
+                          }).FirstOrDefault();
+
+        var category = Db.GetOne<PP_Category>(t => t.CategoryPath == model.CategoryPath);
+
+
+        model.comnet = Db.Table<PP_Comment>().Where(x => x.idproduct == model.Id && x.Status == "SUCCESS").ToArray();
+        model.commenheck = Db.Table<PP_Comment>().Where(x => x.Status == "SUCCESS").ToArray();
+
+
+        if (model.comnet.Count() == 0)
+        {
+            model.comnet = null;
+        }
+
+        model.Breadcrumbs = Newtonsoft.Json.JsonConvert.DeserializeObject<KeyValuePair<string, string>[]>(category.Breadcrumb);
+        var arrCategory = Root.CategoryIndexes[category.Id].ToList();
+
+        model.cat = Db.Table<PP_Category>().Where(x => x.NodeType == "product").ToArray();
+
+        var count =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Product>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "product"
+ select new VM_Product
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Content,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     Des = node.Des,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     listcat = node.listcat,
+     Price = node.Price,
+     ImagesJson = node.ImagesJson,
+     idnode = cat_blog.Idproduct,
+     PromotionPrice = node.PromotionPrice,
+     PromotionEnabled = node.PromotionEnabled,
+ })
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+        model.count = count;
+
+
+        var news =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Product>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "product" && arrCategory.Contains(cat_blog.Idcat ?? 0)
+ select new VM_Product
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Content,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     Des = node.Des,
+     ImagesJson = node.ImagesJson,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     listcat = node.listcat,
+     Price = node.Price,
+     idnode = cat_blog.Idproduct,
+     PromotionPrice = node.PromotionPrice,
+ }).AsEnumerable()
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+        model.RecentItems = (from cat_blog in Db.Table<PP_Category_details>()
+                             join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+                             join node in Db.Table<PP_Product>() on cat_blog.Idproduct equals node.Id
+                             where node.NodeType == "product" && arrCategory.Contains(cat_blog.Idcat ?? 0) && node.Id != model.Id
+                             select new VM_Product
+                             {
+
+                                 JsonContent = node.Content,
+                                 Title = node.Title,
+                                 Path = node.NodePath,
+                                 Summary = node.Content,
+                                 Des = node.Des,
+                                 ImageUrl = node.ImageUrl,
+                                 ImagesJson = node.ImagesJson,
+                                 CreatedTime = node.CreatedTime,
+                                 CategoryId = catnew.Id,
+                                 CategoryName = catnew.Title,
+                                 CategoryPath = catnew.CategoryPath,
+                                 catid = catnew.Id,
+                                 PromotionEnabled = node.PromotionEnabled,
+                                 Price = node.Price,
+                                 PromotionPrice = node.PromotionPrice,
+
+                                 idnode = cat_blog.Idproduct,
+
+                             }).AsEnumerable().GroupBy(b => b.Title)
+.Select(g => g.OrderByDescending(b => b.CreatedTime).First())
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+
+        model.cat = Db.Table<PP_Category>().Where(x => x.NodeType == "product").ToArray();
+        return model;
+
+    });
+    if (IsPost && query == "?commet")
+    {
+        new Func<Action>(() =>
+        {
+            try
+            {
+                AntiForgery.Validate();
+                string captcha = Request.Form[nameof(captcha)].ToLower();
+                Validation.RequireField(field.GetName(t => t.Name));
+                Validation.RequireField(field.GetName(t => t.Email));
+                Validation.Add(field.GetName(t => t.Email), Validator.Regex("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"));
+                if (!Validation.IsValid())
+                {
+                    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
+                }
+
+                if (captcha != this.Context.Session["CaptchaVerify"].ToString())
+                {
+                    return AjaxResult.BadRequest("Capcha không hợp lệ!");
+                }
+
+                var model = new PP_Comment() { Status = "NEW" };
+                model.Name = Request.Form[field.GetName(t => t.Name)].NullIfWhiteSpace();
+                model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+                model.Comment = Request.Form[field.GetName(t => t.Comment)].NullIfWhiteSpace();
+                model.idproduct = Data.Id;
+                model.notetype = "product";
+                model.star = Request.Form[field.GetName(t => t.star)].AsInt();
+                model.Comment = Request.Form[field.GetName(t => t.Comment)].NullIfWhiteSpace();
+                model.ProcessNote = "Chưa xử lý";
+                Db.Insert<PP_Comment>(model);
+
+                Response.Write("Cám ơn bạn đã gửi thông tin, chúng tôi sẽ phản hồi cho bạn sớm nhất có thể!");
+                return () => Response.End();
+            }
+            catch (Exception ex)
+            {
+                return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
+            }
+        })()();
+    }
+    var cart = new ShoppingCart(this.Context);
+    if (query == "?buynow")
+    {
+        AntiForgery.Validate();
+        int productidby = Request.Form[nameof(productidby)].AsInt();
+        int quantity = Request.Form[nameof(quantity)].AsInt();
+        string variation = Request.Form[nameof(variation)].NullIfWhiteSpace();
+
+        var product = Db.GetOne<PP_Product>(productidby);
+        if (product == null)
+        {
+            Response.StatusCode = 404;
+            Response.End();
+        }
+
+        cart.Update(product, variation, quantity);
+        string baseUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}";
+
+        // Concatenate with the relative URL path from your configuration
+        string fullUrl = $"{baseUrl}/{Root.Config.Link.PageMakeOrder.TrimStart('/')}";
+
+        // Redirect to the full URL
+        Response.Redirect(fullUrl);
+
+        Response.End();
+    }
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+@section head{
+    <link href="~/assets/css/fancy.carousel.css" rel="stylesheet" />
+    <link href="~/assets/css/fancybox.carousel.thumbs.css" rel="stylesheet" />
+}
+<!-- Single Page Header start -->
+<div class="container-fluid page-header py-5" style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost)">
+    <h1 class="text-center display-6">@Data.Title</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.EmptyIfNull().First().Href">@Root.Config.MainMenus.EmptyIfNull().First().Title</a></li>
+        <li class="breadcrumb-item"><a href="@Root.Config.Link.PageShop">Sản phẩm</a></li>
+        <li class="breadcrumb-item active ">@Data.Title</li>
+    </ol>
+</div>
+<!-- Single Page Header End -->
+<!-- Single Product Start -->
+<div class="container-fluid ">
+    <div class="container py-5">
+        <div class="row g-4 mb-5">
+            <div class="col-lg-8 col-xl-9">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="">
+                            <div class="f-carousel" id="myCarousel">
+                                <div class="f-carousel__slide"
+                                     data-thumb-src="@Data.ImageUrl">
+                                    <img width="640"
+                                         height="480"
+                                         alt=""
+                                         data-lazy-src="@Data.ImageUrl" />
+                                </div>
+                                @if (!String.IsNullOrEmpty(Data.ImagesJson))
+                                {
+                                    foreach (var item in Data.ImagesJson.Split(','))
+                                    {
+                                        if (Data.ImageUrl != item)
+                                        {
+                                            <div class="f-carousel__slide"
+                                                 data-thumb-src="@item">
+                                                <img width="640"
+                                                     height="480"
+                                                     alt=""
+                                                     data-lazy-src="@item" />
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <form method="post" name="product" action="@NodeSlug?buynow">
+                            @AntiForgery.GetHtml()
+                            <h3 class="fw-bold mb-3">@Data.Title</h3>
+                            <input type="hidden" value="@Data.Id" name="productidby" />
+                            <p class="mb-3">
+                                Danh mục:  @foreach (var item in Data.listcat.Split(',').Select((x, y) => new { x, y }))
+                                {
+                                    int idcheck = item.x.AsInt();
+                                    foreach (var item2 in Data.cat.EmptyIfNull().Where(x => x.Id == idcheck).Select((x, y) => new { x, y }))
+                                    {
+                                        var count = Data.listcat.Split(',').Count();
+                                        <text><a href="@item2.x.CategoryPath">@item2.x.Title</a>   @(item.y +1 == count ? "" : "/")   </text>
+                                    }
+                                }
+                            </p>
+
+                            <div class="d-flex mb-2">
+                                @if (Data.PromotionEnabled == true)
+                                {
+                                    <h5 class="fw-bold me-2">@Data.PromotionPrice.ToString("#,##0") đ</h5>
+                                    <h5 class="text-danger text-decoration-line-through">@Data.Price.ToString("#,##0") đ</h5>
+                                }
+                                else
+                                {
+                                    <h5 class="fw-bold me-2">@Data.Price.ToString("#,##0") đ</h5>
+                                }
+
+
+                            </div>
+
+                            <div class="d-flex mb-4">
+                                @if (Data.comnet != null)
+                                {
+                                    if (Data.comnet.Count() > 0)
+                                    {
+                                        var comments = Db.Table<PP_Comment>()
+                                      .Where(x => x.idproduct == Data.idnode && x.Status == "SUCCESS")
+                                      .ToArray();
+                                        int totalStars = comments.Sum(x => x.star);
+                                        int numberOfComments = comments.Length;
+                                        double averageStars = numberOfComments > 0 ? (double)totalStars / numberOfComments : 0;
+                                        int roundedAverageStars = (int)Math.Round(averageStars);
+                                        string formattedAverageStars = roundedAverageStars.ToString("F0");
+                                        <i class="fa fa-star @(roundedAverageStars >= 1 ?"text-secondary" : "")"></i>
+                                        <i class="fa fa-star @(roundedAverageStars >= 2 ?"text-secondary" : "")"></i>
+                                        <i class="fa fa-star @(roundedAverageStars >= 3 ?"text-secondary" : "")"></i>
+                                        <i class="fa fa-star @(roundedAverageStars >= 4 ?"text-secondary" : "")"></i>
+                                        <i class="fa fa-star @(roundedAverageStars >= 5 ?"text-secondary" : "")"></i>
+
+                                    }
+                                }
+
+
+                            </div>
+                            @Data.Summary
+                            <div class="input-group quantity mb-5" style="width: 100px;">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-sm btn-minus rounded-circle bg-light border">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" id="quantity" name="quantity" class="form-control form-control-sm text-center border-0" value="1" min="1">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-sm btn-plus rounded-circle bg-light border">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="d-flex ">
+                                    <a href="#" class="pro-details-buy-now btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary mx-2" id="buy-now">@Text["Buy Now", "Mua ngay"]</a>
+                                <a id="add-to-cart" data-product-id="@Data.Id" class="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary add-to-cart">
+                                    <i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="col-lg-12">
+                        <nav>
+                            <div class="nav nav-tabs mb-3">
+                                <button class="nav-link active border-white border-bottom-0" type="button" role="tab"
+                                        id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about"
+                                        aria-controls="nav-about" aria-selected="true">
+                                    Thông tin
+                                </button>
+                                @*<button class="nav-link border-white border-bottom-0" type="button" role="tab"
+                                        id="nav-mission-tab" data-bs-toggle="tab" data-bs-target="#nav-mission"
+                                        aria-controls="nav-mission" aria-selected="false">
+                                    Đánh giá
+                                </button>*@
+                            </div>
+                        </nav>
+                        <div class="tab-content mb-5">
+                            <div class="tab-pane active" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab">
+                                @Data.Des
+                            </div>
+                            <div class="tab-pane" id="nav-mission" role="tabpanel" aria-labelledby="nav-mission-tab">
+
+                                @foreach (var item in Data.comnet.EmptyIfNull())
+                                {
+
+                                    <div class="d-flex">
+                                        <img src="~/assets/img/avatar.jpg" class="img-fluid rounded-circle p-3" style="width: 100px; height: 100px;" alt="">
+                                        <div class="w-100"  >
+                                            <p class="mb-2" style="font-size: 14px;">@item.CreatedTime.ToString("dd/MM/yyyy")</p>
+                                            <div class="d-flex justify-content-between">
+                                                <h5>@item.Name</h5>
+                                                <div class="d-flex  mb-3">
+                                                    <i class="fa fa-star  @(item.star >= 1 ? "text-secondary" : "")"></i>
+                                                    <i class="fa fa-star  @(item.star >= 2 ? "text-secondary" : "")"></i>
+                                                    <i class="fa fa-star  @(item.star >= 3 ? "text-secondary" : "")"></i>
+                                                    <i class="fa fa-star  @(item.star >= 4 ? "text-secondary" : "")"></i>
+                                                    <i class="fa fa-star @(item.star >= 5? "text-secondary" : "")"></i>
+                                                </div>
+                                            </div>
+                                            <p>
+                                                @item.Comment
+                                            </p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <!--<form action="?commet" method="post" id="commet">
+                        <h4 class="mb-5 fw-bold">Bình luận</h4>
+                        <div class="row g-4">
+                            <div class="col-lg-6">
+                                <div class="border-bottom rounded">
+                                    <input type="text" id="name" name="@field.GetName(x=>x.Name)" class="form-control border-0 me-4" required placeholder="Họ và tên *">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="border-bottom rounded">
+                                    <input type="email" id="email" name="@field.GetName(x=>x.Email)" c class="form-control border-0" placeholder="Email *" required>
+                                </div>
+                            </div>-->
+                            @*<div class="col-lg-12">
+                                <div class="border-bottom rounded my-4">
+                                    <textarea id="subject" name="@field.GetName(x=>x.Comment)" c class="form-control border-0" cols="30" rows="8" placeholder="Bình luận *" spellcheck="false"></textarea>
+                                </div>
+                            </div>*@
+                            <!--<div class="col-lg-12">
+                                <div class="d-flex justify-content-between py-3 mb-5">
+                                    <div class="d-flex align-items-center">
+                                        <p class="mb-0 me-3">Đánh giá</p>
+                                        <div class="d-flex align-items-center" style="font-size: 12px;">
+                                            <i class="fa fa-star text-muted star" data-value="1"></i>
+                                            <i class="fa fa-star text-muted star" data-value="2"></i>
+                                            <i class="fa fa-star text-muted star" data-value="3"></i>
+                                            <i class="fa fa-star text-muted star" data-value="4"></i>
+                                            <i class="fa fa-star text-muted star" data-value="5"></i>
+                                        </div>
+                                        <input type="hidden" id="star" name="@field.GetName(x=>x.star)" />
+                                    </div>
+                                    <a href="#" class="btn border border-secondary text-primary commet-button rounded-pill px-4 py-3"> Bình luận</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>-->
+                </div>
+            </div>
+            <div class="col-lg-4 col-xl-3">
+                <div class="row g-4 fruite">
+                    <div class="col-lg-12 mb-2">
+                        <form class="input-group w-100 mx-auto d-flex" action="@Root.Config.Link.PageBlog" method="get">
+                            @AntiForgery.GetHtml()
+                            <input type="search" class="form-control p-3" name="keyword" placeholder="Tìm kiếm" value="@Request.QueryString["keyword"]" aria-describedby="search-icon-1">
+                            <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
+                        </form>
+                        <div class="mb-4 mt-3">
+                            <h4>Danh mục</h4>
+                            <ul class="list-unstyled fruite-categorie">
+                                @foreach (var item in Data.cat.EmptyIfNull().Where(x => x.CategoryLevel == 2).OrderByDescending(x => x.STT))
+                                {
+
+                                    var category = Db.GetOne<PP_Category>(t => t.CategoryPath == item.CategoryPath);
+                                    var arrCategory = Root.CategoryIndexes[category.Id].ToList();
+                                    var count = Data.count
+                                        .EmptyIfNull()
+                                        .Count(x => arrCategory.Contains(x.catid ?? 0));
+
+                                    <li>
+                                        <div class="d-flex justify-content-between fruite-name">
+                                            <a href="@item.CategoryPath"><i class="fas fa-bars me-2"></i>@item.Title</a>
+                                            <span>(@(count))</span>
+                                        </div>
+                                    </li>
+                                    foreach (var item3 in Data.cat.EmptyIfNull().Where(x => x.CategoryLevel == 3 && x.ParentId == item.Id))
+                                    {
+                                        var category2 = Db.GetOne<PP_Category>(t => t.CategoryPath == item3.CategoryPath);
+                                        var arrCategory2 = Root.CategoryIndexes[category2.Id].ToList();
+                                        var count2 = Data.count
+                                            .EmptyIfNull()
+                                            .Count(x => arrCategory2.Contains(x.catid ?? 0));
+                                        <li>
+                                            <div class="d-flex justify-content-between fruite-name">
+                                                <a href="@item3.CategoryPath" style="padding-left:10px;"><i class="fas fa-minus-circle me-2"></i> @item3.Title</a>
+                                                <span>(@(count2))</span>
+                                            </div>
+                                        </li>
+                                        foreach (var item4 in Data.cat.EmptyIfNull().Where(x => x.CategoryLevel == 4 && x.ParentId == item3.Id))
+                                        {
+                                            var category3 = Db.GetOne<PP_Category>(t => t.CategoryPath == item4.CategoryPath);
+                                            var arrCategory3 = Root.CategoryIndexes[category3.Id].ToList();
+                                            var count3 = Data.count
+                                                .EmptyIfNull()
+                                                .Count(x => arrCategory2.Contains(x.catid ?? 0));
+                                            <li>
+                                                <div class="d-flex justify-content-between fruite-name">
+                                                    <a href="@item4.CategoryPath" style="padding-left:10px;"><i class="fas fa-minus-circle me-2"></i> @item4.Title</a>
+                                                    <span>(@(count3))</span>
+                                                </div>
+                                            </li>
+                                        }
+                                    }
+
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <h4 class="mb-4">Sản phẩm liên quan</h4>
+                        @if (Data.RecentItems.Count() > 0)
+                        {
+                            foreach (var item in Data.RecentItems.EmptyIfNull().AsEnumerable().GroupBy(b => b.Title)
+.Select(g => g.OrderByDescending(b => b.CreatedTime).First())
+.OrderByDescending(b => b.CreatedTime)
+.ToArray().Take(3))
+                            {
+                                var idcheck = @item.idnode;
+                                <div class="row mb-2 p-0">
+                                    <div class="col-lg-12">
+                                        <div class="d-flex align-items-center justify-content-start">
+                                            <div class="rounded">
+                                                <a href="@item.Path"><img src="@item.ImageUrl" class="img-fluid rounded w-100" alt="Image"></a>
+                                            </div>
+                                            <div class="w-100 p-2">
+                                                <h6 class="limited-title mb-2" title="@item.Title">@item.Title</h6>
+                                                <div class="d-flex mb-2">
+
+                                                    @if (Data.commenheck.Where(x => x.idproduct != idcheck).Count() > 0)
+                                                    {
+                                                        var check = Data.commenheck.Where(x => x.idproduct == @item.idnode);
+                                                        var comments = Db.Table<PP_Comment>()
+                                                      .Where(x => x.idproduct == @item.idnode && x.Status == "SUCCESS")
+                                                      .ToArray();
+                                                        int totalStars = comments.Sum(x => x.star);
+                                                        int numberOfComments = comments.Length;
+                                                        double averageStars = numberOfComments > 0 ? (double)totalStars / numberOfComments : 0;
+                                                        int roundedAverageStars = (int)Math.Round(averageStars);
+                                                        string formattedAverageStars = roundedAverageStars.ToString("F0");
+                                                        <i class="fa fa-star @(roundedAverageStars >= 1 ?"text-secondary" : "")"></i>
+                                                        <i class="fa fa-star @(roundedAverageStars >= 2 ?"text-secondary" : "")"></i>
+                                                        <i class="fa fa-star @(roundedAverageStars >= 3 ?"text-secondary" : "")"></i>
+                                                        <i class="fa fa-star @(roundedAverageStars >= 4 ?"text-secondary" : "")"></i>
+                                                        <i class="fa fa-star @(roundedAverageStars >= 5 ?"text-secondary" : "")"></i>
+
+                                                    }
+                                                </div>
+                                                <div class="d-flex mb-2">
+                                                    @if (item.PromotionEnabled == true)
+                                                    {
+                                                        <h5 class="fw-bold me-2">@item.PromotionPrice.ToString("#,##0") đ</h5>
+                                                        <h5 class="text-danger text-decoration-line-through">@item.Price.ToString("#,##0") đ</h5>
+                                                    }
+                                                    else
+                                                    {
+                                                        <h5 class="fw-bold me-2">@item.Price.ToString("#,##0") đ</h5>
+                                                    }
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        <div class="d-flex justify-content-center my-4">
+                            <a href="@Data.CategoryPath" class="btn border border-secondary px-4 py-3 rounded-pill text-primary w-100">Xem thêm</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="position-relative">
+                            <img src="@Root.Config.BanerNew" class="img-fluid w-100 rounded" alt="banmer">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h1 class="fw-bold mb-3">Sản phẩm liên quan</h1>
+        <div class="vesitable">
+            <div class="owl-carousel vegetable-carousel justify-content-center">
+                @foreach (var item in Data.RecentItems.EmptyIfNull().Take(8))
+                {
+                    <div class="border border-primary rounded position-relative vesitable-item">
+                        <div class="vesitable-img">
+                            <a href="@item.Path"><img src="@item.ImageUrl" class="img-fluid rounded" alt="Image"></a>
+                        </div>
+
+                        <div class="p-4 pb-0 rounded-bottom">
+                            <h5 class="limited-title" title="@item.Title">@item.Title</h5>
+                            <h6 class="limited-text" style="color: #C0C0C0!important">@item.Summary</h6>
+                            <div class="pb-4">
+                                <p class="text-dark fs-5 fw-bold">@item.Price.ToString("#,##0") đ</p>
+                                <button class="btn product-action-cart   border border-secondary rounded-pill px-3 text-primary" data-product-id="@item.idnode" data-product-title="@item.Title"><i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script src="~/assets/js/carousel.thumbs.umd.js"></script>
+    <script src="~/assets/js/carousel.umd.js"></script>
+    <script>
+        new Carousel(document.getElementById("myCarousel"), {
+            Dots: false,
+            Thumbs: {
+                type: "classic",
+            },
+        }, { Thumbs });
+    </script>
+    <script>
+        document.querySelectorAll('.star').forEach(star => {
+            star.addEventListener('click', function () {
+                let rating = this.getAttribute('data-value');
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+
+                this.classList.add('selected');
+                let previousSiblings = getPreviousSiblings(this);
+                previousSiblings.forEach(sibling => sibling.classList.add('selected'));
+
+                console.log('Rating:', rating); // You can use this value for form submission or AJAX call
+            });
+
+            star.addEventListener('mouseover', function () {
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('hovered'));
+
+                this.classList.add('hovered');
+                let previousSiblings = getPreviousSiblings(this);
+                previousSiblings.forEach(sibling => sibling.classList.add('hovered'));
+            });
+
+            star.addEventListener('mouseout', function () {
+                document.querySelectorAll('.star').forEach(s => s.classList.remove('hovered'));
+            });
+        });
+
+        function getPreviousSiblings(element) {
+            let siblings = [];
+            while (element = element.previousElementSibling) {
+                siblings.push(element);
+            }
+            return siblings;
+        }
+    </script>
+    @*<script type="text/javascript">
+            $(document).ready(function () {
+                $(document).on("click", ".pro-details-size-content ul li a", function () {
+                    event.preventDefault();
+                    $(this).parent().siblings().each(function () {
+                        $(this).find("a").css("background-color", "#ffffff");
+                        $(this).find("a").css("color", "#828495");
+                    });
+                    $(this).css("background-color", "#cd071e");
+                    $(this).css("color", "#ffffff");
+                    $("#variation").val($(this).text());
+                    $("#alert").addClass("d-none");
+                });
+
+
+
+            });
+        </script>*@
+    <script>
+             $(document).on("click", ".pro-details-buy-now", function () {
+         event.preventDefault();
+
+         if ($('#variation').length)
+         {
+             var variation = $("#variation").val()
+             if (variation == "") {
+                 $("#alert").removeClass("d-none");
+                 return;
+             }
+         }
+
+         document.forms["product"].submit();
+     });
+
+  $(document).on("click", "#add-to-cart", function(event) {
+    event.preventDefault();
+
+    var productId = $(this).attr("data-product-id");
+    var variation = $("#variation").val();
+    var quantity = $("#quantity").val();
+
+    $.post("@Root.Config.Link.PageCart?add", {
+        "__RequestVerificationToken": "@Root.AntiForgeryTokenForAjaxPost()",
+        "productId": productId,
+        "variation": variation,
+        "quantity": quantity
+    }, function(data) {
+        $(".sidebar-cart-active").html(data);
+        $(".cart-count1").load(window.location.href + " .cart-count1");
+        $(".cart-count2").load(window.location.href + " .cart-count2");
+        $("#add-to-cart i").removeClass("spinner-border spinner-border-sm");
+        $("#add-to-cart i").addClass("icon-basket");
+        $.toast({
+            heading: 'Thông báo',
+            text: 'Giỏ hàng đã được cập nhật!',
+            position: 'bottom-center',
+            stack: false
+        });
+    }).fail(function() {
+        $.toast({
+            heading: 'ERROR',
+            text: 'Đã có lỗi xảy ra!',
+            position: 'bottom-center',
+            stack: false
+        });
+        $("#add-to-cart i").removeClass("spinner-border spinner-border-sm");
+        $("#add-to-cart i").addClass("icon-basket");
+    });
+});
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Đảm bảo rằng giá trị không nhỏ hơn 1 khi người dùng nhập
+            $('#quantity').on('input blur', function () {
+                var value = parseInt($(this).val(), 10);
+                if (isNaN(value) || value < 1) {
+                    $(this).val(1);
+                }
+            });
+
+
+        });
+    </script>
+}

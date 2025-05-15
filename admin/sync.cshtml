@@ -1,0 +1,7 @@
+﻿@inherits MyAdminPage
+@{
+    CheckAuthen()();
+    Db.PP.Delete<PP_Compt>(string.Empty);
+    ComponentSynchronizer.Run();
+    Response.Redirect(Constants.Admin_Url);
+}

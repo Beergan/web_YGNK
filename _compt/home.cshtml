@@ -1,0 +1,661 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(Type = ComptType.Page_Template,
+        ComptName = "en:Homepage template|vi:Mẫu trang chủ")]
+    public class ViewModel
+    {
+        public string Title { get; set; }
+
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+        public string CategoryPath { get; set; }
+
+        public VM_Product[] Items { get; set; }
+        public VM_Product[] count { get; set; }
+        public VM_Product[] RecentItems { get; set; }
+        public PP_Category[] cat { get; set; }
+        public PP_Comment[] comnet { get; set; }
+
+
+
+        public static ViewModel Default => new ViewModel()
+        {
+            Title = "Trang chủ",
+
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+
+    private FieldExtractor<PP_Register> field = new FieldExtractor<PP_Register>();
+    private PP_Register model = new PP_Register() { Status = "NEW" };
+}
+
+@{
+    var query = Request.Url.Query;
+
+    if (IsPost && query == "?register")
+    {
+        new Func<Action>(() =>
+        {
+            try
+            {
+                AntiForgery.Validate();
+                string captcha = Request.Form[nameof(captcha)].ToLower();
+                Validation.RequireField(field.GetName(t => t.Email));
+                Validation.Add(field.GetName(t => t.Email), Validator.Regex("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"));
+                if (!Validation.IsValid())
+                {
+                    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
+                }
+
+                if (captcha != this.Context.Session["CaptchaVerify"].ToString())
+                {
+                    return AjaxResult.BadRequest("Capcha không hợp lệ!");
+                }
+
+                var model = new PP_Register() { Status = "NEW" };
+                model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+                model.ProcessNote = Request.Form[field.GetName(t => t.ProcessNote)].NullIfWhiteSpace();
+
+                model.ProcessNote = "Chưa xử lý";
+                Db.Insert<PP_Register>(model);
+
+                Response.Write("Cám ơn bạn đã gửi thông tin, chúng tôi sẽ phản hồi cho bạn sớm nhất có thể!");
+                return () => Response.End();
+            }
+            catch (Exception ex)
+            {
+                return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
+            }
+        })()();
+    }
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        var page = Db.GetOne<PP_Page>(PageId);
+
+
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+
+        return model;
+    });
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+    Page.IndexPageRunning = true;
+}
+<div class="page_content_wrap">
+    <div class="content_wrap_fullscreen">
+
+
+        <div class="content">
+            <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
+            <div data-elementor-type="wp-page" data-elementor-id="3438" class="elementor elementor-3438" data-elementor-post-type="page">
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-492ba97 elementor-section-full_width scheme_dark elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="492ba97" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                    <div class="elementor-container elementor-column-gap-no">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-c7640a4 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="c7640a4" data-element_type="column">
+                            <div class="elementor-widget-wrap">
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-d9ea2cf elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="d9ea2cf" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-0021518 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="0021518" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-5cb19dc sc_height_large sc_fly_static elementor-widget elementor-widget-spacer" data-id="5cb19dc" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-70f3c9a sc_height_medium sc_fly_static elementor-widget elementor-widget-spacer" data-id="70f3c9a" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-68324f6 elementor-section-full_width sc_layouts_hide_on_wide sc_layouts_hide_on_desktop sc_layouts_hide_on_notebook sc_layouts_hide_on_tablet elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="68324f6" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-acf9470 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="acf9470" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-7d66aaf sc_fly_static elementor-widget elementor-widget-image" data-id="7d66aaf" data-element_type="widget" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img fetchpriority="high" decoding="async" width="1500" height="1500" src="wp-content/uploads/2025/02/v2025.png" class="attachment-full size-full wp-image-3864" alt="" srcset="wp-content/uploads/2025/02/v2025.png 1500w, wp-content/uploads/2025/02/v2025-300x300.png 300w, wp-content/uploads/2025/02/v2025-1024x1024.png 1024w, wp-content/uploads/2025/02/v2025-150x150.png 150w, wp-content/uploads/2025/02/v2025-768x768.png 768w, wp-content/uploads/2025/02/v2025-370x370.png 370w, wp-content/uploads/2025/02/v2025-120x120.png 120w, wp-content/uploads/2025/02/v2025-840x840.png 840w, wp-content/uploads/2025/02/v2025-410x410.png 410w" sizes="(max-width: 1500px) 100vw, 1500px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-d266854 elementor-section-full_width elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="d266854" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-6cf7f75 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="6cf7f75" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-de0582e sc_layouts_hide_on_mobile sc_fly_static elementor-widget elementor-widget-image" data-id="de0582e" data-element_type="widget" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img decoding="async" width="1640" height="624" src="wp-content/uploads/2025/02/2-Banner2025.png" class="attachment-full size-full wp-image-3860" alt="" srcset="wp-content/uploads/2025/02/2-Banner2025.png 1640w, wp-content/uploads/2025/02/2-Banner2025-300x114.png 300w, wp-content/uploads/2025/02/2-Banner2025-1024x390.png 1024w, wp-content/uploads/2025/02/2-Banner2025-768x292.png 768w, wp-content/uploads/2025/02/2-Banner2025-1536x584.png 1536w, wp-content/uploads/2025/02/2-Banner2025-370x141.png 370w, wp-content/uploads/2025/02/2-Banner2025-840x320.png 840w, wp-content/uploads/2025/02/2-Banner2025-410x156.png 410w" sizes="(max-width: 1640px) 100vw, 1640px">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-b660cbb elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="b660cbb" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-d7b9a3b sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="d7b9a3b" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-82580bf sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="82580bf" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-6ba8477 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle sc_gradient_animation_none sc_fly_static" data-id="6ba8477" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-a26d4e7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="a26d4e7" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-4a5479a sc_fly_static elementor-widget elementor-widget-heading" data-id="4a5479a" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h3 class="elementor-heading-title elementor-size-default">TIN NỔI BẬT</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-16dd839 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="16dd839" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                    <div class="elementor-container elementor-column-gap-default">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-0eaaa40 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="0eaaa40" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-9746bf0 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="9746bf0" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-a80745d sc_fly_static elementor-widget elementor-widget-trx_widget_slider" data-id="a80745d" data-element_type="widget" data-widget_type="trx_widget_slider.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="widget_area sc_widget_slider">
+                                            <aside class="widget widget_slider">
+                                                <div class="slider_wrap slider_engine_swiper">
+                                                    <div class="slider_outer slider_swiper_outer slider_style_default slider_source_posts_post slider_outer_direction_horizontal slider_outer_multi slider_outer_nopagination slider_outer_controls slider_outer_controls_bottom slider_outer_nocentered slider_outer_overflow_hidden slider_outer_titles_center slider_outer_height_auto"><div class="slider_container slider_swiper swiper-slider-container slider_direction_horizontal slider_nopagination slider_multi slider_type_images slider_controls slider_controls_bottom slider_nocentered slider_overflow_hidden slider_titles_center slider_resize slider_swipe slider_height_auto" data-ratio="1200:800" data-interval="7000" data-speed="600" data-effect="slide" data-pagination="bullets" data-direction="horizontal" data-slides-per-view="2" data-slides-space="50" data-slides-parallax="0" data-slides-centered="0" data-slides-overflow="0" data-mouse-wheel="0" data-autoplay="1" data-loop="1" data-free-mode="0" data-slides-min-width="220" data-slides-per-view-breakpoints="{&quot;999999&quot;:2}" data-slides-space-breakpoints="{&quot;999999&quot;:&quot;50&quot;}"><div class="slider-wrapper swiper-wrapper"><div class="slider-slide swiper-slide with_titles" data-title="Gửi hàng từ Hàn Quốc về Việt Nam giá rẻ nhất – Giải pháp tối ưu cùng NHB Logistics" style=""><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="gui-hang-tu-han-quoc-ve-viet-nam-gia-re-nhat/index.htm">Gửi hàng từ Hàn Quốc về Việt Nam giá rẻ nhất – Giải pháp tối ưu cùng NHB Logistics</a></h3><div class="slide_number">01</div></div><a href="gui-hang-tu-han-quoc-ve-viet-nam-gia-re-nhat/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/05/muagiosanbay.jpg" data-title="Mua Gì Ở Sân Bay Hàn Quốc? Gợi Ý Những Món Quà Ý Nghĩa &#038; Đáng Tiền Không Nên Bỏ Qua" style=""><img decoding="async" src="wp-content/uploads/2025/05/muagiosanbay.jpg" alt="Mua Gì Ở Sân Bay Hàn Quốc? Gợi Ý Những Món Quà Ý Nghĩa &#038; Đáng Tiền Không Nên Bỏ Qua"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="mua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia/index.htm">Mua Gì Ở Sân Bay Hàn Quốc? Gợi Ý Những Món Quà Ý Nghĩa &#038; Đáng Tiền Không Nên Bỏ Qua</a></h3><div class="slide_number">02</div></div><a href="mua-gi-o-san-bay-han-quoc-goi-y-nhung-mon-qua-y-nghia/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/05/DAT-MUA.jpg" data-title="Đặt mỹ phẩm Hàn Quốc chính hãng về Việt Nam nhanh chóng" style=""><img decoding="async" src="wp-content/uploads/2025/05/DAT-MUA.jpg" alt="Đặt mỹ phẩm Hàn Quốc chính hãng về Việt Nam nhanh chóng"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="dat-my-pham-han-quoc-chinh-hang-ve-viet-nam/index.htm">Đặt mỹ phẩm Hàn Quốc chính hãng về Việt Nam nhanh chóng</a></h3><div class="slide_number">03</div></div><a href="dat-my-pham-han-quoc-chinh-hang-ve-viet-nam/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/www.nhblogistics.com-1.jpg" data-title="DỊCH VỤ MUA HỘ HÀNG ONLINE TẠI HÀN QUỐC UY TÍN, NHANH CHÓNG" style=""><img decoding="async" src="wp-content/uploads/2025/04/www.nhblogistics.com-1.jpg" alt="DỊCH VỤ MUA HỘ HÀNG ONLINE TẠI HÀN QUỐC UY TÍN, NHANH CHÓNG"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="dich-vu-mua-ho-hang-online-tai-han-quoc-uy-tin-nhanh-chong-cung-nhblogistics/index.htm">DỊCH VỤ MUA HỘ HÀNG ONLINE TẠI HÀN QUỐC UY TÍN, NHANH CHÓNG</a></h3><div class="slide_number">04</div></div><a href="dich-vu-mua-ho-hang-online-tai-han-quoc-uy-tin-nhanh-chong-cung-nhblogistics/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/Untitled-1-1.jpg" data-title="Công Ty Mua Hộ Hàng Hàn Quốc Uy Tín, Nhanh Chóng Và Chuyên Nghiệp" style=""><img decoding="async" src="wp-content/uploads/2025/04/Untitled-1-1.jpg" alt="Công Ty Mua Hộ Hàng Hàn Quốc Uy Tín, Nhanh Chóng Và Chuyên Nghiệp"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="cong-ty-mua-ho-hang-han-quoc-uy-tin-nhanh-chong-va-chuyen-nghiep/index.htm">Công Ty Mua Hộ Hàng Hàn Quốc Uy Tín, Nhanh Chóng Và Chuyên Nghiệp</a></h3><div class="slide_number">05</div></div><a href="cong-ty-mua-ho-hang-han-quoc-uy-tin-nhanh-chong-va-chuyen-nghiep/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/1200.jpg" data-title="Gửi Hàng Bằng Tàu Biển Từ Hàn Quốc: Lựa Chọn Tối Ưu Cho Vận Chuyển Quốc Tế" style=""><img decoding="async" src="wp-content/uploads/2025/04/1200.jpg" alt="Gửi Hàng Bằng Tàu Biển Từ Hàn Quốc: Lựa Chọn Tối Ưu Cho Vận Chuyển Quốc Tế"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="gui-hang-bang-tau-bien-tu-han-quoc-lua-chon-toi-uu-cho-van-chuyen-quoc-te/index.htm">Gửi Hàng Bằng Tàu Biển Từ Hàn Quốc: Lựa Chọn Tối Ưu Cho Vận Chuyển Quốc Tế</a></h3><div class="slide_number">06</div></div><a href="gui-hang-bang-tau-bien-tu-han-quoc-lua-chon-toi-uu-cho-van-chuyen-quoc-te/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/NHB-LOGISTICS-1.jpg" data-title="GIÁ CƯỚC VẬN CHUYỂN ĐƯỜNG BIỂN MỚI NHẤT 2025: CẨM NANG CHI TIẾT CHO DOANH NGHIỆP VÀ CÁ NHÂN" style=""><img decoding="async" src="wp-content/uploads/2025/04/NHB-LOGISTICS-1.jpg" alt="GIÁ CƯỚC VẬN CHUYỂN ĐƯỜNG BIỂN MỚI NHẤT 2025: CẨM NANG CHI TIẾT CHO DOANH NGHIỆP VÀ CÁ NHÂN"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="gia-cuoc-van-chuyen-duong-bien-moi-nhat-2025/index.htm">GIÁ CƯỚC VẬN CHUYỂN ĐƯỜNG BIỂN MỚI NHẤT 2025: CẨM NANG CHI TIẾT CHO DOANH NGHIỆP VÀ CÁ NHÂN</a></h3><div class="slide_number">07</div></div><a href="gia-cuoc-van-chuyen-duong-bien-moi-nhat-2025/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/Untitled-1.jpg" data-title="Top 10 Công Ty Vận Tải Biển Hàn Việt Uy Tín Nhất Hiện Nay" style=""><img decoding="async" src="wp-content/uploads/2025/04/Untitled-1.jpg" alt="Top 10 Công Ty Vận Tải Biển Hàn Việt Uy Tín Nhất Hiện Nay"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="top-10-cong-ty-van-tai-bien-han-viet-uy-tin-nhat-hien-nay/index.htm">Top 10 Công Ty Vận Tải Biển Hàn Việt Uy Tín Nhất Hiện Nay</a></h3><div class="slide_number">08</div></div><a href="top-10-cong-ty-van-tai-bien-han-viet-uy-tin-nhat-hien-nay/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/2-NHB-LOGISTICS.jpg" data-title="Công Ty Chở Hàng Biển Uy Tín Hiện Nay – Giải Pháp Vận Tải Hàng Hóa An Toàn, Tiết Kiệm và Chuyên Nghiệp" style=""><img decoding="async" src="wp-content/uploads/2025/04/2-NHB-LOGISTICS.jpg" alt="Công Ty Chở Hàng Biển Uy Tín Hiện Nay – Giải Pháp Vận Tải Hàng Hóa An Toàn, Tiết Kiệm và Chuyên Nghiệp"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="cong-ty-cho-hang-bien-uy-tin-hien-nay-giai-phap-van-tai-hang-hoa-an-toan-tiet-kiem-va-chuyen-nghiep/index.htm">Công Ty Chở Hàng Biển Uy Tín Hiện Nay – Giải Pháp Vận Tải Hàng Hóa An Toàn, Tiết Kiệm và Chuyên Nghiệp</a></h3><div class="slide_number">09</div></div><a href="cong-ty-cho-hang-bien-uy-tin-hien-nay-giai-phap-van-tai-hang-hoa-an-toan-tiet-kiem-va-chuyen-nghiep/index.htm" class="slide_link"></a></div><div class="slider-slide swiper-slide with_titles" data-image="https://nhblogistics.com/wp-content/uploads/2025/04/duong-bien.jpg" data-title="DỊCH VỤ CHỞ HÀNG BẰNG ĐƯỜNG BIỂN TỪ HÀN QUỐC VỀ VIỆT NAM &#8211; NHBLOGISTICS" style=""><img decoding="async" src="wp-content/uploads/2025/04/duong-bien.jpg" alt="DỊCH VỤ CHỞ HÀNG BẰNG ĐƯỜNG BIỂN TỪ HÀN QUỐC VỀ VIỆT NAM &#8211; NHBLOGISTICS"><div class="slide_overlay slide_overlay_small"></div><div class="slide_info slide_info_small"><h3 class="slide_title"><a href="dich-vu-cho-hang-bang-duong-bien-tu-han-quoc-ve-viet-nam-nhblogistics/index.htm">DỊCH VỤ CHỞ HÀNG BẰNG ĐƯỜNG BIỂN TỪ HÀN QUỐC VỀ VIỆT NAM &#8211; NHBLOGISTICS</a></h3><div class="slide_number">10</div></div><a href="dich-vu-cho-hang-bang-duong-bien-tu-han-quoc-ve-viet-nam-nhblogistics/index.htm" class="slide_link"></a></div></div></div><div class="slider_controls_wrap slider_arrows_wrap"><a class="slider_prev slider_arrow_default swiper-button-prev" href="#"></a><a class="slider_next slider_arrow_default swiper-button-next" href="#"></a></div></div>
+                                                </div>
+                                            </aside>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-c5a2ddd elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="c5a2ddd" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-fc07cb7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="fc07cb7" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-94e1dda sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="94e1dda" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-ac7f82a elementor-section-full_width elementor-section-height-min-height elementor-section-items-stretch elementor-section-height-default sc_gradient_animation_none sc_fly_static" data-id="ac7f82a" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+                    <div class="elementor-container elementor-column-gap-default">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-66d80ed sc_content_align_inherit sc_layouts_column_icons_position_left sc_gradient_animation_none sc_fly_static" data-id="66d80ed" data-element_type="column" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-9befc53 elementor-headline--style-rotate sc_fly_static elementor-widget elementor-widget-animated-headline" data-id="9befc53" data-element_type="widget" data-settings="{&quot;headline_style&quot;:&quot;rotate&quot;,&quot;animation_type&quot;:&quot;wave&quot;,&quot;rotating_text&quot;:&quot;UY T\u00cdN\nCHUY\u00caN NGHI\u1ec6P\nGIAO NHANH&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;rotate_iteration_delay&quot;:2500}" data-widget_type="animated-headline.default">
+                                    <div class="elementor-widget-container">
+                                        <h6 class="elementor-headline elementor-headline-animation-type-wave elementor-headline-letters">
+                                            <span class="elementor-headline-plain-text elementor-headline-text-wrapper">NHB LOGICTICS</span>
+                                            <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
+                                                <span class="elementor-headline-dynamic-text elementor-headline-text-active">
+                                                    UY&nbsp;TÍN
+                                                </span>
+                                                <span class="elementor-headline-dynamic-text">
+                                                    CHUYÊN&nbsp;NGHIỆP
+                                                </span>
+                                                <span class="elementor-headline-dynamic-text">
+                                                    GIAO&nbsp;NHANH
+                                                </span>
+                                            </span>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-c9f9bb1 scheme_light elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="c9f9bb1" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-ef61294 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="ef61294" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-d6c3dd0 sc_height_small sc_fly_static elementor-widget elementor-widget-spacer" data-id="d6c3dd0" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <section class="elementor-section elementor-inner-section elementor-element elementor-element-2a37976 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="2a37976" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                                    <div class="elementor-container elementor-column-gap-no">
+                                        <div class="elementor-column elementor-col-100 elementor-inner-column elementor-element elementor-element-877debb sc_content_align_inherit sc_layouts_column_icons_position_left sc_gradient_animation_none sc_fly_static" data-id="877debb" data-element_type="column" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+                                            <div class="elementor-widget-wrap elementor-element-populated">
+                                                <div data-animation-type="sequental" data-animation-stagger="" class="elementor-element elementor-element-875f625 animation_type_sequental sc_fly_static elementor-invisible elementor-widget elementor-widget-trx_sc_icons" data-id="875f625" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;globallogistics-fadeinup&quot;,&quot;_animation_delay&quot;:100}" data-widget_type="trx_sc_icons.default">
+                                                    <div class="elementor-widget-container">
+                                                        <div class="sc_icons sc_icons_default sc_icons_size_small sc_align_center">
+                                                            <div class="sc_icons_columns_wrap sc_item_columns trx_addons_columns_wrap columns_padding_bottom columns_in_single_row">
+                                                                <div class="trx_addons_column-1_4 trx_addons_column-1_2-tablet">
+                                                                    <div class="sc_icons_item sc_icons_item_linked with_more">
+                                                                        <div class="sc_icons_icon sc_icon_type_ icon-dollar"><span class="sc_icon_type_ icon-dollar"></span></div><div class="sc_icons_item_details">
+                                                                            <h4 class="sc_icons_item_title" style="color:#FF0000;">
+                                                                                <a href="bang-gia/index.htm">
+                                                                                    Bảng giá vận chuyển
+                                                                                </a>
+                                                                            </h4><div class="sc_icons_item_description" style="color:#000000;"><span>Bảng giá vận chuyển 2 chiều: Hàn Quốc - Việt Nam, và ngược lại</span></div><a href="bang-gia/index.htm" class="sc_icons_item_more_link">
+                                                                                <span class="link_text">Xem chi tiết</span><span class="link_icon"></span>
+                                                                            </a><a href="bang-gia/index.htm" class="sc_icons_item_link">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div><div class="trx_addons_column-1_4 trx_addons_column-1_2-tablet">
+                                                                    <div class="sc_icons_item sc_icons_item_linked with_more">
+                                                                        <div class="sc_icons_icon sc_icon_type_ icon-delivery"><span class="sc_icon_type_ icon-delivery"></span></div><div class="sc_icons_item_details">
+                                                                            <h4 class="sc_icons_item_title" style="color:#FF0000;">
+                                                                                <a href="gui-yeu-cau-van-chuyen-hang-va-nhan-bao-gia/index.htm">
+                                                                                    Gửi yêu cầu vận chuyển
+                                                                                </a>
+                                                                            </h4><div class="sc_icons_item_description" style="color:#000000;"><span>Quý khách gửi yêu cầu vận chuyển hàng hóa tại đây</span></div><a href="gui-yeu-cau-van-chuyen-hang-va-nhan-bao-gia/index.htm" class="sc_icons_item_more_link">
+                                                                                <span class="link_text">Đặt ngay</span><span class="link_icon"></span>
+                                                                            </a><a href="gui-yeu-cau-van-chuyen-hang-va-nhan-bao-gia/index.htm" class="sc_icons_item_link">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div><div class="trx_addons_column-1_4 trx_addons_column-1_2-tablet">
+                                                                    <div class="sc_icons_item sc_icons_item_linked with_more">
+                                                                        <div class="sc_icons_icon sc_icon_type_ icon-cart-1"><span class="sc_icon_type_ icon-cart-1"></span></div><div class="sc_icons_item_details">
+                                                                            <h4 class="sc_icons_item_title" style="color:#FF0000;">
+                                                                                <a href="dich-vu-mua-ho-hang-hoa-tu-han-quoc-gui-ve-viet-nam/index.htm">
+                                                                                    Dịch vụ mua hộ
+                                                                                </a>
+                                                                            </h4><div class="sc_icons_item_description" style="color:#000000;"><span>Mua hộ tất cả các loại hàng hóa từ Hàn Quốc về Việt Nam</span></div><a href="dich-vu-mua-ho-hang-hoa-tu-han-quoc-gui-ve-viet-nam/index.htm" class="sc_icons_item_more_link">
+                                                                                <span class="link_text">Order ngay</span><span class="link_icon"></span>
+                                                                            </a><a href="dich-vu-mua-ho-hang-hoa-tu-han-quoc-gui-ve-viet-nam/index.htm" class="sc_icons_item_link">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div><div class="trx_addons_column-1_4 trx_addons_column-1_2-tablet">
+                                                                    <div class="sc_icons_item sc_icons_item_linked with_more">
+                                                                        <div class="sc_icons_icon sc_icon_type_ icon-search-light"><span class="sc_icon_type_ icon-search-light"></span></div><div class="sc_icons_item_details">
+                                                                            <h4 class="sc_icons_item_title" style="color:#FF0000;">
+                                                                                <a href="tra-cuu-don-hang/index.htm">
+                                                                                    Tra cứu đơn hàng
+                                                                                </a>
+                                                                            </h4><div class="sc_icons_item_description" style="color:#000000;"><span>Tra cứu thông tin đơn hàng nhanh chóng</span></div><a href="tra-cuu-don-hang/index.htm" class="sc_icons_item_more_link">
+                                                                                <span class="link_text">Tra cứu tại đây</span><span class="link_icon"></span>
+                                                                            </a><a href="tra-cuu-don-hang/index.htm" class="sc_icons_item_link">
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div><!-- /.sc_icons -->
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                                <div class="elementor-element elementor-element-b996017 sc_height_small sc_fly_static elementor-widget elementor-widget-spacer" data-id="b996017" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-de77fd8 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="de77fd8" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-efa40fa sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="efa40fa" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-2c91ad1 sc_fly_static elementor-widget elementor-widget-spacer" data-id="2c91ad1" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-fe8f0ad sc_fly_static elementor-widget elementor-widget-heading" data-id="fe8f0ad" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h4 class="elementor-heading-title elementor-size-default">CÁC LOẠI HÀNG VẬN CHUYỂN</h4>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-195e87d sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="195e87d" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section data-animation-type="block" class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static elementor-invisible" data-id="9f06a26" data-element_type="section" data-settings="{&quot;animation&quot;:&quot;fadeIn&quot;}">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-01ef7ff sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="01ef7ff" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-b6ce253 sc_fly_static elementor-widget elementor-widget-image" data-id="b6ce253" data-element_type="widget" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img loading="lazy" decoding="async" width="800" height="800" src="wp-content/uploads/2025/01/1.jpg" class="attachment-large size-large wp-image-3750" alt="" srcset="wp-content/uploads/2025/01/1.jpg 800w, wp-content/uploads/2025/01/1-300x300.jpg 300w, wp-content/uploads/2025/01/1-150x150.jpg 150w, wp-content/uploads/2025/01/1-768x768.jpg 768w, wp-content/uploads/2025/01/1-370x370.jpg 370w, wp-content/uploads/2025/01/1-120x120.jpg 120w, wp-content/uploads/2025/01/1-410x410.jpg 410w" sizes="(max-width: 800px) 100vw, 800px">
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-4afb122 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="4afb122" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-252b6f9 sc_fly_static elementor-widget elementor-widget-heading" data-id="252b6f9" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h6 class="elementor-heading-title elementor-size-default">Giấy tờ, tài liệu, bưu phẩm, hợp đồng,....</h6>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-7a739c4 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="7a739c4" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-5450605 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="5450605" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-450c1ed sc_fly_static elementor-widget elementor-widget-image" data-id="450c1ed" data-element_type="widget" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img loading="lazy" decoding="async" width="800" height="800" src="wp-content/uploads/2025/01/2.jpg" class="attachment-large size-large wp-image-3751" alt="" srcset="wp-content/uploads/2025/01/2.jpg 800w, wp-content/uploads/2025/01/2-300x300.jpg 300w, wp-content/uploads/2025/01/2-150x150.jpg 150w, wp-content/uploads/2025/01/2-768x768.jpg 768w, wp-content/uploads/2025/01/2-370x370.jpg 370w, wp-content/uploads/2025/01/2-120x120.jpg 120w, wp-content/uploads/2025/01/2-410x410.jpg 410w" sizes="(max-width: 800px) 100vw, 800px">
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-2b371f9 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="2b371f9" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-c751fa2 sc_fly_static elementor-widget elementor-widget-heading" data-id="c751fa2" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h6 class="elementor-heading-title elementor-size-default">Mỹ phẩm, nước hoa, sâm nấm,  đồ khô, đặc sản, đồ mỹ nghệ,....</h6>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-15e789f sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="15e789f" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-8f13280 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="8f13280" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-10f2288 sc_fly_static elementor-widget elementor-widget-image" data-id="10f2288" data-element_type="widget" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img loading="lazy" decoding="async" width="800" height="800" src="wp-content/uploads/2025/01/4.jpg" class="attachment-large size-large wp-image-3753" alt="" srcset="wp-content/uploads/2025/01/4.jpg 800w, wp-content/uploads/2025/01/4-300x300.jpg 300w, wp-content/uploads/2025/01/4-150x150.jpg 150w, wp-content/uploads/2025/01/4-768x768.jpg 768w, wp-content/uploads/2025/01/4-370x370.jpg 370w, wp-content/uploads/2025/01/4-120x120.jpg 120w, wp-content/uploads/2025/01/4-410x410.jpg 410w" sizes="(max-width: 800px) 100vw, 800px">
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-e77de87 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="e77de87" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-43face3 sc_fly_static elementor-widget elementor-widget-heading" data-id="43face3" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h6 class="elementor-heading-title elementor-size-default">Đồ cao cấp như điện thoại, máy tính bảng, đồ điện tử,...</h6>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-d809843 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="d809843" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="elementor-column elementor-col-25 elementor-top-column elementor-element elementor-element-d162f62 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="d162f62" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div data-animation-type="block" class="elementor-element elementor-element-d392414 animation_type_block sc_fly_static elementor-invisible elementor-widget elementor-widget-image" data-id="d392414" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;bounceIn&quot;}" data-widget_type="image.default">
+                                    <div class="elementor-widget-container">
+                                        <img loading="lazy" decoding="async" width="800" height="800" src="wp-content/uploads/2025/01/3.jpg" class="attachment-large size-large wp-image-3752" alt="" srcset="wp-content/uploads/2025/01/3.jpg 800w, wp-content/uploads/2025/01/3-300x300.jpg 300w, wp-content/uploads/2025/01/3-150x150.jpg 150w, wp-content/uploads/2025/01/3-768x768.jpg 768w, wp-content/uploads/2025/01/3-370x370.jpg 370w, wp-content/uploads/2025/01/3-120x120.jpg 120w, wp-content/uploads/2025/01/3-410x410.jpg 410w" sizes="(max-width: 800px) 100vw, 800px">
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-42470a2 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="42470a2" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-77a4012 sc_fly_static elementor-widget elementor-widget-heading" data-id="77a4012" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h6 class="elementor-heading-title elementor-size-default">
+                                            Các loại hàng cồng kềnh, dễ vỡ, khó vận chuyển
+                                        </h6>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-5cd0e4c sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="5cd0e4c" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-d1728d9 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="d1728d9" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-4f76e3d sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="4f76e3d" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-1fb5a77 sc_height_small sc_fly_static elementor-widget elementor-widget-spacer" data-id="1fb5a77" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-3b7a937 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle sc_fly_static" data-id="3b7a937" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-1edc3fc sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="1edc3fc" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-22859b7 sc_fly_static elementor-widget elementor-widget-heading" data-id="22859b7" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h3 class="elementor-heading-title elementor-size-default">ĐÁNH GIÁ CỦA KHÁCH HÀNG</h3>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-97a0cbe sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="97a0cbe" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="elementor-element elementor-element-0f19b32 elementor-arrows-yes elementor-pagination-type-bullets elementor-review--has-separator elementor--star-style-star_fontawesome sc_fly_static elementor-widget elementor-widget-reviews" data-id="0f19b32" data-element_type="widget" data-settings="{&quot;show_arrows&quot;:&quot;yes&quot;,&quot;pagination&quot;:&quot;bullets&quot;,&quot;speed&quot;:500,&quot;autoplay&quot;:&quot;yes&quot;,&quot;autoplay_speed&quot;:5000,&quot;loop&quot;:&quot;yes&quot;,&quot;pause_on_hover&quot;:&quot;yes&quot;,&quot;pause_on_interaction&quot;:&quot;yes&quot;,&quot;space_between&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]}}" data-widget_type="reviews.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-swiper">
+                                            <div class="elementor-main-swiper swiper" role="region" aria-roledescription="carousel" aria-label="Slides">
+                                                <div class="swiper-wrapper">
+                                                    <div class="swiper-slide" role="group" aria-roledescription="slide">
+                                                        <div class="elementor-testimonial elementor-repeater-item-6b985f7">
+                                                            <div class="elementor-testimonial__header">
+                                                                <div class="elementor-testimonial__image">
+                                                                    <img decoding="async" src="wp-content/uploads/2025/01/a.jpg" alt="Tuấn Khải">
+                                                                </div>
+                                                                <cite class="elementor-testimonial__cite"><span class="elementor-testimonial__name">Tuấn Khải</span><div class="elementor-star-rating"><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i></div><span class="elementor-testimonial__title">tuankhai2022</span></cite>					<div class="elementor-testimonial__icon elementor-icon elementor-icon-facebook" aria-label="Read More"><i aria-hidden="true" class="fab fa-facebook"></i></div>
+                                                            </div>
+                                                            <div class="elementor-testimonial__content">
+                                                                <div class="elementor-testimonial__text">
+                                                                    Mình du học và làm việc tại Seoul, mình thường xuyên sử dụng dịch vụ vận chuyển của NHB Logictics để gửi và nhận đồ về Việt Nam. NHB Logictics rất chuyên  nghiệp và vận chuyển nhanh chóng, mình rất yên tâm.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide" role="group" aria-roledescription="slide">
+                                                        <div class="elementor-testimonial elementor-repeater-item-203cf88">
+                                                            <div class="elementor-testimonial__header">
+                                                                <div class="elementor-testimonial__image">
+                                                                    <img decoding="async" src="wp-content/uploads/2025/01/b.jpg" alt="Lê Hải Văn">
+                                                                </div>
+                                                                <cite class="elementor-testimonial__cite"><span class="elementor-testimonial__name">Lê Hải Văn</span><div class="elementor-star-rating"><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i></div><span class="elementor-testimonial__title">levan1998</span></cite>					<div class="elementor-testimonial__icon elementor-icon elementor-icon-facebook" aria-label="Read More"><i aria-hidden="true" class="fab fa-facebook"></i></div>
+                                                            </div>
+                                                            <div class="elementor-testimonial__content">
+                                                                <div class="elementor-testimonial__text">
+                                                                    Mình vừa qua Hàn Quốc được 1 năm và thường xuyên nhận hàng hóa từ nhà gửi sang. Mình rất hài lòng về dịch vụ của NHB Logictics.
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="swiper-slide" role="group" aria-roledescription="slide">
+                                                        <div class="elementor-testimonial elementor-repeater-item-2ce968c">
+                                                            <div class="elementor-testimonial__header">
+                                                                <div class="elementor-testimonial__image">
+                                                                    <img decoding="async" src="wp-content/uploads/2025/01/c.jpg" alt="Nguyễn Thị Thương">
+                                                                </div>
+                                                                <cite class="elementor-testimonial__cite"><span class="elementor-testimonial__name">Nguyễn Thị Thương</span><div class="elementor-star-rating"><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i><i class="elementor-star-full">&#xE934;</i></div><span class="elementor-testimonial__title">thuonglun</span></cite>					<div class="elementor-testimonial__icon elementor-icon elementor-icon-facebook" aria-label="Read More"><i aria-hidden="true" class="fab fa-facebook"></i></div>
+                                                            </div>
+                                                            <div class="elementor-testimonial__content">
+                                                                <div class="elementor-testimonial__text">
+                                                                    Được bạn bè giới thiệu nên biết tới NHB Logictics. Đánh giá 5* ạ
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="swiper-pagination"></div>
+                                                <div class="elementor-swiper-button elementor-swiper-button-prev" role="button" tabindex="0" aria-label="Previous">
+                                                    <i aria-hidden="true" class="eicon-chevron-left"></i>
+                                                </div>
+                                                <div class="elementor-swiper-button elementor-swiper-button-next" role="button" tabindex="0" aria-label="Next">
+                                                    <i aria-hidden="true" class="eicon-chevron-right"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-0e543e7 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="0e543e7" data-element_type="section">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-3c4419e sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="3c4419e" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-50850cc sc_fly_static elementor-widget elementor-widget-spacer" data-id="50850cc" data-element_type="widget" data-widget_type="spacer.default">
+                                    <div class="elementor-widget-container">
+                                        <div class="elementor-spacer">
+                                            <div class="elementor-spacer-inner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<a id="footer_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
+@section scripts{
+    <script type="text/javascript" id="elementor-frontend-js-before">
+        /* <![CDATA[ */
+        var elementorFrontendConfig = { "environmentMode": { "edit": false, "wpPreview": false, "isScriptDebug": false }, "i18n": { "shareOnFacebook": "Chia s\u1ebb tr\u00ean Facebook", "shareOnTwitter": "Chia s\u1ebb tr\u00ean Twitter", "pinIt": "Ghim n\u00f3", "download": "T\u1ea3i xu\u1ed1ng", "downloadImage": "T\u1ea3i h\u00ecnh \u1ea3nh", "fullscreen": "To\u00e0n m\u00e0n h\u00ecnh", "zoom": "Thu ph\u00f3ng", "share": "Chia s\u1ebb", "playVideo": "Ph\u00e1t video", "previous": "Quay v\u1ec1", "next": "Ti\u1ebfp theo", "close": "\u0110\u00f3ng", "a11yCarouselPrevSlideMessage": "Slide tr\u01b0\u1edbc", "a11yCarouselNextSlideMessage": "Slide ti\u1ebfp theo", "a11yCarouselFirstSlideMessage": "\u0110\u00e2y l\u00e0 slide \u0111\u1ea7u ti\u00ean", "a11yCarouselLastSlideMessage": "\u0110\u00e2y l\u00e0 slide cu\u1ed1i c\u00f9ng", "a11yCarouselPaginationBulletMessage": "\u0110i \u0111\u1ebfn slide" }, "is_rtl": false, "breakpoints": { "xs": 0, "sm": 480, "md": 768, "lg": 1025, "xl": 1440, "xxl": 1600 }, "responsive": { "breakpoints": { "mobile": { "label": "Di \u0111\u1ed9ng d\u1ecdc", "value": 767, "default_value": 767, "direction": "max", "is_enabled": true }, "mobile_extra": { "label": "Ch\u1ebf \u0111\u1ed9 ngang di \u0111\u1ed9ng", "value": 880, "default_value": 880, "direction": "max", "is_enabled": false }, "tablet": { "label": "Tablet d\u1ecdc", "value": 1024, "default_value": 1024, "direction": "max", "is_enabled": true }, "tablet_extra": { "label": "Tablet ngang", "value": 1200, "default_value": 1200, "direction": "max", "is_enabled": false }, "laptop": { "label": "Laptop", "value": 1366, "default_value": 1366, "direction": "max", "is_enabled": false }, "widescreen": { "label": "Trang r\u1ed9ng", "value": 2400, "default_value": 2400, "direction": "min", "is_enabled": false } }, "hasCustomBreakpoints": false }, "version": "3.26.4", "is_static": false, "experimentalFeatures": { "additional_custom_breakpoints": true, "e_swiper_latest": true, "e_nested_atomic_repeaters": true, "e_onboarding": true, "e_css_smooth_scroll": true, "theme_builder_v2": true, "home_screen": true, "landing-pages": true, "nested-elements": true, "editor_v2": true, "link-in-bio": true, "floating-buttons": true }, "urls": { "assets": "https:\/\/nhblogistics.com\/wp-content\/plugins\/elementor\/assets\/", "ajaxurl": "https:\/\/nhblogistics.com\/wp-admin\/admin-ajax.php", "uploadUrl": "https:\/\/nhblogistics.com\/wp-content\/uploads" }, "nonces": { "floatingButtonsClickTracking": "36669284c7" }, "swiperClass": "swiper", "settings": { "page": [], "editorPreferences": [] }, "kit": { "body_background_background": "classic", "active_breakpoints": ["viewport_mobile", "viewport_tablet"], "global_image_lightbox": "yes", "lightbox_enable_counter": "yes", "lightbox_enable_fullscreen": "yes", "lightbox_enable_zoom": "yes", "lightbox_enable_share": "yes", "lightbox_title_src": "title", "lightbox_description_src": "description" }, "post": { "id": 3438, "title": "NHB%20LOGICTICS%20-%20D%E1%BB%8ACH%20V%E1%BB%A4%20V%E1%BA%ACN%20CHUY%E1%BB%82N%202%20CHI%E1%BB%80U%20H%C3%80N%20-%20VI%E1%BB%86T%20-%20NHBLOGISTICS", "excerpt": "", "featuredImage": false } };
+        /* ]]> */
+    </script>
+    <script type="text/javascript">
+    function setREVStartSize(e) {
+            try {
+                var pw = document.getElementById(e.c).parentNode.offsetWidth,
+                    newh;
+                pw = pw === 0 || isNaN(pw) ? window.innerWidth : pw;
+                e.tabw = e.tabw === undefined ? 0 : parseInt(e.tabw);
+                e.thumbw = e.thumbw === undefined ? 0 : parseInt(e.thumbw);
+                e.tabh = e.tabh === undefined ? 0 : parseInt(e.tabh);
+                e.thumbh = e.thumbh === undefined ? 0 : parseInt(e.thumbh);
+                e.tabhide = e.tabhide === undefined ? 0 : parseInt(e.tabhide);
+                e.thumbhide = e.thumbhide === undefined ? 0 : parseInt(e.thumbhide);
+                e.mh = e.mh === undefined || e.mh == "" || e.mh === "auto" ? 0 : parseInt(e.mh, 0);
+                if (e.layout === "fullscreen" || e.l === "fullscreen")
+                    newh = Math.max(e.mh, window.innerHeight);
+                else {
+                    e.gw = Array.isArray(e.gw) ? e.gw : [e.gw];
+                    for (var i in e.rl) if (e.gw[i] === undefined || e.gw[i] === 0) e.gw[i] = e.gw[i - 1];
+                    e.gh = e.el === undefined || e.el === "" || (Array.isArray(e.el) && e.el.length == 0) ? e.gh : e.el;
+                    e.gh = Array.isArray(e.gh) ? e.gh : [e.gh];
+                    for (var i in e.rl) if (e.gh[i] === undefined || e.gh[i] === 0) e.gh[i] = e.gh[i - 1];
+
+                    var nl = new Array(e.rl.length),
+                        ix = 0,
+                        sl;
+                    e.tabw = e.tabhide >= pw ? 0 : e.tabw;
+                    e.thumbw = e.thumbhide >= pw ? 0 : e.thumbw;
+                    e.tabh = e.tabhide >= pw ? 0 : e.tabh;
+                    e.thumbh = e.thumbhide >= pw ? 0 : e.thumbh;
+                    for (var i in e.rl) nl[i] = e.rl[i] < window.innerWidth ? 0 : e.rl[i];
+                    sl = nl[0];
+                    for (var i in nl) if (sl > nl[i] && nl[i] > 0) { sl = nl[i]; ix = i; }
+                    var m = pw > (e.gw[ix] + e.tabw + e.thumbw) ? 1 : (pw - (e.tabw + e.thumbw)) / (e.gw[ix]);
+
+                    newh = (e.type === "carousel" && e.justify === "true" ? e.gh[ix] : (e.gh[ix] * m)) + (e.tabh + e.thumbh);
+                }
+
+                if (window.rs_init_css === undefined) window.rs_init_css = document.head.appendChild(document.createElement("style"));
+                document.getElementById(e.c).height = newh;
+                window.rs_init_css.innerHTML += "#" + e.c + "_wrapper { height: " + newh + "px }";
+            } catch (e) {
+                console.log("Failure at Presize of Slider:" + e)
+            }
+        };</script>
+} 

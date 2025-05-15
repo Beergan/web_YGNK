@@ -1,0 +1,188 @@
+﻿@inherits MyAdminPage
+@functions{
+    private FieldExtractor<PP_Visit> field = new FieldExtractor<PP_Visit>();
+}
+@{
+    CheckAuthen()();
+    var query = Request.Url.Query;
+
+    var items = Db.GetList<PP_Visit>().OrderByDescending(t => t.CreatedTime).ToList();
+
+    Page.Title = Text["LIST OF VISITS", "DANH SÁCH TRUY CẬP"];
+    Page.Menu = "visit";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách truy cập" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box table-responsive">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="#list" data-toggle="tab" aria-expanded="true" class="nav-link active">
+                            <i class="fas fa-list-ol"></i> Danh sách truy cập
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="list">
+                        <table id="datatable" class="table table-striped table-bordered dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 110px">@Text[field.GetTitle(t => t.CreatedTime)]</th>
+                                    <th>@Text[field.GetTitle(t => t.Ip)]</th>
+                                    <th>@Text[field.GetTitle(t => t.Country)]</th>
+                                    <th>@Text[field.GetTitle(t => t.Referer)]</th>
+                                    <th>@Text[field.GetTitle(t => t.Device)]</th>
+                                    <th>@Text[field.GetTitle(t => t.Browser)]</th>
+                                    <th>@Text[field.GetTitle(t => t.StayTime)]</th>
+                                    <th>Clicks</th>
+                                    <th>@Text[field.GetTitle(t => t.MakeOrder)]</th>
+                                    <th style="width:1%;min-width:80px;">@Text["Control", "Thao tác"]</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (int i = 0; i < items.Count; i++)
+                                {
+                                    <tr>
+                                        <td>@($"{items[i].CreatedTime:yyyy-MM-dd HH:mm}")</td>
+                                        <td align="center">@items[i].Ip</td>
+                                        <td align="center">@items[i].Country</td>
+                                        <td>@items[i].Referer</td>
+                                        <td>@items[i].Device</td>
+                                        <td>@items[i].Browser</td>
+                                        <td align="center">@(items[i].StayTime)s</td>
+                                        <td align="center">@items[i].ClickCount</td>
+                                        <td align="center">@(items[i].MakeOrder ? "YES" : "NO")</td>
+                                        <td align="center">
+                                            <div class="btn-group btn-group-sm">
+                                                <a title="@Text["View", "Xem"]" data-toggle="modal" data-target="#order-details-modal-center" data-session-id="@items[i].SessionId" href="#" type="button" class="btn btn-warning btn-view-order">
+                                                    <span class="fa fa-eye"></span>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="order-details-modal-center" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="order-details-modal-title">Chi tiết truy cập</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body orderbody">
+                <div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-modal-close" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section head{
+    <!-- third party css -->
+    <link href="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/libs/datatables/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <style>
+        .modal-dialog {
+            max-width: 800px;
+        }
+    </style>
+}
+@section scripts{
+    <script src="@Constants.Admin_Url/assets/libs/datatables/jquery.dataTables.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.responsive.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+
+    <script>
+        function delele(id) {
+            Swal.fire({
+                title: '@Html.Raw(Text["Confirm to delete!","Hãy xác nhận?"])',
+                text: '@Html.Raw(Text["Delete operation cannot be undone","Thao tác xóa không thể hoàn tác"])',
+                type: "warning",
+                showCancelButton: !0,
+                confirmButtonText: '@Html.Raw(Text["OK","Được"])',
+                cancelButtonText: '@Html.Raw(Text["Wait!","Khoan!"])',
+                confirmButtonClass: "btn btn-success mt-2",
+                cancelButtonClass: "btn btn-danger ml-2 mt-2",
+                buttonsStyling: !1
+            }).then(function (t) {
+                t.value ? $.ajax({
+                    url: "@Constants.Admin_Url/order?delete",
+                    type: "POST",
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: { __RequestVerificationToken: '@AntiForgeryTokenForAjaxPost()', Id: id },
+                    success: function (result) {
+                        Swal.fire({
+                            title: '@Html.Raw(Text["Congratulation!", "Chúc mừng!"])',
+                            text: result,
+                            type: "success"
+                        }).then(function (t) { location.reload(); })
+                    },
+                    error: function (errormessage) {
+                        Swal.fire({
+                            title: '@Html.Raw(Text["Oh, no!", "Thôi xong!"])',
+                            text: errormessage.responseText,
+                            type: "error"
+                        })
+                    }
+                }) : {}
+            });
+        }
+
+        $(document).ready(function () {
+
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "formatted-num-pre": function (a) {
+                    a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+                    return parseFloat(a);
+                },
+                "formatted-num-asc": function (a, b) {
+                    return a - b;
+                },
+                "formatted-num-desc": function (a, b) {
+                    return b - a;
+                }
+            });
+
+            $(document).on("click", ".btn-view-order", function () {
+                var sessionId = $(this).attr("data-session-id");
+                var orderCode = $(this).attr("data-order-code");
+                $(".orderbody").html('<div class="spinner-border text-primary" role="status"><span class="sr-only">Loading...</span></div>');
+                $.get("@Constants.Admin_Url/visit/view?sessionId=" + sessionId, function (data) {
+                    $(".orderbody").html(data);
+                });
+            });
+
+            $('#datatable').DataTable({
+                "aaSorting": [],
+                "columnDefs": [{ type: 'formatted-num', targets: 0 }],
+                "pageLength": 100,
+                "lengthChange": false,
+            });
+        });
+    </script>
+}

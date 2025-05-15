@@ -1,0 +1,25 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Element,
+        ComptName = "en:Cart sidebar tempalte|vi:Số đếm đơn hàng")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public static ViewModel Default => new ViewModel() { };
+    }/*end_viewmodel*/
+    private ViewModel _data = null;
+    private ViewModel Data => _data;
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    var query = Request.Url.Query;
+    var cart = new ShoppingCart(this.Context);
+    Layout = null;
+}
+<a href="@Root.Config.Link.PageCart" class=" position-relative me-4 my-auto">
+    <i class="fas fa-cart-plus fa-2x"></i>
+    <span class=" position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1" style="top: -5px; left: 25px; height: 20px; min-width: 20px; "><span class="cart-count1">@cart.GetCartLines().Sum(x => x.Quantity)</span> </span>
+</a>

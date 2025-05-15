@@ -1,0 +1,188 @@
+﻿@inherits MyAdminPage
+@functions{
+    private FieldExtractor<PP_Product> field = new FieldExtractor<PP_Product>();
+    private PP_Product model = null;
+}
+@{
+    CheckAuthen()();
+    int itemId;
+
+    if (!int.TryParse(Request.QueryString[field.GetName(t => t.Id)].NullIfWhiteSpace() ?? Request.Form[field.GetName(t => t.Id)], out itemId))
+    {
+        Response.Redirect($"{Constants.Admin_Url}/product");
+    }
+
+    model = Db.GetOne<PP_Product>(itemId);
+
+    if (model == null)
+    {
+        Response.Redirect($"{Constants.Admin_Url}/product");
+    }
+
+    var imageUrls = Json.Decode<List<string>>(model.ImagesJson);
+    var query = Request.Url.Query;
+
+    if (query == "?append")
+    {
+        AntiForgery.Validate();
+
+        var imageUrl = Request.Form[field.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+
+        if (!imageUrls.Contains(imageUrl))
+        {
+            imageUrls.Add(imageUrl);
+            model.ImagesJson = Json.Encode(imageUrls);
+            Db.Update<PP_Product>(model);
+            Response.Redirect($"image?id={model.Id}", endResponse: true);
+        }
+    }
+    else if (query == "?remove")
+    {
+        AntiForgery.Validate();
+
+        var imageUrl = Request.Form[field.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+
+        if (imageUrls.Contains(imageUrl))
+        {
+            imageUrls.Remove(imageUrl);
+            model.ImagesJson = Json.Encode(imageUrls);
+
+            if (imageUrls.Count > 0)
+            {
+                model.ImageUrl = imageUrls[0];
+            }
+
+            Db.Update<PP_Product>(model);
+            Root.ClearCache();
+            Response.End();
+        }
+    }
+
+    var category = Db.GetOne<PP_Category>(model.CategoryId ?? 0);
+
+    Page.Title = Text["PRODUCT IMAGES UPLOAD", "UPLOAD ẢNH SẢN PHẨM"];
+    Page.Menu = "product";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách sản phẩm" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box table-responsive">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/category?type=product" aria-expanded="false" class="nav-link">
+                            <i class="fe-folder"></i> @Text["Categories", "Các chuyên mục"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/product?categoryId=@model.CategoryId" aria-expanded="true" class="nav-link">
+                            <i class="fas fa-list-ol"></i> @Text["All of products", "Tất cả sản phẩm"]
+                        </a>
+                    </li>
+                    @if (@model.CategoryId > 0)
+                    {
+                        <li class="nav-item">
+                            <a href="@Constants.Admin_Url/product?categoryId=@model.CategoryId" aria-expanded="true" class="nav-link">
+                                <i class="fas fa-list-ol"></i> @category.Title
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a href="#edit" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                            <i class="fas fa-plus-circle"></i> @Text["Product images upload", "Upload ảnh sản phẩm"]
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="edit">
+                        <form class="form-horizontal validable" role="form" method="post" action="?append">
+                            @AntiForgery.GetHtml()
+                            @if (ModelState.Any())
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @Html.ValidationSummary("Thao tác không thành công!", excludeFieldErrors: true, htmlAttributes: null)
+                                </div>
+                            }
+
+                            <input type="hidden" name="Id" value="@model.Id" />
+                            @MyHtml.TextBoxFor(field[t => t.Title], value: model.Title, disabled: true)
+                            @MyHtml.ImagePickerFor(field[t => t.ImageUrl])
+
+                            <hr />
+                            <div class="form-group mb-0">
+                                <div>
+                                    <button type="submit" class="btn btn-gradient waves-effect waves-light">
+                                        @Text["Submit", "Xác nhận"]
+                                    </button>
+                                    <button type="button" class="btn btn-light waves-effect ml-1" onclick="window.history.back()">
+                                        @Text["Back", "Quay lại"]
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @foreach (var imageUrl in imageUrls)
+                                {
+                                    <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 mt-3 product-image">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <img src="@imageUrl" style="width:100%" />
+                                                <a href="#" class="btn btn-danger btn-delete" style="position: absolute;z-index:10;right:0px;bottom:0px;" data-image-url="@imageUrl">Xóa</a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>             
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section head{
+}
+
+@section scripts{
+    <script src="@Constants.Admin_Url/ckfinder/ckfinder.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(document).on("click", ".btn-ckfinder-popup", function (e) {
+                event.preventDefault();
+                var targetId = $(this).attr('target');
+
+                window["callback_" + targetId] = function (fileUrl) {
+                    var url = new URL(fileUrl);
+                    $('#'+targetId).val(url.pathname);
+                    $('#img-'+targetId).attr("src", url.pathname);
+                }
+
+                CKFinder.popup({
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    selectActionFunction: window["callback_" + targetId]
+                });
+            });
+
+            $(document).on("click", ".btn-delete", function () {
+                event.preventDefault();
+                var imageUrl = $(this).attr("data-image-url");
+                var imageDiv = $(this).parents(".product-image");
+
+                $.post("?remove", {"id": "@model.Id", "imageUrl": imageUrl, "__RequestVerificationToken": '@AntiForgeryTokenForAjaxPost()' }, function (data) {
+                    imageDiv.remove();
+                });
+            });
+
+        });
+
+    </script>
+}

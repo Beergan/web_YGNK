@@ -1,0 +1,145 @@
+﻿@inherits MyAdminPage
+@{
+    Layout = null;
+
+    if (IsPost)
+    {
+        try
+        {
+            AntiForgery.Validate();
+            Validation.RequireField("username", Text["Username cannot be empty!", "Tên đăng nhập không được để trống."]);
+            Validation.RequireField("password", Text["Password cannot be empty!", "Mật khẩu không được để trống."]);
+            Validation.Add("password",
+                Validator.StringLength(
+                    maxLength: Int32.MaxValue,
+                    minLength: 6,
+                    errorMessage: Text["Password must be at least 6 characters.", "Mật khẩu phải gồm ít nhất 6 ký tự."]));
+
+            if (Validation.IsValid())
+            {
+                string username = Request.Form["username"].Replace("'", "");
+                string password = Request.Form["password"].Replace("'", "").Replace("&^%$", "");
+                var passwordHash = Crypto.SHA256(password);
+
+                var checkUser = Root.Db.GetOne<PP_User>(t => t.UserId == username && t.Password == passwordHash);
+
+                if (checkUser != null)
+                {
+                    MyWebSecurity.WriteAuthenCookie(username, password, checkUser.DisplayName);
+                    Response.Redirect($"{Constants.Admin_Url}");
+                }
+            }
+
+            ModelState.AddFormError(Text["Username or password are incorrect!", "Tên đăng nhập hoặc mật khẩu không đúng!"]);
+        }
+        catch (Exception ex) {
+            ModelState.AddFormError(ex.Message);
+        }
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Text["LOGIN", "ĐĂNG NHẬP"] - SLK ADMIN v5.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    @*<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+        <meta content="Coderthemes" name="author" />*@
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+
+    <!-- App css -->
+    <link href="@Constants.Admin_Url/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <style>
+
+        html, body {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        body {
+            touch-action: pan-x pan-y;
+        }
+
+        .my-container {
+            text-align: center;
+            display: block;
+            height: 100%;
+            position: relative;
+            z-index: 1000;
+        }
+
+            .my-container::before,
+            .my-container .box {
+                display: inline-block;
+                vertical-align: middle;
+                text-align: left;
+            }
+
+            .my-container::before {
+                content: '';
+                width: 0;
+                height: 100%;
+            }
+
+        .video, .canvas {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 1;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            -webkit-transform: translate(-50%, -50%);
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style> 
+</head>
+
+<body>
+
+    <video class="video" autoplay muted loop>
+        <source src="@Constants.Admin_Url/assets/videos/Indian-Tea.mp4" type="video/mp4">
+    </video>
+
+    <div class="my-container">
+        <div class="box">
+            <div class="card" style="min-width:350px">
+                <div class="card-body">
+                    <div class="text-center w-75 m-auto">
+                        <a href="/admin">
+                            <span><img src="assets/images/logo-slk.png" alt="" height="100"></span>
+                        </a>
+                        <h5 class="text-uppercase text-center font-bold mb-2">@Text["ADMIN PANEL", "QUẢN TRỊ WEBSITE"]</h5>
+                    </div>
+
+                    <form action="login" method="post">
+                        @AntiForgery.GetHtml()
+                        @Html.ValidationSummary(Text["Login failed", "Đăng nhập không thành công!"], excludeFieldErrors: true, htmlAttributes: null)
+                        <div class="form-group mb-3">
+                            <label for="username">@Text["Username", "Tên đăng nhập"]</label>
+                            <input class="form-control" type="text" id="username" name="username" required="required">
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="password">@Text["Password", "Mật khẩu"]</label>
+                            <input class="form-control" type="password" required="required" id="password" name="password">
+                        </div>
+                        <div class="form-group mb-0 text-center">
+                            <button class="btn btn-gradient btn-block" type="submit">@Text["Login", "Đăng nhập"]</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

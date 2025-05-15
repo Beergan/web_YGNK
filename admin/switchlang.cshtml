@@ -1,0 +1,19 @@
+﻿@inherits MyAdminPage
+@{
+    string langId = "vi";
+    string redirect = Constants.Admin_Url;
+
+    if (Request.QueryString.AllKeys.Contains("vi"))
+    {
+        redirect = Request.QueryString["vi"];
+    }
+    else
+    if (Request.QueryString.AllKeys.Contains("en"))
+    {
+        langId = "en";
+        redirect = Request.QueryString["en"];
+    }
+
+    LangIdDisplay = langId;
+    Response.Redirect(redirect);
+}

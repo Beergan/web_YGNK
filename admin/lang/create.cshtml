@@ -1,0 +1,125 @@
+﻿@inherits MyAdminPage
+@functions{
+    private FieldExtractor<PP_Lang> field = new FieldExtractor<PP_Lang>();
+    private PP_Lang model = new PP_Lang();
+
+    private Action ProcessPost()
+    {
+        AntiForgery.Validate();
+
+        Validation.RequireField(field.GetName(t => t.Title), Text["The title can not be empty!", "Tiêu đề không thể để trống!"]);
+
+        model.LangId = Request.Form[field.GetName(t => t.LangId)].NullIfWhiteSpace();
+        model.Title = Request.Form[field.GetName(t => t.Title)].NullIfWhiteSpace();
+        model.DateFormat = Request.Form[field.GetName(t => t.DateFormat)].NullIfWhiteSpace();
+        model.TimeFormat = Request.Form[field.GetName(t => t.TimeFormat)].NullIfWhiteSpace();
+        model.Enabled = Request.Form[field.GetName(t => t.Enabled)].AsBool();
+
+        if (!Validation.IsValid())
+        {
+            return EmptyAction;
+        }
+
+        if (Db.Exists<PP_Lang>(t => t.LangId == model.LangId))
+        {
+            ModelState.AddFormError(Text["Duplicate name!", "Trùng tên với phần tử đã tồn tại!"]);
+            return EmptyAction;
+        }
+
+        Db.Insert<PP_Lang>(model);
+        Root.ReloadLangs();
+        return () => Response.Redirect($"{Constants.Admin_Url}/i18n");
+    }
+}
+@{
+    CheckAuthen()();
+    if (IsPost)
+    {
+        try
+        {
+            ProcessPost().Invoke();
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddFormError(ex.Message);
+        }
+    }
+
+    Page.Title = Text["ADD NEW LANGUAGE", "KHAI BÁO NGÔN NGỮ"];
+    Page.Menu = "i18n";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách ngôn ngữ" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box table-responsive">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/i18n" aria-expanded="true" class="nav-link">
+                            <i class="fas fa-list-ol"></i> @Text["List of languagues", "Danh sách ngôn ngữ"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#create" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                            <i class="fas fa-plus-circle"></i> @Text["Create new one", "Thêm mới"]
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="create">
+                        <form class="form-horizontal validable" role="form" method="post">
+
+                            @AntiForgery.GetHtml()
+
+                            @if (ModelState.Any())
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @Html.ValidationSummary(Text["Operation failed!", "Thao tác không thành công!"], excludeFieldErrors: false, htmlAttributes: null)
+                                </div>
+                            }
+
+                            @MyHtml.TextBoxFor(field[t => t.LangId], value: model.LangId)
+                            @MyHtml.TextBoxFor(field[t => t.Title], value: model.Title)
+                            @MyHtml.TextBoxFor(field[t => t.DateFormat], value: model.DateFormat)
+                            @MyHtml.TextBoxFor(field[t => t.TimeFormat], value: model.TimeFormat)
+                            @MyHtml.RadioFor(field[t => t.Enabled], value: model.Enabled)             
+                            <hr />
+
+                            <div class="form-group mb-0">
+                                <div>
+                                    <button type="submit" class="btn btn-gradient waves-effect waves-light">
+                                        @Text["Submit", "Xác nhận"]
+                                    </button>
+                                    <button type="button" class="btn btn-light waves-effect ml-1" onclick="window.history.back()">
+                                        @Text["Back", "Quay lại"]
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> <!-- end row -->
+    <!-- end row -->
+</div>
+
+@section head
+{
+}
+
+@section scripts
+{
+    <script src="@Constants.Admin_Url/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script type="text/javascript">
+            $(document).ready(function() {
+                $(".validable").parsley();
+            });
+    </script>
+}

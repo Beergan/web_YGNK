@@ -1,0 +1,232 @@
+﻿@using SLK.Common
+@inherits MyWebPage
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        ComptName = "en:Page contact template|vi:Mẫu trang liên hệ")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+
+
+
+        public class Contact
+        {
+            [Field(
+Title = "Tiêu đề",
+Required = false,
+Control = InputControlType.TextBox)]
+            public string Title { get; set; }
+            [Field(
+Title = "Nội dung",
+Required = false,
+Control = InputControlType.RichTextBox)]
+            public string Content { get; set; }
+
+        }
+        [Field(
+Title = "Liên hệ")]
+        public Contact contact { get; set; }
+
+        public static ViewModel Default => new ViewModel()
+        {
+            Title = "Liên hệ",
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+    private FieldExtractor<PP_Contact> field = new FieldExtractor<PP_Contact>();
+    private PP_Contact model = new PP_Contact() { Status = "NEW" };
+}
+@{
+    var query = Request.Url.Query;
+
+    if (IsPost && query == "?contact")
+    {
+        new Func<Action>(() =>
+        {
+            try
+            {
+                AntiForgery.Validate();
+                string captcha = Request.Form[nameof(captcha)].ToLower();
+                Validation.RequireField(field.GetName(t => t.Name));
+                Validation.RequireField(field.GetName(t => t.Email));
+                Validation.Add(field.GetName(t => t.Email), Validator.Regex("^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"));
+                if (!Validation.IsValid())
+                {
+                    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
+                }
+
+                if (captcha != this.Context.Session["CaptchaVerify"].ToString())
+                {
+                    return AjaxResult.BadRequest("Capcha không hợp lệ!");
+                }
+                var model = new PP_Contact() { Status = "NEW" };
+                model.Name = Request.Form[field.GetName(t => t.Name)].NullIfWhiteSpace();
+                model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+                model.Message = Request.Form[field.GetName(t => t.Message)].NullIfWhiteSpace();
+
+                model.ProcessNote = "Chưa xử lý";
+                Db.Insert<PP_Contact>(model);
+                SendMail sm = new SendMail();
+                string body = @"
+       <!DOCTYPE html>
+       <html lang=""en"">
+       <head>
+       <meta charset=""UTF-8"">
+       <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+       <title>Xác nhận thông tin</title>
+       <style>
+       body {
+       font-family: Arial, sans-serif;
+       margin: 0;
+       padding: 0;
+       background-color: #f2f2f2;
+       }
+       .container {
+       width: 60%;
+       margin: 20px auto;
+       background-color: #fff;
+       border-radius: 8px;
+       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+       padding: 20px;
+       }
+       h1 {
+       color: black;
+       }
+       .info {
+       margin-bottom: 20px;
+       }
+       .info p {
+       margin: 5px 0;
+       }
+       .info strong {
+       font-weight: bold;
+       }
+       .center-image {
+       display: block;
+       margin: 0 auto; /* Căn giữa hình ảnh */
+       }
+       </style>
+       </head>
+       <body>
+
+       <div class=""container"">
+       <h1>Xác nhận thông tin</h1>
+       <div class=""info"">
+       <p><strong>Nội dung:</strong> Thông tin khách hàng liên hệ</p>
+       <p><strong>Họ tên:</strong> " + model.Name + @"</p>
+       <p><strong>Email:</strong> " + model.Email + @"</p>
+       <p><strong>Nội dung:</strong> " + model.Message + @"</p>
+      
+       </div>
+
+       </div>
+
+       </body>
+       </html>";
+                string results = sm.Send_Mail("Khách hàng liên hệ", body, Root.Config.Company.Email);
+                Response.Write("Cám ơn bạn đã gửi thông tin, chúng tôi sẽ phản hồi cho bạn sớm nhất có thể!");
+                return () => Response.End();
+            }
+            catch (Exception ex)
+            {
+                return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
+            }
+        })()();
+    }
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? new ViewModel();
+
+        var page = Db.GetOne<PP_Page>(PageId);
+
+        if (page == null)
+        {
+            return model;
+        }
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+
+        return model;
+    });
+
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+<div class="container-fluid page-header py-5 "  style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost);">
+    <h1 class="text-center  display-6">@Data.Title</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.First().Href">@Root.Config.MainMenus.First().Title</a></li>
+        <li class="breadcrumb-item active ">@Data.Title</li>
+    </ol>
+</div>
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="p-5 bg-light rounded">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="text-center mx-auto" style="max-width: 700px;">
+                        <h1 class="text-primary">@Data.contact.Title</h1>
+                        <p class="mb-4">@Data.contact.Content</p>
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="h-100 rounded">
+                        <iframe class="rounded w-100"
+                                style="height: 400px;" src="@Root.Config.Company.Map"
+                                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <form id="contact-form" action="?contact" method="post">
+                        <input type="text" class="w-100 form-control border-0 py-3 mb-4" id="name" name="@field.GetName(x=>x.Name)" placeholder="Họ và tên" required>
+                        <input type="email" class="w-100 form-control border-0 py-3 mb-4" id="email" name="@field.GetName(x=>x.Email)" placeholder="Email" required>
+                        <textarea class="w-100 form-control border-0 mb-4" rows="5" cols="10" id="subject" name="@field.GetName(x=>x.Message)" placeholder="Nội dung" required></textarea>
+                        <button class="w-100 btn form-control border-secondary py-3 contact-button bg-white text-primary" type="submit">Gửi</button>
+                    </form>
+                </div>
+                <div class="col-lg-5">
+                    <div class="d-flex p-4 rounded mb-4 bg-white">
+                        <i class="fas fa-map-marker-alt fa-2x text-primary me-4"></i>
+                        <div>
+                            <h4>Địa chỉ</h4>
+                            <p class="mb-2">@Root.Config.Company.Address</p>
+                        </div>
+                    </div>
+                    <div class="d-flex p-4 rounded mb-4 bg-white">
+                        <i class="fas fa-envelope fa-2x text-primary me-4"></i>
+                        <div>
+                            <h4>Email</h4>
+                            <p class="mb-2">@Root.Config.Company.Email</p>
+                        </div>
+                    </div>
+                    <div class="d-flex p-4 rounded bg-white">
+                        <i class="fa fa-phone-alt fa-2x text-primary me-4"></i>
+                        <div>
+                            <h4>Phone</h4>
+                            <p class="mb-2">@Root.Config.Company.ContactPhone</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+
+}

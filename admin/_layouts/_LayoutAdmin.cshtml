@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@Page.Title - SLK ADMIN v5.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+    <meta content="Coderthemes" name="author" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="@Constants.Admin_Url/assets/images/favicon.ico">
+
+    <!-- App css -->
+    <link href="@Constants.Admin_Url/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/libs/switchery/switchery.min.css" rel="stylesheet" type="text/css" />
+    <link href="@Constants.Admin_Url/assets/libs/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+    @RenderSection("head", required: false)
+</head>
+
+<body>
+    <!-- Begin wrapper -->
+    <div id="wrapper">
+        <!-- Topbar Start -->
+        @RenderPage("_PartialTopBar.cshtml")
+        <!-- end Topbar -->
+        <!-- ========== Left Sidebar Start ========== -->
+        <div class="left-side-menu">
+            <div class="slimscroll-menu">
+                <!-- Begin Sidebar -->
+                @RenderPage("_PartialLeftSideBar.cshtml")
+                <!-- End Sidebar -->
+                <div class="clearfix"></div>
+            </div>
+            <!-- Sidebar -left -->
+        </div>
+        <!-- Left Sidebar End -->
+        <!-- ============================================================== -->
+        <!-- Start Page Content here -->
+        <!-- ============================================================== -->
+        <div class="content-page">
+            <div class="content">
+                @RenderBody()
+            </div> <!-- end content -->
+            <!-- Footer Start -->
+            @RenderPage("_PartialFooter.cshtml")
+            <!-- end Footer -->
+
+        </div>
+        <!-- ============================================================== -->
+        <!-- End Page content -->
+        <!-- ============================================================== -->
+    </div>
+    <!-- END wrapper -->
+    <!-- Right Sidebar -->
+    @RenderPage("_PartialRightSideBar.cshtml")
+    <!-- /Right-bar -->
+    <!-- Right bar overlay-->
+    <div class="rightbar-overlay"></div>
+
+    <!-- Vendor js -->
+    <script src="@Constants.Admin_Url/assets/js/vendor.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/switchery/switchery.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+    @RenderSection("scripts", required: false)
+    <!-- App js -->
+    <script src="@Constants.Admin_Url/assets/js/app.min.js"></script>
+    <script>
+        jQuery(document).ready(function () {
+            $.ajaxSetup({
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            });
+
+            $('[data-plugin="switchery"]').each(function(a,n) {
+                new Switchery($(this)[0],$(this).data())
+            });
+        });
+    </script>
+</body>
+</html>

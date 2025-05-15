@@ -1,0 +1,6 @@
+﻿@inherits MyAdminPage
+@{
+    CheckAuthen()();
+    LangIdCompose = Request.QueryString["lang"];
+    Response.Redirect(Request.QueryString["redirect"]);
+}

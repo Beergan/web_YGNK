@@ -1,0 +1,961 @@
+﻿@helper ComposeLanguageSwitch()
+{
+    <div class="form-group row">
+        <label for="LangIdCompose"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[en: "Input language", vi: "Ngôn ngữ nhập"]
+        </label>
+        <div class="col-12 col-md-10">
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       id="LangIdCompose"
+                       value="@($"{@MyAdminPage.LangIdCompose} ({ @MyAdminPage.LangCompose.Title})")" disabled="disabled" />
+                <div class="input-group-append">
+                    <a href="@Constants.Admin_Url/i18n"
+                       class="btn btn-primary"
+                       type="button">
+                        <i class="fa-exchange"></i> @MyAdminPage.Text[en: "Change", vi: "Thay đổi"]
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@helper ComposeLanguageSwitch2()
+{
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary">@Root.Langs[MyAdminPage.LangIdCompose].Title</button>
+        <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="mdi mdi-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu">
+            @foreach (var l in Root.Langs.Values)
+            {
+                if (l.LangId == MyAdminPage.LangIdCompose || l.Enabled == false) { continue; }
+                <a class="dropdown-item" href="@Constants.Admin_Url/switch?lang=@l.LangId&redirect=@Request.Url.PathAndQuery">@l.Title</a>
+            }
+        </div>
+    </div>
+}
+
+@helper CheckBoxFor(Field field, int index = -1, bool value = false)
+{
+    <div class="form-group row">
+        <div class="col-12 col-md-10 offset-md-2">
+            <div class="checkbox checkbox-purple">
+                <input id="@field.Name@(index>-1?$"-{index}":"")"
+                       originId="@field.Name"
+                       name="@field.Name@(index>-1?$"-{index}":"")"
+                       type="checkbox"
+                       @(value ? "checked" : "")>
+                <label for="@field.Name@(index>-1?$"-{index}":"")">
+                    @MyAdminPage.Text[field.Title]
+                </label>
+            </div>
+        </div>
+    </div>
+}
+
+@helper TextBoxFor(Field field, int index = -1, string value = "", bool required = false, string pattern = "", bool disabled = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            @if (required)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        <div class="col-12 col-md-10">
+            <input class="form-control"
+                   type="text"
+                   @(!string.IsNullOrEmpty(pattern) ? $"data-toggle=input-mask data-mask-format={pattern}" : "")
+                   @(required ? "required" : "")
+                   @(disabled ? "disabled" : "")
+                   parsley-type="text"
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@field.Name@(index>-1?$"-{index}":"")"
+                   placeholder="@field.Prompt"
+                   value="@value">
+        </div>
+    </div>
+}
+
+@helper  DateTimeFor(Field field, int index = -1, DateTime? value = null, bool required = false, string pattern = "", bool disabled = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            @if (required)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        <div class="col-12 col-md-10">
+            <input class="form-control"
+                   type="datetime-local"
+                   @(required ? "required" : "")
+                   @(disabled ? "disabled" : "")
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@field.Name@(index>-1?$"-{index}":"")"
+                   placeholder="@field.Prompt"
+                   value="@($"{value:yyyy-MM-ddTHH:mm:ss}")">
+        </div>
+    </div>
+}
+
+@helper TagsInputFor(Field field, int index = -1, string value = "", bool required = false, bool disabled = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            @if (required)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        <div class="col-12 col-md-10">
+            <input class="form-control"
+                   type="text"
+                   @(required ? "required" : "")
+                   @(disabled ? "disabled" : "")
+                   data-role="tagsinput"
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@field.Name@(index>-1?$"-{index}":"")"
+                   placeholder="@field.Prompt"
+                   value="@value">
+        </div>
+    </div>
+}
+
+@helper NumberBoxFor(Field field, int index = -1, object value = null, bool required = false, string pattern = "", bool disabled = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            @if (required)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        <div class="col-12 col-md-10">
+            <input class="form-control"
+                   type="number"
+                   @(!string.IsNullOrEmpty(pattern) ? $"data-toggle=input-mask data-mask-format={pattern}" : "")
+                   @(required ? "required" : "")
+                   @(disabled ? "disabled" : "")
+                   parsley-type="number"
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@field.Name@(index>-1?$"-{index}":"")"
+                   placeholder="@field.Prompt"
+                   value="@(value??0)">
+        </div>
+    </div>
+}
+
+@helper TextAreaFor(Field field, int index = -1, string value = "", bool required = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            @if (required)
+            {
+                <span class="text-danger">*</span>
+            }
+        </label>
+        <div class="col-12 col-md-10">
+            <textarea class="form-control"
+                      type="text"
+                      @(required ? "required" : "")
+                      parsley-type="text"
+                      originId="@field.Name"
+                      name="@field.Name@(index>-1?$"-{index}":"")"
+                      id="@field.Name@(index>-1?$"-{index}":"")"
+                      placeholder="@field.Prompt" rows="7">@Html.Raw(value)</textarea>
+        </div>
+    </div>
+}
+
+@helper PasswordFor(Field field, int index = -1, string value = "")
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               for="@field.Name@(index>-1?$"-{index}":"")"
+               class="col-12 col-md-2 col-form-label">
+            @MyAdminPage.Text[field.Title]
+            <span class="text-danger">*</span>
+        </label>
+        <div class="col-12 col-md-2">
+            <input class="form-control"
+                   type="password"
+                   required
+                   parsley-type="password"
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@field.Name@(index>-1?$"-{index}":"")"
+                   placeholder="@field.Prompt"
+                   value="@value">
+        </div>
+    </div>
+}
+
+@helper RadioFor(Field field, int index = -1, bool value = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               class="col-12 col-md-2 col-form-label"
+               for="@field.Name@(index>-1?$"-{index}":"")">
+            @MyAdminPage.Text[field.Title]
+        </label>
+        <div class="col-12 col-md-10">
+            <input type="checkbox"
+                   originId="@field.Name"
+                   name="@field.Name@(index>-1?$"-{index}":"")"
+                   id="@(field.Name)@(index>-1?$"-{index}":"")"
+                   value="true" @(value ? "checked" : "")
+                   data-plugin="switchery"
+                   data-color="#3ec396" />
+        </div>
+    </div>
+}
+
+@helper ComboboxFor(Field field, int index = -1, Dictionary<string, string> options = null, string value = null, bool disabled = false)
+{
+    <div class="form-group row">
+        <label originId="@field.Name"
+               class="col-12 col-md-2 col-form-label"
+               for="@field.Name@(index>-1?$"-{index}":"")">
+            @MyAdminPage.Text[field.Title]
+        </label>
+        <div class="col-12 col-md-10">
+            <select class="form-control"
+                    originId="@field.Name"
+                    id="@field.Name@(index>-1?$"-{index}":"")"
+                    name="@field.Name@(index>-1?$"-{index}":"")" @(disabled ? "disabled" : "")>
+
+                @foreach (var item in options)
+                {
+                    <option value="@item.Key" @(item.Key == value ? "selected" : "")>@MyAdminPage.Text[item.Value]</option>
+                }
+            </select>
+        </div>
+    </div>
+}
+@helper ListComboboxFor(Field field, Dictionary<string, string> options = null, string value = null, bool disabled = false)
+{
+    var ids = !string.IsNullOrEmpty(value)
+        ? value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+        : new string[] { };
+    <div id="comboboxlist">
+        @for (var i = 0; i < ids.Length; i++)
+        {
+            <div class="form-group row comboboxlist">
+                <label originId="@field.Name"
+                       class="col-12 col-md-2 col-form-label"
+                       for="@field.Name">
+                    @MyAdminPage.Text[field.Title]
+                </label>
+                <div class="col-12 col-md-9">
+                    <select class="form-control"
+                            originId="@field.Name"
+                            id="@field.Name"
+                            name="@field.Name" @(disabled ? "disabled" : "")>
+                        @foreach (var item in options)
+                        {
+                            <option value="@item.Key" @(item.Key == ids[i] ? "selected" : "")>@MyAdminPage.Text[item.Value]</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteCat(this)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                </div>
+            </div>
+
+
+        }
+        @if (ids.Length == 0)
+        {
+            <div class="form-group row comboboxlist">
+                <label originId="@field.Name"
+                       class="col-12 col-md-2 col-form-label"
+                       for="@field.Name">
+                    @MyAdminPage.Text[field.Title]
+                </label>
+                <div class="col-12 col-md-10">
+                    <select class="form-control"
+                            originId="@field.Name"
+                            id="@field.Name"
+                            name="@field.Name" @(disabled ? "disabled" : "")>
+                        @foreach (var item in options)
+                        {
+                            <option value="@item.Key" @(item.Key == value ? "selected" : "")>@MyAdminPage.Text[item.Value]</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-md-11">
+                </div>
+                <div class="col-md-1">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteCat(this)">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+        }
+    </div>
+            <div class="row">
+                <div class="col-lg-2">
+                    <button type="button" class="btn btn-primary" onclick="addCat('@field.Name', '@field.Title', '@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(options).Replace("\"", "&quot;"))')">Thêm mục</button>
+
+                </div>
+            </div>
+        }
+
+        @helper ImagePickerForlist(Field field, string value = "", bool required = false)
+        {
+            var imageUrls = !string.IsNullOrEmpty(value)
+                ? value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                : new string[] { };
+
+            <div id="image-picker-container">
+                @for (var i = 0; i < imageUrls.Length; i++)
+                {
+                    <div class="form-group row image-picker-item">
+                        <label for="@field.Name-@i"
+                               class="col-12 col-md-2 col-form-label">
+                            @MyAdminPage.Text[field.Title]
+                        </label>
+                        <div class="col-12 col-md-8">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control ckfinder-input"
+                                       name="@field.Name"
+                                       id="@field.Name-@i"
+                                       value="@imageUrls[i]"
+                                       readonly />
+                                <div class="input-group-append">
+                                    <button originid="@field.Name"
+                                            target="@field.Name-@i"
+                                            class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                            type="button"
+                                            onclick="openCKFinder(this)">
+                                        <i class="fe-upload"></i> @MyAdminPage.Text["Browse files ..", "Duyệt file"]
+                                    </button>
+                                </div>
+                            </div>
+                            <img id="img-@field.Name-@i" originid="@field.Name" src="@imageUrls[i]" class="image-preview" style="margin-top:10px; max-height: 250px; max-width: 100%" />
+                        </div>
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info btn-sm move-up-btn" onclick="moveUpImage(this)">
+                                    <i class="fa fa-arrow-up"></i>
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm move-down-btn" onclick="moveDownImage(this)">
+                                    <i class="fa fa-arrow-down"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteImage(this)">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                @if (imageUrls.Length == 0)
+                {
+                    <div class="form-group row image-picker-item">
+                        <label for="@field.Name"
+                               class="col-12 col-md-2 col-form-label">
+                            @MyAdminPage.Text[field.Title]
+                        </label>
+                        <div class="col-12 col-md-8">
+                            <div class="input-group">
+                                <input type="text"
+                                       class="form-control ckfinder-input"
+                                       name="@field.Name"
+                                       id="@field.Name"
+                                       value=""
+                                       readonly />
+                                <div class="input-group-append">
+                                    <button originid="@field.Name"
+                                            target="@field.Name"
+                                            class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                            type="button"
+                                            onclick="openCKFinder(this)">
+                                        <i class="fe-upload"></i> @MyAdminPage.Text["Browse files ..", "Duyệt file"]
+                                    </button>
+                                </div>
+                            </div>
+                            <img id="img-@field.Name" originid="@field.Name" src="/assets/images/no-image.jpg" class="image-preview" style="margin-top:10px; max-height: 250px; max-width: 100%" />
+                        </div>
+                        <div class="col-md-2">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info btn-sm move-up-btn" onclick="moveUpImage(this)">
+                                    <i class="fa fa-arrow-up"></i>
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm move-down-btn" onclick="moveDownImage(this)">
+                                    <i class="fa fa-arrow-down"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteImage(this)">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <button type="button" class="btn btn-primary" onclick="addImagePicker('@field.Name', '@field.Title')">Thêm hình ảnh</button>
+        }
+        @helper ComboboxFor(string name, string title, Dictionary<string, string> options = null, string value = "")
+        {
+            <div class="form-group row">
+                <label originId="@name"
+                       class="col-12 col-md-2 col-form-label"
+                       for="@name">
+                    @MyAdminPage.Text[title]
+                </label>
+                <div class="col-12 col-md-10">
+                    <select class="form-control"
+                            originId="@name"
+                            id="@name"
+                            name="@name">
+
+                        @foreach (var item in options)
+                        {
+                            <option value="@item.Value" @(item.Value == value ? "selected" : "")>@item.Key</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        }
+
+        @helper ImagePickerFor(Field field, int index = -1, string value = "", bool required = false)
+        {
+            <div class="form-group row">
+                <label originid="@field.Name"
+                       for="@field.Name@(index>-1?$"-{index}":"")"
+                       class="col-12 col-md-2 col-form-label">
+                    @MyAdminPage.Text[field.Title]
+                    @if (required)
+                    {
+                        <span class="text-danger">*</span>
+                    }
+                </label>
+                <div class="col-12 col-md-10">
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               @(required ? "required" : "")
+                               name="@field.Name@(index>-1?$"-{index}":"")"
+                               id="@field.Name@(index>-1?$"-{index}":"")"
+                               originid="@field.Name"
+                               value="@(value??string.Empty)"
+                               @*onkeyup="javascript:document.getElementById('img-@field.Name@(index > -1 ? $"-{index}" : "")').src=this.value"*@
+                               readonly />
+                        <div class="input-group-append">
+                            <button originid="@field.Name"
+                                    target="@field.Name@(index>-1?$"-{index}":"")"
+                                    class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                    type="button">
+                                <i class="fe-upload"></i> @MyAdminPage.Text["Browse files ..", "Duyệt file"]
+                            </button>
+                        </div>
+                    </div>
+                    <img id="img-@field.Name@(index>-1?$"-{index}":"")" originid="@field.Name" src="@(string.IsNullOrEmpty(value as string)?"/assets/images/no-image.jpg":value)" style="margin-top:10px; max-height: 250px; max-width: 100%" />
+                </div>
+            </div>
+        }
+
+        @helper AutoRenderField(ComponentField field, IDictionary<string, object> data = null)
+        {
+            object value = null;
+
+            if (data != null && data.ContainsKey(field.FieldId))
+            {
+                value = data[field.FieldId];
+            }
+            var guid = Guid.NewGuid();
+
+            if (field.ControlType == "richtextbox")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <textarea class="form-control myckeditor"
+                                  @(field.Required ? "required" : "")
+                                  originid="@field.FieldId"
+                                  name="@field.FieldId-@guid"
+                                  id="@field.FieldId-@guid"
+                                  placeholder="@field.PlaceHolder" rows="7" myckeditor>@Html.Raw(value ?? string.Empty)</textarea>
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "textarea")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <textarea class="form-control"
+                                  @(field.Required ? "required" : "")
+                                  originid="@field.FieldId"
+                                  name="@field.FieldId-@guid"
+                                  id="@field.FieldId-@guid"
+                                  placeholder="@field.PlaceHolder" rows="7">@Html.Raw(value ?? string.Empty)</textarea>
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "combobox")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <select class="form-control"
+                                originid="@field.FieldId"
+                                id="@field.FieldId-@guid"
+                                name="@field.FieldId-@guid">
+
+                            @if (field.Options != null)
+                            {
+                                foreach (var item in field.Options)
+                                {
+                                    <option value="@item" @(item == value as string ? "selected" : "")>@item</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "checkbox")
+            {
+                @*<div class="form-group row">
+                    <div class="col-12 col-md-10 offset-md-2">
+                        <div class="checkbox checkbox-purple">
+                            <input originid="@field.FieldId"
+                                    id="@field.FieldId-@guid"
+                                    name="@field.FieldId-@guid"
+                                    type="checkbox"
+                                    @((value!=null && (bool)value) ? "checked" : "")>
+                            <label for="@field.FieldId-@guid"
+                                    originid="@field.FieldId">
+                                @MyAdminPage.Text[field.FieldTitle]
+                            </label>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="form-group row">
+                    <label originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label"
+                           for="@field.FieldId-@guid">
+                        @MyAdminPage.Text[field.FieldTitle]
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <input type="checkbox"
+                               originid="@field.FieldId"
+                               name="@field.FieldId-@guid"
+                               id="@field.FieldId-@guid"
+                               value="true" @(Root.IsTrueValue(value) ? "checked" : "")
+                               data-plugin="switchery"
+                               data-color="#3ec396" mycheckbox />
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "image")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   @(field.Required ? "required" : "")
+                                   parsley-type="@field.ControlType"
+                                   @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                                   name="@field.FieldId-@guid"
+                                   id="@field.FieldId-@guid"
+                                   originid="@field.FieldId"
+                                   placeholder="@field.PlaceHolder"
+                                   value="@(value ?? string.Empty)"
+                                   @*onkeyup="javascript:document.getElementById('img-@field.FieldId@(index > -1 ? $"-{index}" : "")').src=this.value"*@
+                                   readonly />
+                            <div class="input-group-append">
+                                <button originid="@field.FieldId"
+                                        class="btn btn-primary"
+                                        type="button" onclick="javascript:$('#@field.FieldId-@guid').val('')">
+                                    @MyAdminPage.Text["Clear", "Xóa"]
+                                </button>
+                                <button target="@field.FieldId-@guid" originid="@field.FieldId"
+                                        class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                        type="button">
+                                    <i class="fe-upload"></i> @MyAdminPage.Text["Browse file ..", "Duyệt file .."]
+                                </button>
+                            </div>
+                        </div>
+                        <img id="img-@field.FieldId-@guid" originid="@field.FieldId" src="@(string.IsNullOrEmpty(value as string) ? "/assets/images/no-image.jpg" : value)" style="margin-top:10px; max-height: 250px; max-width: 100%" />
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "file")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   @(field.Required ? "required" : "")
+                                   parsley-type="@field.ControlType"
+                                   @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                                   name="@field.FieldId-@guid"
+                                   id="@field.FieldId-@guid"
+                                   originid="@field.FieldId"
+                                   placeholder="@field.PlaceHolder"
+                                   value="@(value ?? string.Empty)"
+                                   @*onkeyup="javascript:document.getElementById('img-@field.FieldId@(index > -1 ? $"-{index}" : "")').src=this.value"*@ />
+                            <div class="input-group-append">
+                                <button target="@field.FieldId-@guid" originid="@field.FieldId"
+                                        class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                        type="button">
+                                    <i class="fe-upload"></i> @MyAdminPage.Text["Browse file ..", "Duyệt file .."]
+                                </button>
+                            </div>
+                        </div>
+                        <img id="img-@field.FieldId-@guid" originid="@field.FieldId" style="display: none" />
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "date")
+            {
+                var strdate = (string.IsNullOrEmpty(value as string) ? "1990-01-01" : value).ToString().Replace("T", " ");
+                var date = DateTime.Parse(strdate);
+
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <input class="form-control"
+                               type="@field.ControlType"
+                               @(field.Required ? "required" : "")
+                               parsley-type="@field.ControlType"
+                               @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                               name="@field.FieldId-@guid"
+                               id="@field.FieldId-@guid"
+                               originid="@field.FieldId"
+                               placeholder="@field.PlaceHolder"
+                               value="@($"{date:yyyy-MM-dd}")">
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "link")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <div class="input-group">
+                            <input class="form-control"
+                                   type="@field.ControlType"
+                                   @(field.Required ? "required" : "")
+                                   parsley-type="@field.ControlType"
+                                   @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                                   name="@field.FieldId-@guid"
+                                   id="@field.FieldId-@guid"
+                                   originid="@field.FieldId"
+                                   placeholder="@field.PlaceHolder"
+                                   value="@(value ?? string.Empty)">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#insertLinkModal" data-insertback="@field.FieldId-@guid">@MyAdminPage.Text["Select link ..", "Chọn link .."]</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (field.ControlType == "tagsinput")
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <input class="form-control"
+                               type="@field.ControlType"
+                               @(field.Required ? "required" : "")
+                               data-role="tagsinput"
+                               parsley-type="@field.ControlType"
+                               name="@field.FieldId-@guid"
+                               id="@field.FieldId-@guid"
+                               originid="@field.FieldId"
+                               placeholder="@field.PlaceHolder"
+                               value="@(value ?? string.Empty)">
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="form-group row">
+                    <label for="@field.FieldId-@guid" originid="@field.FieldId"
+                           class="col-12 col-md-2 col-form-label">
+                        @MyAdminPage.Text[field.FieldTitle]
+                        @if (field.Required)
+                        {
+                            <span class="text-danger">*</span>
+                        }
+                    </label>
+                    <div class="col-12 col-md-10">
+                        <input class="form-control"
+                               type="@field.ControlType"
+                               @(field.Required || field.ControlType == "number" ? "required" : "")
+                               parsley-type="@field.ControlType"
+                               @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                               name="@field.FieldId-@guid"
+                               id="@field.FieldId-@guid"
+                               originid="@field.FieldId"
+                               placeholder="@field.PlaceHolder"
+                               value="@(value ?? string.Empty)">
+                    </div>
+                </div>
+            }
+        }
+
+        @helper RenderArrayField(ComponentField field, int index = -1, IDictionary<string, object> data = null)
+        {
+
+            object value = null;
+
+            if (data != null && data.ContainsKey(field.FieldId))
+            {
+                value = data[field.FieldId];
+            }
+
+            var array = value != null ? value as System.Collections.ArrayList : new System.Collections.ArrayList();
+
+            foreach (var item in array)
+            {
+                <div class="input-group mb-3">
+                    <input class="form-control"
+                           type="@field.ControlType"
+                           @(field.Required ? "required" : "" )
+                           parsley-type="@field.ControlType"
+                           @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                           name="@field.FieldId@(index > -1 ? $"-{index}" : "")"
+                           id="@field.FieldId@(index > -1 ? $"-{index}" : "")"
+                           originid="@field.FieldId"
+                           placeholder="@field.PlaceHolder"
+                           value="@(item ?? string.Empty)"
+                           tabindex=-1>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-delete-arrFieldItem" tabindex=-1><i class="fe-x-circle"></i></button>
+                    </div>
+                </div>
+            }
+
+            <div class="input-group mb-3">
+                <input class="form-control"
+                       type="@field.ControlType"
+                       @(field.Required ? "required" : "" )
+                       parsley-type="@field.ControlType"
+                       @(!string.IsNullOrEmpty(field.InputMask) ? $"data-toggle=input-mask data-mask-format={field.InputMask}" : "")
+                       name="@field.FieldId@(index > -1 ? $"-{index}" : "")"
+                       id="@field.FieldId@(index > -1 ? $"-{index}" : "")"
+                       originid="@field.FieldId"
+                       placeholder="@field.PlaceHolder"
+                       tabindex=-1>
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-primary btn-insert-arrFieldItem" tabindex=-1><i class="fe-plus-circle"></i></button>
+                </div>
+            </div>
+        }
+
+        @helper RenderSchema(ObjectSchema schema, string path, IDictionary<string, object> data = null)
+        {
+            if (path == "root")
+            {
+                <div class="card @(schema.SingleFieldTypes.Count == 0?"d-none":"")">
+                    <div class="card-header">
+                        @MyAdminPage.Text[en: "Basic info", vi: "Nhập thông tin"] <button type="button" class="btn btn-info float-right collapsed" data-toggle="collapse" data-target="#@(path)-singleFields"><i class="fa fa-chevron-down pull-right"></i></button>
+                    </div>
+                    <div class="card-body card-body-singleFields collapse" id="@(path)-singleFields">
+                        @foreach (var singleFieldType in schema.SingleFieldTypes)
+                        {
+                            @MyHtml.AutoRenderField(singleFieldType, data: data)
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="card-body-singleFields">
+                    @foreach (var singleFieldType in schema.SingleFieldTypes)
+                    {
+                        @MyHtml.AutoRenderField(singleFieldType, data: data)
+                    }
+                </div>
+            }
+
+            foreach (var arrayFieldType in schema.ArrayFieldTypes)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        @arrayFieldType.FieldId
+                        <button type="button" class="btn btn-info float-right collapsed" data-toggle="collapse" data-target="#@(path)-arrayField-@arrayFieldType.FieldId"><i class="fa fa-chevron-down pull-right"></i></button>
+                    </div>
+                    <div class="card-body card-body-arrayField collapse" id="@(path)-arrayField-@arrayFieldType.FieldId" originId="@arrayFieldType.FieldId">
+                        @MyHtml.RenderArrayField(arrayFieldType, data: data)
+                    </div>
+                </div>
+            }
+
+            foreach (var singleObjType in schema.SingleObjectTypes)
+            {
+                var singleObjData = (data.ContainsKey(singleObjType.PropName) ? data[singleObjType.PropName] : null) as IDictionary<string, object>;
+
+                <div class="card">
+                    <div class="card-header">
+                        @singleObjType.Title <button type="button" class="btn btn-info float-right collapsed" data-toggle="collapse" data-target="#@(path)-singleObj-@singleObjType.PropName"><i class="fa fa-chevron-down pull-right"></i></button>
+                    </div>
+                    <div class="card-body card-body-singleObj collapse" id="@(path)-singleObj-@singleObjType.PropName" originId="@singleObjType.PropName">
+                        @MyHtml.RenderSchema(singleObjType, $"{path}-singleObj-{singleObjType.PropName}", singleObjData)
+                    </div>
+                </div>
+            }
+
+            foreach (var arrObjType in schema.ArrayObjectTypes)
+            {
+                var arrayData = (data != null && data.ContainsKey(arrObjType.PropName) ? data[arrObjType.PropName] ?? new System.Collections.ArrayList() : new System.Collections.ArrayList()) as System.Collections.ArrayList;
+
+                <div class="card">
+                    <div class="card-header">
+                        @MyAdminPage.Text[arrObjType.Title] <button type="button" class="btn btn-info float-right collapsed" data-toggle="collapse" data-target="#@(path)-arrObjType-@arrObjType.PropName" aria-expanded="false"><i class="fa fa-chevron-down pull-right"></i></button>
+                    </div>
+                    <div class="card-body card-body-arrObjType collapse" id="@(path)-arrObjType-@arrObjType.PropName" originId="@arrObjType.PropName">
+
+                        <div class="card-template">
+                            <div class="card-header">
+                                @arrObjType.ChildTitle
+                                <div class="form-group mb-0 button-card-body-arrObjType float-right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-warning btn-move-up-arrObjDataItem waves-effect"><i class="mdi mdi-minus-circle"></i> @MyAdminPage.Text["Up", "Đi lên"]</button>
+                                        <button type="button" class="btn btn-danger btn-delete-arrObjDataItem waves-effect"><i class="mdi mdi-minus-circle"></i> @MyAdminPage.Text["Remove", "Xóa"]</button>
+                                        <button type="button" class="btn btn-info float-right btn-card-header-arrObjType collapsed" data-toggle="collapse" data-target="#@(path)-arrObj-@arrObjType.PropName"><i class="fa fa-chevron-down pull-right"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body card-body-template card-body-arrObjItem collapse" id="@(path)-arrObj-@arrObjType.PropName">
+                                @MyHtml.RenderSchema(arrObjType, $"{path}-arrObjType-{arrObjType.PropName}")
+                            </div>
+                        </div>
+
+                        @foreach (var arrayItem in arrayData)
+                        {
+                            var guid = Guid.NewGuid();
+                            var arrObjData = arrayItem as IDictionary<string, object>;
+
+                            <div class="card card-arrayItem">
+                                <div class="card-header">
+                                    @(arrObjData.ContainsKey("Title")?arrObjData["Title"] : arrObjType.ChildTitle)
+
+                                    <div class="form-group mb-0 button-card-body-arrObjType float-right">
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-warning btn-move-up-arrObjDataItem waves-effect"><i class="mdi mdi-arrow-up-drop-circle"></i> @MyAdminPage.Text["Up", "Đi lên"]</button>
+                                            <button type="button" class="btn btn-danger btn-delete-arrObjDataItem waves-effect"><i class="mdi mdi-minus-circle"></i> @MyAdminPage.Text["Remove", "Xóa"]</button>
+                                            <button type="button" class="btn btn-info collapsed" data-toggle="collapse" data-target="#@(path)-arrObj-@arrObjType.PropName-@guid"><i class="fa fa-chevron-down pull-right"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body card-body-arrObjItem collapse" id="@(path)-arrObj-@arrObjType.PropName-@guid">
+                                    @MyHtml.RenderSchema(arrObjType, $"{path}-arrObj-{arrObjType.PropName}-{guid}", arrObjData)
+                                </div>
+                            </div>
+                        }
+
+                        <div class="form-group mb-0 button-card-body-arrObjType" style="text-align:right">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-light waves-effect btn-insert-arrObjDataItem"><i class="mdi mdi-plus-circle"></i> @MyAdminPage.Text["Add record", "Thêm bản ghi"]</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }

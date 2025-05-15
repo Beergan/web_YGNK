@@ -1,0 +1,38 @@
+﻿@inherits MyAdminPage
+@{
+    CheckAuthen()();
+    var query = Request.Url.Query;
+
+    string sessionId = Request.QueryString[nameof(sessionId)];
+    var visit = Db.GetOne<PP_Visit>(t => t.SessionId == sessionId);
+    var lines = Newtonsoft.Json.JsonConvert.DeserializeObject<List<KeyValuePair<string, long>>>(visit.JsonDetails);
+    Layout = null;
+    int i = 0;
+}
+<table class="table">
+    <tr>
+        <td>Phiên</td>
+        <td>@visit.SessionId</td>
+    </tr>
+    <tr>
+        <td>Thời gian</td>
+        <td>@($"{visit.CreatedTime:yyyy-MM-dd HH:mm}")</td>
+    </tr>
+</table>
+<table class="table">
+    <tr>
+
+        <td>#</td>
+        <td>Đường dẫn</td>
+        <td align="right">Thời gian</td>
+    </tr>
+    
+    @foreach (var line in lines)
+    {
+        <tr>
+            <td>@(++i)</td>
+            <td>@line.Key</td>
+            <td align="right">@(line.Value)s</td>
+        </tr>
+    }
+</table>

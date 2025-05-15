@@ -1,0 +1,192 @@
+﻿@inherits MyAdminPage
+@{
+	Layout = null;
+	CheckAuthen()();
+
+	if (IsPost)
+	{
+		AntiForgery.Validate();
+		Validation.RequireField("CurrentPassword", Text["Current password cannot be empty!", "Mật khẩu không được để trống."]);
+		Validation.RequireField("NewPassword", Text["New password cannot be empty!", "Mật khẩu không được để trống."]);
+		Validation.RequireField("ConfirmationPassword", Text["Confirmation password cannot be empty!", "Mật khẩu không được để trống."]);
+
+		Validation.Add("CurrentPassword",
+			Validator.StringLength(
+			maxLength: Int32.MaxValue,
+			minLength: 6,
+			errorMessage: Text["Current password must be at least 6 characters.", "Mật khẩu hiện tại phải gồm ít nhất 6 ký tự."]));
+
+		Validation.Add("NewPassword",
+			Validator.StringLength(
+			maxLength: Int32.MaxValue,
+			minLength: 6,
+			errorMessage: Text["New password must be at least 6 characters.", "Mật khẩu mới phải gồm ít nhất 6 ký tự."]));
+
+		Validation.Add("NewPassword",
+			Validator.EqualsTo(
+			otherFieldName: "ConfirmationPassword",
+			errorMessage: Text["New password and confirmation do not match.", "Xác nhận mật khẩu không khớp."]));
+
+		if (Validation.IsValid())
+		{
+			string currentPassword = Request.Form["CurrentPassword"].Replace("'", "").Replace("&^%$", "");
+			string newPassword = Request.Form["NewPassword"].Replace("'", "").Replace("&^%$", "");
+			var currentPasswordHash = Crypto.SHA256(currentPassword);
+			var newPasswordHash = Crypto.SHA256(newPassword);
+
+			var checkUser = Db.GetOne<PP_User>(t => t.UserId == UserId && t.Password == currentPasswordHash);
+
+			if (checkUser != null)
+			{
+				checkUser.Password = newPasswordHash;
+				Db.Update<PP_User>(checkUser);
+				MyWebSecurity.Logout();
+				Response.Redirect(Constants.Admin_Login_Url);
+			}
+			else
+			{
+				ModelState.AddFormError(Text["Username or password are incorrect!", "Tên đăng nhập hoặc mật khẩu không đúng!"]);
+			}
+		}
+	}
+}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>@Text["CHANGE PASSWORD", "ĐỔI MẬT KHẨU"] - SLK ADMIN v5.0</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	@*<meta content="A fully featured admin theme which can be used to build CRM, CMS, etc." name="description" />
+		<meta content="Coderthemes" name="author" />*@
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<!-- App favicon -->
+	<link rel="shortcut icon" href="assets/images/favicon.ico">
+
+	<!-- App css -->
+	<link href="@Constants.Admin_Url/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+	<link href="@Constants.Admin_Url/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+	<link href="@Constants.Admin_Url/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+	<style>
+
+		html, body {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+		}
+
+		body {
+			touch-action: pan-x pan-y;
+		}
+
+		.my-container {
+			text-align: center;
+			display: block;
+			height: 100%;
+			position: relative;
+			z-index: 1000;
+		}
+
+			.my-container::before,
+			.my-container .box {
+				display: inline-block;
+				vertical-align: middle;
+				text-align: left;
+			}
+
+			.my-container::before {
+				content: '';
+				width: 0;
+				height: 100%;
+			}
+
+		.video, .canvas {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			z-index: 1;
+			min-width: 100%;
+			min-height: 100%;
+			width: auto;
+			height: auto;
+			-webkit-transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		}
+	</style>
+
+</head>
+
+<body class="authentication-bg bg-gradient">
+
+	<video class="video" autoplay muted loop>
+		<source src="@Constants.Admin_Url/assets/videos/Indian-Tea.mp4" type="video/mp4">
+	</video>
+
+	<div class="my-container">
+		<div class="box">
+			<div class="card" style="min-width:350px">
+				<div class="card-body">
+					<div class="text-center w-75 m-auto">
+						@*<a href="/admin">
+								<span><img src="assets/images/logo-slk.png" alt="" height="100"></span>
+							</a>*@
+						<h5 class="text-uppercase text-center font-bold mb-2">@Text["CHANGE PASSWORD", "ĐỔI MẬT KHẨU"]</h5>
+					</div>
+
+					<form method="post">
+						@AntiForgery.GetHtml()
+
+						@if (ModelState.Any())
+						{
+							<div class="alert alert-danger" role="alert">
+								@Html.ValidationSummary(Text["Operation failed!", "Thao tác không thành công!"], excludeFieldErrors: false, htmlAttributes: null)
+							</div>
+						}
+
+						<div class="form-group mb-3">
+							<label for="username">@Text["Username", "Tên đăng nhập"]</label>
+							<input class="form-control" type="text" value="@UserId" disabled>
+						</div>
+
+						<div class="form-group mb-3">
+							<label for="password">@Text["Current password", "Mật khẩu hiện tại"]</label>
+							<input class="form-control" type="password" required="required" id="CurrentPassword" name="CurrentPassword">
+						</div>
+
+						<div class="form-group mb-3">
+							<label for="password">@Text["New password", "Mật khẩu mới"]</label>
+							<input class="form-control" type="password" required="required" id="NewPassword" name="NewPassword">
+						</div>
+
+						<div class="form-group mb-3">
+							<label for="password">@Text["Confirmation password", "Xác nhận mật khẩu"]</label>
+							<input class="form-control" type="password" required="required" id="ConfirmationPassword" name="ConfirmationPassword">
+						</div>
+
+						@*<div class="form-group mb-3">
+								<div class="custom-control custom-checkbox">
+									<input type="checkbox" class="custom-control-input" id="checkbox-signin" checked>
+									<label class="custom-control-label" for="checkbox-signin">Ghi nhớ</label>
+								</div>
+							</div>*@
+
+						<div class="form-group mb-0 text-center">
+							<button class="btn btn-gradient btn-block" type="submit">@Text["Submit", "Xác nhận"]</button>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- end page -->
+	<!-- Vendor js -->
+	<script src="assets/js/vendor.min.js"></script>
+
+	<!-- App js -->
+	<script src="assets/js/app.min.js"></script>
+
+</body>
+</html>

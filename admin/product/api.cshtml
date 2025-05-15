@@ -1,0 +1,167 @@
+﻿@using OfficeOpenXml
+@inherits MyAdminPage
+@using System.Threading.Tasks
+@using System.Net.Http
+
+@functions{
+    private FieldExtractor<PP_Product> field = new FieldExtractor<PP_Product>();
+    private PP_Product model = new PP_Product() { NodeStatus = "CREATED", NodeType = "product" };
+
+    public async Task OnPostAsync()
+    {
+        AntiForgery.Validate();
+        var cat = Db.Table<PP_Category>();
+        var product = Db.Table<PP_Product>();
+        var result = product.Join(cat, p => p.CategoryId, c => c.Id, (p, c) => new
+        {
+            p,
+            c
+
+        }).ToList();
+
+        var orderSubmit = new REQ_Product_SUBMIT()
+        {
+            _Category = result.Select(api => new REQ_Product_SUBMIT.Category()
+            {
+                Id = api.c.Id,
+                Title = api.c.Title,
+                ImageUrl = api.c.ImageUrl,
+                ParentId = api.c.ParentId,
+                CategoryLevel = api.c.CategoryLevel,
+                _product = new List<REQ_Product_SUBMIT.Product>()
+                {
+                new REQ_Product_SUBMIT.Product
+                {
+                    Title = api.p.Title,
+                    Price = api.p.Price,
+                    ImagesJson = api.p.ImageUrl,
+                    Des = api.p.Des,
+                    Content = api.p.Content,
+                    IDcat = api.p.CategoryId,
+                }
+            }
+            }).ToList()
+        };
+        bool apiResult = await API_APP_CHECK.SubmitProductAsync(orderSubmit,
+                success: responseData =>
+                {
+                    Console.WriteLine("Submit successful: " + responseData.message);
+                    return true;
+                },
+                error: errorMessage =>
+                {
+                    Console.WriteLine("Error: " + errorMessage);
+                });
+    }
+        }
+@{
+
+    if (IsPost)
+    {
+
+        try
+        {
+         OnPostAsync();
+
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddFormError(ex.Message);
+        }
+    }
+    Page.Title = Text["CREATE A text", "THÊM SẢN PHẨM"];
+    Page.Menu = "porduct";
+
+}
+<div id="loading" style="display: none;">
+    <p>Loading...</p>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách sản phẩm" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box table-responsive">
+                <ul class="nav nav-tabs">
+                    <a href="~/upload/excel/"></a>
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/product" aria-expanded="true" class="nav-link">
+                            <i class="fas fa-list-ol"></i> @Text["All of text", "Tất cả sản phẩm"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#create" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                            <i class="fas fa-plus-circle"></i> @Text["Create new text", "Import Excel"]
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="create">
+                        <form class="form-horizontal validable" role="form" method="post" enctype="multipart/form-data">
+                            @AntiForgery.GetHtml()
+                            @if (ModelState.Any())
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @Html.ValidationSummary(Text["Operation failed!", "Thao tác không thành công!"], excludeFieldErrors: false, htmlAttributes: null)
+                                </div>
+                            }
+                            @MyHtml.ComposeLanguageSwitch()
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    @MyHtml.ComboboxFor(field[t => t.CategoryId], options: GetGroupSelector("vi", "product"), value: (model.CategoryId ?? 0).ToString())
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-2 pt-3">
+                                    <label for="formFile">  File Excel</label>
+                                </div>
+                                <div class="mb-3 col-lg-10">
+                                    <a class="btn-group" href="~/upload/excel/listtext/text.xlsx">Tải mẫu</a>
+                                    <input class="form-control" type="file" id="File" name="File" accept=".xls, .xlsx">
+                                </div>
+
+                            </div>
+
+                            @*MyHtml.ComboboxFor(field[t => t.Brand], value: model.Brand, options: brandSelections)*@
+
+                            <hr />
+
+                            <div class="form-group mb-0">
+                                <div>
+                                    <button type="submit" class="btn btn-gradient waves-effect waves-light">
+                                        @Text["Submit", "Xác nhận"]
+                                    </button>
+                                    <button type="button" class="btn btn-light waves-effect ml-1" onclick="window.history.back()">
+                                        @Text["Back", "Quay lại"]
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section head{
+}
+
+@section scripts{
+    <script src="~/assets/js/jquery.min.js"></script>
+    <script src="~/assets/js/jquery.js"></script>
+    <script src="~/admin/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="@Constants.Admin_Url/ckeditor/ckeditor.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/ckfinder/ckfinder.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/speakingurl/speakingurl.min.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/stringtoslug/jquery.stringtoslug.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script type="text/javascript">
+
+    </script>
+    
+}

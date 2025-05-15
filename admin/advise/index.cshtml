@@ -1,0 +1,246 @@
+﻿@inherits MyAdminPage
+@functions{
+	private FieldExtractor<PP_Advise> field = new FieldExtractor<PP_Advise>();
+	private List<PP_Advise> items = null;
+}
+@{
+    CheckAuthen()();
+    var query = Request.Url.Query.NullIfWhiteSpace() ?? "?new";
+
+    var dbQuery = Db.Query<PP_Advise>();
+
+    if (query == "?update_status")
+    {
+        int id = Request.Form[nameof(id)].AsInt();
+        string status = Request.Form[nameof(status)];
+        string note = Request.Form[nameof(note)];
+
+        var contact = Db.GetOne<PP_Advise>(id);
+        contact.Status = status;
+        contact.ProcessNote = note;
+        Db.Update<PP_Advise>(contact);
+
+        AjaxResult.Ok("Thông tin đã được ghi nhận!")();
+    }
+    else if (query == "?processing")
+    {
+        dbQuery = dbQuery.Where(t => t.Status == "PROCESSING");
+    }
+    else if (query == "?cancelled")
+    {
+        dbQuery = dbQuery.Where(t => t.Status == "CANCELLED");
+    }
+    else if (query == "?success")
+    {
+        dbQuery = dbQuery.Where(t => t.Status == "SUCCESS");
+    }
+    else
+    {
+        dbQuery = dbQuery.Where(t => t.Status == "NEW");
+    }
+
+    Page.Title = Text["LIST OF ADVISE", "DANH SÁCH TƯ VẤN"];
+    Page.Menu = "advise";
+    items = dbQuery.OrderByDescending(t => t.CreatedTime).ToList();
+}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			@RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách tư vấn" })
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<div class="card-box table-responsive">
+				<ul class="nav nav-tabs">
+					<li class="nav-item">
+						<a href="?new" aria-expanded="true" class="nav-link @(query=="?new"||query==string.Empty?"active":string.Empty)">
+							<i class="fas fa-list-ol"></i> Tư vấn mới
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="?processing" aria-expanded="true" class="nav-link @(query=="?processing"?"active":string.Empty)">
+							<i class="fas fa-list-ol"></i> Đang xử lý
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="?cancelled" aria-expanded="true" class="nav-link @(query=="?cancelled"?"active":string.Empty)">
+							<i class="fas fa-list-ol"></i> Đã hủy
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="?success" aria-expanded="true" class="nav-link @(query=="?success"?"active":string.Empty)">
+							<i class="fas fa-list-ol"></i> Xử lý thành công
+						</a>
+					</li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane show active" id="list">
+						<table id="datatable" class="table table-striped table-bordered dt-responsive" style="border-collapse: collapse; border-spacing: 0; width: 100%;">
+							<thead>
+								<tr>
+									<th style="width:1%;min-width:80px;"> @Text[field.GetTitle(t => t.CreatedTime)]</th>
+									<th style="min-width: 230px; width: 15%;">Người liên hệ</th>
+									<th>Nội dung liên hệ</th>
+									<th>Xử lý</th>
+									<th style="width:1%;min-width:80px;">@Text["Control", "Thao tác"]</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								@for (int i = 0; i < items.Count; i++)
+								{
+									<tr>
+										<td>@($"{items[i].CreatedTime:yyyy-MM-dd}")</td>
+										<td style="min-width: 230px; width: 15%;">
+											<h5 class="mt-0">@items[i].Name</h5>
+											<div><u>Điện thoại:</u> @items[i].Phone</div>
+										</td>
+										<td>
+											<div><u>Nội dung:</u> @items[i].Content</div>
+										</td>
+										<td>
+											<b class="data-contact-status">@items[i].Status</b>
+											<div><u>Ghi chú:</u> <span class="data-contact-process">@items[i].ProcessNote</span></div>
+										</td>
+
+										<td align="center">
+											<button type="button" class="btn btn-info waves-effect waves-light btn-update" data-toggle="modal" data-target="#update-modal" data-contact-id="@items[i].Id">Cập nhật</button>
+										</td>
+									</tr>
+								}
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> <!-- end row -->
+	<!-- end row -->
+</div>
+
+<div id="update-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body">
+				<h2 class="text-uppercase text-center mb-4">
+					<a href="index.html" class="text-success">
+						<span><img src="/admin/assets/images/logo-sm.png" alt="" height="90"></span>
+					</a>
+				</h2>
+
+				<form class="form-horizontal form-update-status" action="#">
+					@AntiForgery.GetHtml()
+					<input type="hidden" name="id" id="id" />
+					<div class="form-group">
+						<div class="col-12">
+							<label for="status">Trạng thái</label>
+							<select class="form-control" name="status" id="status">
+								<option value="NEW">Mới</option>
+								<option value="PROCESSING">Đang xử lý</option>
+								<option value="SUCCESS">Thành công</option>
+								<option value="CANCELLED">Hủy</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<div class="col-12">
+							<label for="password1">Nội dung cập nhật</label>
+							<textarea class="form-control" type="text" required id="note" name="note" placeholder="Nội dung xử lý .." rows="5"></textarea>
+						</div>
+					</div>
+
+					<div class="form-group account-btn text-center">
+						<div class="col-12">
+							<button class="btn width-lg btn-rounded btn-primary waves-effect waves-light" type="submit">Xác nhận</button>
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+@section head{
+	<!-- third party css -->
+	<link href="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
+	<link href="@Constants.Admin_Url/assets/libs/datatables/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
+	<link href="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
+	<link href="@Constants.Admin_Url/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+}
+
+@section scripts{
+	<script src="@Constants.Admin_Url/assets/libs/datatables/jquery.dataTables.min.js"></script>
+	<script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.min.js"></script>
+	<script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.responsive.min.js"></script>
+	<script src="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
+	<script src="@Constants.Admin_Url/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+	<script>
+		$(document).ready(function () {
+
+			$(document).on("click", ".btn-update", function () {
+				var contactId = $(this).attr("data-contact-id");
+				var status = $(this).parents("tr").find(".data-contact-status").html();
+				var process = $(this).parents("tr").find(".data-contact-process").html();
+
+				$("#id").val(contactId)
+				$("#note").val(process)
+				$("#status").val(status)
+			});
+
+			$('.form-update-status').on('submit', function (event) {
+				event.preventDefault();
+				console.log($(this).serialize());
+
+								$('#update-modal').modal('hide');
+				Swal.fire({
+					title: 'Xin chờ đợi!',
+					html: 'Hệ thống đang ghi nhận thông tin ..',
+					didOpen: () => { Swal.showLoading(); },
+				});
+
+				$.post("@Constants.Admin_Url/advise?update_status",
+					$(this).serialize(),
+					function (data) {
+						Swal.fire({
+							title: 'Chúc mừng!',
+							text: data,
+							type: "success"
+						}).then(() => { window.location.reload(); });
+					})
+					.fail(function (error) {
+						Swal.fire({
+							title: '@Text["Oh, no!", "Thôi xong!"]',
+							text: error.responseText,
+							type: "error"
+						});
+					});
+			});
+
+			jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+				"formatted-num-pre": function (a) {
+					a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+					return parseFloat(a);
+				},
+				"formatted-num-asc": function (a, b) {
+					return a - b;
+				},
+				"formatted-num-desc": function (a, b) {
+					return b - a;
+				}
+			});
+
+			$('#datatable').DataTable({
+				"aaSorting": [],
+				"columnDefs": [{ type: 'formatted-num', targets: 0 }],
+				"pageLength": 100,
+				"lengthChange": false,
+			});
+		});
+	</script>
+}

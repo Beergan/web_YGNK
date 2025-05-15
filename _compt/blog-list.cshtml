@@ -1,0 +1,305 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@using System.Linq
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        ComptName = "en:Blog list template|vi:Mẫu trang danh sách Blog",
+        PathPostfix = "/{0}",
+        PageType = "list", NodeType = "post")]
+    public class ViewModel : PageListModel
+    {
+        public VM_Blog[] Items { get; set; }
+        public VM_Blog[] count { get; set; }
+        public VM_Blog[] RecentItems { get; set; }
+        public PP_Category[] cat { get; set; }
+
+        [Field(
+Title = "en:Describe|vi:Mô tả",
+Required = false,
+Control = InputControlType.RichTextBox)]
+        public string Describe { get; set; }
+
+        public static ViewModel Default => new ViewModel()
+        {
+            Title = "Danh sách blog",
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    string keyword = Request.QueryString[nameof(keyword)];
+    var slug = ToneRemover.MakeSlug(keyword);
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}-{CurrentPage}", setup: (model) =>
+    {
+
+
+
+        model = model ?? new ViewModel();
+
+        var page = Db.GetOne<PP_Page>(PageId);
+        if (page == null) return null;
+
+        var category = Db.GetOne<PP_Category>(t => t.CategoryPath == NodeSlug);
+        if (category == null)
+
+        {
+            HttpContext.Current.Response.Redirect("/404.html", true);
+            return null;
+        }
+
+        model.Breadcrumbs = Newtonsoft.Json.JsonConvert.DeserializeObject<KeyValuePair<string, string>[]>(category.Breadcrumb);
+        var arrCategory = Root.CategoryIndexes[category.Id].ToList();
+
+        model.cat = Db.Table<PP_Category>().Where(x => x.NodeType == "post").ToArray();
+
+
+        var count =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "post"
+ select new VM_Blog
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Summary,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     idnode = cat_blog.Idproduct,
+     Featured = node.Featured,
+     listcat = node.listcat,
+ })
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+
+        var news =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0)
+ select new VM_Blog
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Summary,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     idnode = cat_blog.Idproduct,
+     Featured = node.Featured,
+     listcat = node.listcat,
+ }).AsEnumerable()
+.GroupBy(b => b.Title)
+.Select(g => g.OrderByDescending(b => b.CreatedTime).First())
+.OrderByDescending(b => b.CreatedTime)
+.ToArray(); ;
+
+
+        model.count = count;
+
+        if(keyword != null)
+        {
+            news =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Node>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "post" && arrCategory.Contains(cat_blog.Idcat ?? 0) && node.Title.Contains(keyword)
+ select new VM_Blog
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Summary,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     idnode = cat_blog.Idproduct,
+     Featured = node.Featured,
+     listcat = node.listcat,
+ }).AsEnumerable()
+.GroupBy(b => b.Title)
+.Select(g => g.OrderByDescending(b => b.CreatedTime).First())
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+        }
+
+
+
+        var paging = news.OrderByDescending(t => t.CreatedTime)
+            .Skip((this.CurrentPage - 1) * 16)
+            .Take(16)
+            .GroupBy(p => new { Total = news.Count() })
+            .FirstOrDefault();
+
+
+        model.Title = page.Title;
+        model.Banner = category.ImageUrl;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+        model.CurrentPage = this.CurrentPage;
+        model.CategoryPath = category.CategoryPath;
+
+
+
+        if (paging != null)
+        {
+            model.TotalPages = (long)Math.Ceiling((decimal)paging.Key.Total / 16);
+            model.Items = paging.ToArray();
+        }
+        else
+        {
+            model.TotalPages = 1;
+            model.Items = new VM_Blog[] { };
+        }
+
+        return model;
+    });
+
+    Layout = "~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal">
+    <div class="content_wrap">
+        <div class="sc_layouts_column sc_layouts_column_align_center">
+            <div class="sc_layouts_item">
+                <div class="sc_layouts_title sc_align_center">
+                    <div class="sc_layouts_title_title">
+                        <h1 itemprop="headline" class="sc_layouts_title_caption">
+                            Tin tức
+                        </h1>
+                    </div>
+                    <div class="sc_layouts_title_breadcrumbs"><div class="breadcrumbs"><a class="breadcrumbs_item home underline_hover" href="../../index.htm">Home</a><span class="breadcrumbs_delimiter"></span><a class="breadcrumbs_item all_posts underline_hover" href="../../blog-standard/index.htm">Tất cả bài viết</a><span class="breadcrumbs_delimiter"></span><span class="breadcrumbs_item current">Tin tức</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="page_content_wrap">
+    <div class="content_wrap">
+        <div class="content">
+            <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
+            <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
+                <div class="column-1_3">
+                    <article class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4193 post type-post status-publish format-standard hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3">
+                        <div class="post_header entry-header">
+                            <h4 class="post_title entry-title"><a href="../../gui-hang-tu-han-quoc-ve-viet-nam-gia-re-nhat/index.htm" rel="bookmark">Gửi hàng từ Hàn Quốc về Việt Nam giá rẻ nhất – Giải pháp tối ưu cùng NHB Logistics</a></h4>
+                        </div>
+
+                    </article>
+                </div>
+                @foreach (var item in Data.Items.EmptyIfNull())
+                {
+
+                    <div class="column-1_3">
+                        <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
+                            <div class="post_featured with_thumb hover_link">
+                                <img fetchpriority="high" width="890" height="628" src="@item.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.Title" title="@item.Title" decoding="async">						<div class="mask"></div>
+                                <a href="@item.Path" aria-hidden="true" class="link"></a>
+                            </div>		<div class="post_header entry-header">
+                                <h4 class="post_title entry-title"><a href="@item.Path" rel="bookmark">@item.Title</a></h4>
+                            </div><!-- .entry-header -->
+
+                        </article>
+                    </div>
+                }
+            </div>
+            <nav class="navigation pagination" aria-label="Phân trang bài viết">
+                <h2 class="screen-reader-text">Phân trang bài viết</h2>
+                <div class="nav-links">
+
+                    @if (Data.CurrentPage > 2)
+                    {
+                        <a href="/@Data.CategoryPath?page=1" title="Trang đầu" class="page-numbers">
+                            <i class="fa fa-angle-double-left"></i>
+                        </a>
+                    }
+
+                    @if (Data.CurrentPage > 1)
+                    {
+                        <a href="/@Data.CategoryPath?page=@(Data.CurrentPage - 1)" class="page-numbers prev">
+                            <i class="fa fa-angle-left"></i>
+                        </a>
+                    }
+
+                    @if (Data.TotalPages > 0)
+                    {
+                        if (Data.CurrentPage > 2)
+                        {
+                            <a href="/@Data.CategoryPath?page=1" class="page-numbers">
+                                <span class="meta-nav screen-reader-text">Page </span>1
+                            </a>
+
+                            if (Data.CurrentPage > 3)
+                            {
+                                <span class="page-numbers dots">…</span>
+                            }
+                        }
+
+                        for (int idx = (int)Math.Max(1, Data.CurrentPage - 1); idx <= Math.Min(Data.TotalPages, Data.CurrentPage + 1); idx++)
+                        {
+                            if (Data.CurrentPage == idx)
+                            {
+                                <span aria-current="page" class="page-numbers current">
+                                    <span class="meta-nav screen-reader-text">Page </span>@idx
+                                </span>
+                            }
+                            else
+                            {
+                                <a class="page-numbers" href="/@Data.CategoryPath?page=@idx">
+                                    <span class="meta-nav screen-reader-text">Page </span>@idx
+                                </a>
+                            }
+                        }
+
+                        if (Data.CurrentPage < Data.TotalPages - 1)
+                        {
+                            if (Data.CurrentPage < Data.TotalPages - 2)
+                            {
+                                <span class="page-numbers dots">…</span>
+                            }
+
+                            <a href="/@Data.CategoryPath?page=@Data.TotalPages" class="page-numbers">
+                                <span class="meta-nav screen-reader-text">Page </span>@Data.TotalPages
+                            </a>
+                        }
+                    }
+
+                    @if (Data.CurrentPage < Data.TotalPages)
+                    {
+                        <a href="/@Data.CategoryPath?page=@(Data.CurrentPage + 1)" class="page-numbers next">
+                            <i class="fa fa-angle-right"></i>
+                        </a>
+                    }
+
+                    @if (Data.TotalPages > 2 && (Data.CurrentPage < Data.TotalPages - 1))
+                    {
+                        <a href="/@Data.CategoryPath?page=@(Data.TotalPages)" title="Trang cuối" class="page-numbers">
+                            <i class="fa fa-angle-double-right"></i>
+                        </a>
+                    }
+
+                </div>
+            </nav>
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,117 @@
+﻿@inherits MyAdminPage
+@{
+    int contacts = Db.Table<PP_Contact>().Where(x => x.Status == "NEW").Count();
+    int comment = Db.Table<PP_Comment>().Where(x => x.Status == "NEW").Count();
+    int registers = Db.Table<PP_Register>().Where(x => x.Status == "NEW").Count();
+    int order = Db.Table<PP_Order>().Where(x => x.OrderStatus == "NEW").Count();
+}
+<div id="sidebar-menu">
+    <ul class="metismenu" id="side-menu">
+        <li class="menu-title">@Text["ADMIN PANEL", "QUẢN TRỊ WEBSITE"]</li>
+        <li>
+            <a href="@Constants.Admin_Url" class="@(Page.Menu == "dashboard" ? "active" : "")">
+                <i class="fe-airplay"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Dashboard", "Trang chủ"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/who" class="@(Page.Menu == "who" ? "active" : "")">
+                <i class="fe-airplay"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Who's online", "Ai đang online"]</span>
+            </a>
+        </li>
+
+
+        <li>
+            <a href="@Constants.Admin_Url/config" class="@(Page.Menu == "config" ? "active" : "")">
+                <i class="fe-settings"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["General configs", "Cấu hình chung"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/page" class="@(Page.Menu == "page" ? "active" : "")">
+                <i class="fe-book-open"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Pages setting", "Danh sách trang"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/category" class="@(Page.Menu == "category" ? "active" : "")">
+                <i class="fe-folder"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Categories setting", "Danh sách chuyên mục"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/product" class="@(Page.Menu == "product" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span>@Text["Product management", "Danh sách sản phẩm"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/post" class="@(Page.Menu == "post" ? "active" : "")">
+                <i class="fe-align-left"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Post management", "Danh sách bài viết"]</span>
+            </a>
+        </li>
+        @*<li>
+            <a href="@Constants.Admin_Url/advise" class="@(Page.Menu == "advise" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span>@Text["Advise", "Tư vấn"]</span>
+            </a>
+        </li>*@
+        <li>
+            <a href="@Constants.Admin_Url/order" class="@(Page.Menu == "order" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span class="badge badge-danger badge-pill float-right">@order</span>
+                <span>@Text["Order management", "Danh sách đơn hàng"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/register" class="@(Page.Menu == "register" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span class="badge badge-danger badge-pill float-right">@registers</span>
+                <span>@Text["register", "Danh sách đăng ký"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/contact" class="@(Page.Menu == "contact" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span class="badge badge-danger badge-pill float-right">@contacts</span>
+                <span>@Text["Contact", "Danh sách liên hệ"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/comment" class="@(Page.Menu == "comment" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span class="badge badge-danger badge-pill float-right">@comment</span>
+                <span>@Text["Comment", "Bình luận"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/visit" class="@(Page.Menu == "visit" ? "active" : "")">
+                <i class="fe-airplay"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Visit history", "Lịch sử truy cập"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/ckfinder/" target="_blank">
+                <i class="fe-image"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Media library", "Thư viện hình ảnh"]</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Constants.Admin_Url/lang" class="@(Page.Menu == "i18n" ? "active" : "")">
+                <i class="fe-globe"></i>
+                @*<span class="badge badge-danger badge-pill float-right">3</span>*@
+                <span>@Text["Languages", "Danh sách ngôn ngữ"]</span>
+            </a>
+        </li>
+    </ul>
+</div>

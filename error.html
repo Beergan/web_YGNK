@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>OH! THẬT KHÔNG MAY</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		html, body {
+			font-family:sans-serif;
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			margin: 0px;
+			padding: 0px;
+		}
+
+		.my-container {
+			text-align: center;
+			display: block;
+			height: 100%;
+			position: relative;
+			z-index: 1000;
+		}
+
+			.my-container::before,
+			.my-container .box {
+				display: inline-block;
+				vertical-align: middle;
+				text-align: left;
+			}
+
+			.my-container::before {
+				content: '';
+				width: 0;
+				height: 100%;
+			}
+
+		.error {
+			min-width: 200px;
+			min-height: 200px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="my-container">
+		<div class="box">
+			<div class="error">
+				<pre class="pre-LG">
+             ,----------------,              ,---------,
+        ,-----------------------,          ,"        ,"|
+      ,"                      ,"|        ,"        ,"  |
+     +-----------------------+  |      ,"        ,"    |
+     |  .-----------------.  |  |     +---------+      |
+     |  |                 |  |  |     | -==----'|      |
+     |  |  OH!            |  |  |     |         |      |
+     |  |  Something went |  |  |/----|`---=    |      |
+     |  |  wrong _        |  |  |   ,/|==== ooo |      ;
+     |  |                 |  |  |  // |(((( [33]|    ,"
+     |  `-----------------'  |," .;'| |((((     |  ,"
+     +-----------------------+  ;;  | |         |,"     <a href="/" style="text-decoration:none">go to home!</a>
+        /_)______________(_/  //'   | +---------+
+   ___________________________/___  `,
+  /  oooooooooooooooo  .o.  oooo /,   \,"-----------
+ / ==ooooooooooooooo==.o.  ooo= //   ,`\--{)B     ,"
+/_==__==========__==_ooo__ooo=_/'   /___________,"
+`-----------------------------'
+</pre>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

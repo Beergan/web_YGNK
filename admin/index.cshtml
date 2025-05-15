@@ -1,0 +1,189 @@
+﻿@inherits MyAdminPage
+@{
+    CheckAuthen()();
+
+    var query = Request.Url.Query;
+
+    if (query == "?getdata")
+    {
+        RenderVisitStatsJson().WriteTo(Response.Output);
+        Response.End();
+    }
+
+    Page.Title = "Dashboard";
+    Page.Menu = "dashboard";
+
+    var dashboard = Db.GetDashboardData();
+    var recentVisits = dashboard.Read<PP_Visit>().ToList();
+    var recentOrders = dashboard.Read<PP_Order>().ToList();
+    var urlStats = VisitCounter
+        .UrlStats
+        .OrderByDescending(t => t.Value)
+        .Select(t => new { Url = t.Key, Counter = t.Value })
+        .ToArray();
+}
+@helper RenderVisitStatsJson()
+{
+var visitStats = Db.GetList<PP_Stats_Daily>("SELECT * FROM pp_stats_daily");
+    <text>{
+        "labels": [@Html.Raw(string.Join(", ", visitStats.Select(t => $"\"{t.Date}\"")))],
+        "datasets": [{
+        "label": "Lượng truy cập",
+        "fill": "!1",
+        "backgroundColor": "#5d6dc3",
+        "borderColor": "#5d6dc3",
+        "data": [@Html.Raw(string.Join(", ", visitStats.Select(t => $"\"{t.VisitCount}\"")))]
+        }, {
+        "label": "Lượng đơn hàng",
+        "fill": "!1",
+        "backgroundColor": "#3ec396",
+        "borderColor": "#3ec396",
+        "data": [@Html.Raw(string.Join(", ", visitStats.Select(t => $"\"{t.OrderCount}\"")))]
+        }]
+        }</text>
+}
+<div class="container-fluid">
+    <!-- start page title -->
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Dashboard" })
+            @*<div class="page-title-box">
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="javascript: void(0);">Abstack</a></li>
+                            <li class="breadcrumb-item active">Dashboard</li>
+                        </ol>
+                    </div>
+                    <h4 class="page-title">Dashboard</h4>
+                </div>*@
+        </div>
+    </div>
+    <!-- end page title -->
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card-box">
+                <h4 class="header-title">Thống kê try cập trong tuần</h4>
+                @*<div class="row">
+                        <div class="col-sm-4">
+                            <div class="text-center mt-3">
+                                <h6 class="font-normal text-muted font-14">Conversion Rate</h6>
+                                <h6 class="font-18"><i class="mdi mdi-arrow-up-bold-hexagon-outline text-success"></i> <span class="text-dark">1.78%</span> <small></small></h6>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center mt-3">
+                                <h6 class="font-normal text-muted font-14">Average Order Value</h6>
+                                <h6 class="font-18"><i class="mdi mdi-arrow-up-bold-hexagon-outline text-success"></i> <span class="text-dark">25.87</span> <small>USD</small></h6>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="text-center mt-3">
+                                <h6 class="font-normal text-muted font-14">Total Wallet Balance</h6>
+                                <h6 class="font-18"><i class="mdi mdi-arrow-up-bold-hexagon-outline text-success"></i> <span class="text-dark">87,4517</span> <small>USD</small></h6>
+                            </div>
+                        </div>
+                    </div>*@
+                <canvas id="transactions-chart" height="100" class="mt-4"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card-box">
+                <h4 class="header-title mb-3">Thống kê truy cập trong ngày</h4>
+                <div class="slimScrollDiv" style="position: relative; overflow: auto; width: auto; height: 522.406px;">
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Đường link</th>
+                                    <th style="text-align:center">Lượt truy cập</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < urlStats.Length; i++)
+                                    {
+                                        <tr>
+                                            <th scope="row">@(i + 1)</th>
+                                            <td><a href="@urlStats[i].Url" target="_blank">@urlStats[i].Url</a></td>
+                                            <td align="center">@urlStats[i].Counter</td>
+                                        </tr>
+                                    }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title mb-3">Truy cập gần đây</h4>
+                <div class="comment-list slimscroll" style="max-height: 370px;">
+                    @foreach (var visit in recentVisits)
+                    {
+                        <a href="#">
+                            <div class="comment-box-item">
+                                <div class="badge badge-pill badge-success">@visit.Ip</div>
+                                <p class="commnet-item-date">@Root.GetMomentAgo(visit.CreatedTime)</p>
+                                <h6 class="commnet-item-msg">@visit.LastUrl</h6>
+                                <p class="commnet-item-user">from @visit.Browser on @visit.Device machine</p>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title mb-3">Đơn hàng gần đây</h4>
+                <div class="comment-list slimscroll" style="max-height: 370px;">
+                    @foreach (var order in recentOrders)
+                    {
+                        <a href="#">
+                            <div class="comment-box-item">
+                                <div class="badge badge-pill badge-success">@order.OrderCode</div>
+                                <p class="commnet-item-date">@Root.GetMomentAgo(order.CreatedTime)</p>
+                                <h6 class="commnet-item-msg">@order.Name</h6>
+                                <p class="commnet-item-user">@order.Phone</p>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!-- Chart JS -->
+    <script src="@Constants.Admin_Url/assets/libs/chart-js/Chart.bundle.min.js"></script>
+
+    <!-- Init js -->
+    @*<script src="@Constants.Admin_Url/assets/js/pages/dashboard.init.js"></script>*@
+    <script>
+        $(document).ready(function () {
+
+            var ctx = document.getElementById('transactions-chart');
+
+            $.get("@Constants.Admin_Url?getdata", function (response) {
+                var json = jQuery.parseJSON(response);
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: json,
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

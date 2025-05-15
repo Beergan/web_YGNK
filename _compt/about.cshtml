@@ -1,0 +1,119 @@
+﻿@using SLK.Common
+@inherits MyWebPage
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        ComptName = "en:Page about template|vi:Mẫu trang text")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+
+        [Field(
+   Title = "en:Content|vi:Nội dung",
+   Required = false,
+   Control = InputControlType.RichTextBox)]
+        public string Content { get; set; }
+
+
+        public static ViewModel Default => new ViewModel()
+        {
+            Title = "Giới thiệu",
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? new ViewModel();
+
+        var page = Db.GetOne<PP_Page>(PageId);
+
+        if (page == null)
+        {
+            return model;
+        }
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+
+        return model;
+    });
+
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+@section head {
+    <style>
+        .terms-container {
+            max-width: 1350px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+            .terms-header h1 {
+                font-size: 32px;
+                color: #007bff;
+                margin-bottom: 10px;
+            }
+
+            .terms-header p {
+                font-size: 14px;
+                color: #666;
+            }
+
+        .terms-content h2 {
+            font-size: 24px;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        .terms-content p {
+            font-size: 16px;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .terms-content a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+            .terms-content a:hover {
+                text-decoration: underline;
+            }
+    </style>
+}
+<div class="container-fluid page-header py-5" style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost);">
+    <h1 class="text-center  display-6">@Data.Title</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.EmptyIfNull().First().Href">@Root.Config.MainMenus.EmptyIfNull().First().Title</a></li>
+        <li class="breadcrumb-item active ">@Data.Title</li>
+    </ol>
+</div>
+<div class="terms-container">
+    <section class="terms-content">
+        @Data.Content
+         </section>
+</div>
+

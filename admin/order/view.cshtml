@@ -1,0 +1,74 @@
+﻿@inherits MyAdminPage
+@{
+    CheckAuthen()();
+    var field = new FieldExtractor<PP_Order>();
+    var query = Request.Url.Query;
+
+    string orderCode = Request.QueryString[nameof(orderCode)] ?? Request.Form[nameof(orderCode)];
+    var order = Db.GetOne<PP_Order>(t => t.OrderCode == orderCode);
+    var lines = Json.Decode<List<OrderLine>>(order.JsonData);
+
+    Layout = null;
+}
+<table class="table">
+    <tr>
+        <td>Mã đơn hàng/Tình trạng</td>
+        <td>@order.OrderCode/@order.OrderStatus</td>
+    </tr>
+    <tr>
+        <td>Tên</td>
+        <td>@order.Name</td>
+    </tr>
+    <tr>
+        <td>Số điện thoại</td>
+        <td>@order.Phone</td>
+    </tr>
+    <tr>
+        <td>Địa chỉ</td>
+        <td>@order.DeliveryAddress</td>
+    </tr>
+    <tr>
+        <td>Hình thức thanh toán</td>
+        <td>@order.PayMethod</td>
+    </tr>
+    <tr>
+        <td>Ghi chú</td>
+        <td>@order.Note</td>
+    </tr>
+
+</table>
+<table class="table">
+    <tr>
+
+        <th>Sản phẩm</th>
+        <td align="right">Tên</td>
+        <td align="right">Giá</td>
+        <td align="right">Số lượng</td>
+        <td align="right">Tiền hàng</td>
+    </tr>
+
+    @foreach (var line in lines)
+    {
+        <tr>
+            <td align="center"><img src="@line.Image" alt="@line.Title" class="img-fluid" style="height:100px; width:150px"></td>
+            <td>@line.Title</td>
+
+            <td align="right">@($"{line.Price:C0}")</td>
+
+            <td align="right">@line.Quantity</td>
+            <td align="right">@($"{line.RowTotal:C0}")</td>
+        </tr>
+    }
+
+ 
+</table>
+<table class="table">
+    <tr>
+        <td>Tổng cộng</td>
+        <td class="text-right">@($"{order.TotalAmount:C0}")</td>
+    </tr>
+    <tr>
+        <td>Phí ship</td>
+        <td class="text-right"></td>
+    </tr>
+</table>

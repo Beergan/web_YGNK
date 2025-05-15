@@ -1,0 +1,179 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+          ComptName = "template|vi:Đặt hàng thành công")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+        public static ViewModel Default => new ViewModel()
+        {
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data;
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    var ordercode = Root.GetRouteData<string>("0");
+
+
+    var check = Session["makeOrder"];
+    var checknumber = Session["numbermakeOrder"];
+
+    if (check == null)
+    {
+        Response.Redirect("/", endResponse: true);
+    }
+    var order = Db.GetOne<PP_Order>(t => t.OrderCode == checknumber);
+
+    _data = IsDirectCall ? ViewModel.Default : LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? new ViewModel();
+        var page = Db.GetOne<PP_Page>(PageId);
+
+        if (page == null)
+        {
+            Response.StatusCode = 404;
+            Response.End();
+        }
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+        return model;
+    });
+
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+@section head {
+    <style>
+
+.order-complete-area {
+    background-color: #f7f7f7;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    font-family: 'Arial', sans-serif;
+}
+
+
+.order-complete-title {
+    margin-bottom: 20px;
+}
+
+    .order-complete-title h3 {
+        font-size: 24px;
+        color: #28a745;
+        margin: 20px 0;
+    }
+
+.order-product-details {
+    margin-top: 20px;
+}
+
+.table-content {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+    table th, table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    table th {
+        background-color: #28a745;
+        color: #ffffff;
+        font-weight: bold;
+    }
+
+    table td {
+        background-color: #f9f9f9;
+        color: #333333;
+    }
+
+    table tr:nth-child(even) td {
+        background-color: #f2f2f2;
+    }
+
+@@media (max-width: 768px) {
+    .order-complete-area {
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+
+    .order-complete-title h3 {
+        font-size: 20px;
+    }
+
+    table th, table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
+
+
+
+    </style>
+}
+<div class="container-fluid page-header py-5 " style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost);">
+    <h1 class="text-center  display-6">Đơn hàng</h1>
+    <ol class="breadcrumb justify-content-center mb-0">
+        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.EmptyIfNull().First().Href">@Root.Config.MainMenus.EmptyIfNull().First().Title</a></li>
+        <li class="breadcrumb-item"><a href="">Đơn hàng</a></li>
+        <li class="breadcrumb-item active ">@Data.Title</li>
+    </ol>
+</div>
+
+<div class="order-complete-area bg-gray pt-50 pb-50">
+    <div class="container text-center">
+        <div class="order-complete-title">
+            <h3>Cám ơn bạn, đơn hàng đã tạo thành công!</h3>
+        </div>
+        <div class="order-product-details">
+            <form action="#">
+                <div class="table-content table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>MÃ ĐƠN HÀNG</th>
+                                <th>NGÀY</th>
+                                <th>TỔNG</th>
+                                <th>THANH TOÁN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@order.OrderCode</td>
+                                <td>@($"{order.CreatedTime:dd/MM/yyyy}")</td>
+                                <td>@($"{order.TotalAmount:C0}")</td>
+                                <td>Thỏa thuận</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+}

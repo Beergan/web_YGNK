@@ -1,0 +1,483 @@
+﻿@inherits MyAdminPage
+@functions{
+    private FieldExtractor<PP_Product> field = new FieldExtractor<PP_Product>();
+    private PP_Product model = new PP_Product() { NodeStatus = "CREATED", NodeType = "product" };
+
+    private Action ProcessPost()
+    {
+        AntiForgery.Validate();
+
+        Validation.RequireField(field.GetName(t => t.Title), "Tiêu đề không thể để trống!");
+        Validation.RequireField(field.GetName(t => t.NodePath), "Alias không thể để trống!");
+        Validation.Add(field.GetName(t => t.NodePath), Validator.Regex(@"^[a-z0-9]+(\-[a-z0-9]+)*$"));
+
+        model.LangId = LangIdCompose;
+        model.CategoryId = Request.Form[field.GetName(t => t.CategoryId)].AsInt().NullIfZero();
+        model.Title = Request.Form[field.GetName(t => t.Title)].NullIfWhiteSpace();
+        model.Brand = "NO_BRAND";// Request.Form[field.GetName(t => t.Brand)].NullIfWhiteSpace();
+        model.Content = Server.HtmlDecode(Request.Form[field.GetName(t => t.Content)]).NullIfWhiteSpace();
+        model.Des = Server.HtmlDecode(Request.Form[field.GetName(t => t.Des)]).NullIfWhiteSpace();
+        model.AttrbEnabled = Request.Form[field.GetName(t => t.AttrbEnabled)].AsBool();
+        model.AttrbName = Request.Form[field.GetName(t => t.AttrbName)];
+        model.AttrbValues = Request.Form[field.GetName(t => t.AttrbValues)];
+
+        model.ProductCode = Request.Form[field.GetName(t => t.ProductCode)].NullIfWhiteSpace();
+        model.StockQty = Request.Form[field.GetName(t => t.StockQty)].AsInt();
+        model.Weight = Request.Form[field.GetName(t => t.Weight)].AsInt();
+
+        model.Price = Request.Form[field.GetName(t => t.Price)].AsDecimal();
+        model.PromotionPrice = Request.Form[field.GetName(t => t.PromotionPrice)].AsDecimal();
+        model.PromotionLabel = Request.Form[field.GetName(t => t.PromotionLabel)].NullIfWhiteSpace();
+        model.PromotionEnabled = Request.Form[field.GetName(t => t.PromotionEnabled)].AsBool();
+        model.BestSeller = Request.Form[field.GetName(t => t.BestSeller)].AsBool();
+        model.PromotionExpiration = Request.Form[field.GetName(t => t.PromotionExpiration)].AsDateTime().NullIfDateTimeMin();
+
+        model.MetaDescription = Request.Form[field.GetName(t => t.MetaDescription)].NullIfWhiteSpace();
+        model.MetaKeywords = Request.Form[field.GetName(t => t.MetaKeywords)].NullIfWhiteSpace();
+        model.ImageUrl = Request.Form[field.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+        model.ImagesJson = Request.Form[field.GetName(t => t.ImagesJson)].NullIfWhiteSpace();
+        if (!Validation.IsValid())
+        {
+            return EmptyAction;
+        }
+
+        //if (model.Weight <= 0)
+        //{
+        //	ModelState.AddFormError("Thông tin [trọng lượng] phải lớn hơn 0");
+        //	return EmptyAction;
+        //}
+
+        if (model.AttrbEnabled)
+        {
+            if (model.AttrbName.IsEmpty() || model.AttrbValues.IsEmpty())
+            {
+                ModelState.AddFormError($"Cần nhập đầy đủ [tên phân loại] và [các giá trị phân loại]");
+                return EmptyAction;
+            }
+        }
+
+        //if (model.PromotionEnabled)
+        //{
+        //    if (model.PromotionPrice == 0 || model.PromotionLabel.IsEmpty() || model.PromotionExpiration == null)
+        //    {
+        //        ModelState.AddFormError("Cần thiết lập đầy đủ thông tin [nhãn khuyến mãi], [giá khuyến mãi] và [thời hạn khuyến mãi]");
+        //        return EmptyAction;
+        //    }
+        //}
+        var listcat = Request.Form[field.GetName(t => t.CategoryId).ToString()].NullIfWhiteSpace();
+        int? cat = listcat.Split(',').FirstOrDefault().AsInt();
+        if (cat == 0)
+        {
+            ModelState.AddFormError("Bắt buộc phải chọn một chuyên mục");
+            return EmptyAction;
+        }
+        //List<string> add = new List<string>();
+
+        //List<string> catlist = listcat.Split(',').ToList();
+        //foreach(var item in catlist.EmptyIfNull())
+        //{
+        //    var idcheck = item.AsInt();
+        //    var cattitle = Db.GetOne<PP_Category>(x=>x.Id == idcheck);
+
+        //    var idnode = cattitle.Id.ToString();
+
+        //    add.Add(idnode);
+        //}
+
+
+        model.listcat = Request.Form[field.GetName(t => t.CategoryId).ToString()].NullIfWhiteSpace();
+        var catDetalis = new PP_Category_details();
+
+
+        HashSet<int> seenIds = new HashSet<int>();
+        int id;
+
+        foreach (var item in listcat.Split(','))
+        {
+            if (!string.IsNullOrWhiteSpace(item) && int.TryParse(item, out id) && !seenIds.Contains(id))
+            {
+                seenIds.Add(id);
+            }
+            else
+            {
+                ModelState.AddFormError("Danh mục bị trùng lặp");
+                return EmptyAction;
+            }
+        }
+        var category = Db.GetOne<PP_Category>(cat ?? 0);
+        var page = Db.GetOne<PP_Page>(category.PageIdItem);
+        model.NodePath = string.Format(page.PathPattern, category.CategoryPath.GetAfter("/"), Request.Form[field.GetName(t => t.NodePath)]);
+        if (Db.Exists<PP_Product>(t => t.NodePath == model.NodePath))
+        {
+            ModelState.AddFormError($"Đường dẫn [{model.NodePath}] đã tồn tại!");
+            return EmptyAction;
+        }
+        Db.Insert<PP_Product>(model);
+        foreach (var item in listcat.Split(','))
+        {
+
+            if (int.TryParse(item, out id))
+            {
+                var idproduct = model.Id;
+
+                seenIds.Add(id);
+                PP_Category_details catDetails = new PP_Category_details();
+                catDetails.Idcat = id;
+                catDetails.LangId = LangIdCompose;
+                catDetails.PageId = model.PageId;
+                catDetails.NodeType = "product";
+                catDetails.PageIdItem = category.PageIdItem;
+                catDetails.Idproduct = model.Id;
+                Db.Insert<PP_Category_details>(catDetails);
+            }
+
+
+        }
+        Root.ClearCache();
+        return () => Response.Redirect($"{Constants.Admin_Url}/product");
+    }
+}
+@{
+    CheckAuthen()();
+    if (IsPost)
+    {
+        try
+        {
+            ProcessPost().Invoke();
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddFormError(ex.Message);
+        }
+    }
+
+    int categoryId = Request.QueryString[field.GetName(t => t.CategoryId)].AsInt();
+    if (categoryId > 0)
+    {
+        model.CategoryId = categoryId;
+    }
+
+    Page.Title = Text["CREATE A PRODUCT", "TẠO MỚI SẢN PHẨM"];
+    Page.Menu = "product";
+
+    //var brandSelections = Db.GetList(QueryFor<PP_Node>
+    //   .Equal(t => t.NodeType, "brand"))
+    //   .ToDictionary(t => t.Title, t => t.Title);
+
+    var category = Db.GetOne<PP_Category>(model.CategoryId ?? 0);
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            @RenderPage($"{Constants.Admin_Url}/_share/_breadcrum.cshtml", new { CurrentBreadcrumb = "Danh sách sản phẩm" })
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card-box table-responsive">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/category?type=product" aria-expanded="false" class="nav-link">
+                            <i class="fe-folder"></i> @Text["Categories", "Các chuyên mục"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Constants.Admin_Url/product" aria-expanded="true" class="nav-link">
+                            <i class="fas fa-list-ol"></i> @Text["All of products", "Tất cả sản phẩm"]
+                        </a>
+                    </li>
+                    @if (categoryId > 0)
+                    {
+                        <li class="nav-item">
+                            <a href="@Constants.Admin_Url/product@(categoryId > 0 ? $"?categoryId={categoryId}" : "")" aria-expanded="true" class="nav-link">
+                                <i class="fas fa-list-ol"></i> @category.Title
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item">
+                        <a href="#create" data-toggle="tab" aria-expanded="false" class="nav-link active">
+                            <i class="fas fa-plus-circle"></i> @Text["Create new product", "Thêm sản phẩm mới"]
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane show active" id="create">
+                        <form class="form-horizontal validable" role="form" method="post">
+                            @AntiForgery.GetHtml()
+
+                            @if (ModelState.Any())
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @Html.ValidationSummary(Text["Operation failed!", "Thao tác không thành công!"], excludeFieldErrors: false, htmlAttributes: null)
+                                </div>
+                            }
+
+                            @MyHtml.ComposeLanguageSwitch()
+                            @MyHtml.ListComboboxFor(field[t => t.CategoryId], options: GetGroupSelector(LangIdCompose, "product"), value: (model.CategoryId ?? 0).ToString())
+                            @MyHtml.TextBoxFor(field[t => t.Title], value: model.Title, required: true)
+                            @MyHtml.TextBoxFor(field[t => t.NodePath], value: model.NodePath.GetAfterLast("/").GetBefore("."), required: true)
+                            @*MyHtml.ComboboxFor(field[t => t.Brand], value: model.Brand, options: brandSelections)*@
+                            @MyHtml.TextAreaFor(field[t => t.Content], value: model.Content)
+                            @MyHtml.TextAreaFor(field[t => t.Des], value: model.Des)
+                            @*@MyHtml.RadioFor(field[t => t.AttrbEnabled], value: model.AttrbEnabled)
+                                @MyHtml.TextBoxFor(field[t => t.AttrbName], value: model.AttrbName)
+                                @MyHtml.TagsInputFor(field[t => t.AttrbValues], value: model.AttrbValues)*@
+
+                            @MyHtml.NumberBoxFor(field[t => t.Price], value: model.Price)
+                            @MyHtml.NumberBoxFor(field[t => t.PromotionPrice], value: model.PromotionPrice)
+                            @*@MyHtml.TextBoxFor(field[t => t.PromotionLabel], value: model.PromotionLabel)*@
+                            @MyHtml.DateTimeFor(field[t => t.PromotionExpiration], value: model.PromotionExpiration)
+                            @MyHtml.RadioFor(field[t => t.PromotionEnabled], value: model.PromotionEnabled)
+                            @MyHtml.RadioFor(field[t => t.BestSeller], value: model.BestSeller)
+
+                            @MyHtml.TextBoxFor(field[t => t.ProductCode], value: model.ProductCode)
+                            @MyHtml.NumberBoxFor(field[t => t.StockQty], value: model.StockQty)
+                            @MyHtml.NumberBoxFor(field[t => t.Weight], value: model.Weight)
+
+                            @MyHtml.TextBoxFor(field[t => t.MetaDescription], value: model.MetaDescription)
+                            @MyHtml.TagsInputFor(field[t => t.MetaKeywords], value: model.MetaKeywords)
+                            @MyHtml.ImagePickerFor(field[t => t.ImageUrl], value: model.ImageUrl)
+                            @MyHtml.ImagePickerForlist(field[t => t.ImagesJson], value: model.ImagesJson)
+                            <hr />
+
+                            <div class="form-group mb-0">
+                                <div>
+                                    <button type="submit" class="btn btn-gradient waves-effect waves-light">
+                                        @Text["Submit", "Xác nhận"]
+                                    </button>
+                                    <button type="button" class="btn btn-light waves-effect ml-1" onclick="window.history.back()">
+                                        @Text["Back", "Quay lại"]
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section head{
+}
+
+@section scripts{
+    <script src="@Constants.Admin_Url/ckeditor/ckeditor.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/ckfinder/ckfinder.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/speakingurl/speakingurl.min.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/stringtoslug/jquery.stringtoslug.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script>
+        function addCat(fieldName, fieldTitle, optionsJson) {
+            const options = JSON.parse(optionsJson.replace(/&quot;/g, '"'));
+            const container = document.getElementById('comboboxlist');
+            const index = container.querySelectorAll('.comboboxlist').length;
+
+            let optionsHtml = '';
+            for (const key in options) {
+                if (options.hasOwnProperty(key)) {
+                    optionsHtml += `<option value="${key}">${options[key]}</option>`;
+                }
+            }
+            const newImagePicker = `
+                                <div class="form-group row comboboxlist">
+                                <label originId="${fieldName}" class="col-12 col-md-2 col-form-label" for="${fieldName}">
+                                    Chuyên mục
+                                </label>
+                                <div class="col-12 col-md-9">
+                                    <select class="form-control" originId="${fieldName}" id="${fieldName}" name="${fieldName}">
+                                        ${optionsHtml}
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+        <div class="btn-group">
+            <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteCat(this)">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-11">
+                                </div>
+
+                            </div>`;
+            container.insertAdjacentHTML('beforeend', newImagePicker);
+        }
+        function deleteCat(button) {
+            // Find the closest row containing the button
+            var row = button.closest('.row');
+
+            // Find the previous element sibling of this row that has the class 'comboboxlist'
+            var item = row.previousElementSibling;
+            while (item && !item.classList.contains('comboboxlist')) {
+                item = item.previousElementSibling;
+            }
+
+            // Log button and item for debugging
+            console.log(button);
+            console.log(item);
+
+            // Remove the found element if it exists
+            if (item) {
+                item.remove();
+            } else {
+                console.error('Parent element with class "comboboxlist" not found.');
+            }
+
+            // Remove the row containing the delete button
+            if (row) {
+                row.remove();
+            }
+        }
+
+    </script>
+
+    <script>
+        function openCKFinder(button) {
+            CKFinder.popup({
+                chooseFiles: true,
+                onInit: function (finder) {
+                    finder.on('files:choose', function (evt) {
+                        var file = evt.data.files.first();
+                        var input = document.getElementById(button.getAttribute('target'));
+                        var img = document.getElementById('img-' + button.getAttribute('target'));
+                        input.value = file.getUrl();
+                        img.src = file.getUrl();
+                    });
+                    finder.on('file:choose:resizedImage', function (evt) {
+                        var file = evt.data.resizedUrl;
+                        var input = document.getElementById(button.getAttribute('target'));
+                        var img = document.getElementById('img-' + button.getAttribute('target'));
+                        input.value = file;
+                        img.src = file;
+                    });
+                }
+            });
+        }
+
+        function addImagePicker(fieldName, fieldTitle) {
+            const container = document.getElementById('image-picker-container');
+            const index = container.querySelectorAll('.image-picker-item').length;
+            const newImagePicker = `
+                                       <div class="form-group row image-picker-item">
+                                           <label for="${fieldName}-${index}"
+                                                  class="col-12 col-md-2 col-form-label">
+                                               ${fieldTitle}
+                                           </label>
+                                           <div class="col-12 col-md-8">
+                                               <div class="input-group">
+                                                   <input type="text"
+                                                          class="form-control ckfinder-input"
+                                                          name="${fieldName}"
+                                                          id="${fieldName}-${index}"
+                                                          value=""
+                                                          readonly />
+                                                   <div class="input-group-append">
+                                                       <button originid="${fieldName}"
+                                                               target="${fieldName}-${index}"
+                                                               class="btn btn-primary waves-effect waves-light btn-ckfinder-popup"
+                                                               type="button"
+                                                               onclick="openCKFinder(this)">
+                                                           <i class="fe-upload"></i> Browse files ..
+                                                       </button>
+                                                   </div>
+                                               </div>
+                                               <img id="img-${fieldName}-${index}" originid="${fieldName}" src="/assets/images/no-image.jpg" class="image-preview" style="margin-top:10px; max-height: 250px; max-width: 100%" />
+                                           </div>
+                                           <div class="col-md-2">
+                                               <div class="btn-group">
+                                                   <button type="button" class="btn btn-info btn-sm move-up-btn" onclick="moveUpImage(this)">
+                                                       <i class="fa fa-arrow-up"></i>
+                                                   </button>
+                                                   <button type="button" class="btn btn-info btn-sm move-down-btn" onclick="moveDownImage(this)">
+                                                       <i class="fa fa-arrow-down"></i>
+                                                   </button>
+                                                   <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteImage(this)">
+                                                       <i class="fa fa-trash"></i>
+                                                   </button>
+                                               </div>
+                                           </div>
+                                       </div>`;
+            container.insertAdjacentHTML('beforeend', newImagePicker);
+        }
+
+        function moveUpImage(button) {
+            var item = button.closest('.image-picker-item');
+            var previousItem = item.previousElementSibling;
+            if (previousItem && previousItem.classList.contains('image-picker-item')) {
+                item.parentNode.insertBefore(item, previousItem);
+            }
+        }
+
+        function moveDownImage(button) {
+            var item = button.closest('.image-picker-item');
+            var nextItem = item.nextElementSibling;
+            if (nextItem && nextItem.classList.contains('image-picker-item')) {
+                item.parentNode.insertBefore(nextItem, item);
+            }
+        }
+
+        function deleteImage(button) {
+            var item = button.closest('.image-picker-item');
+            item.remove();
+        }
+    </script>
+    <script type="text/javascript">
+        CKEDITOR.replace('@field.GetName(t => t.Content)',
+            {
+            toolbar: [['Source', 'Format', 'FontSize', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent',
+                '-', 'Bold', 'Italic', 'Underline', 'Strike',
+                '-', 'TextColor', 'BGColor', 'NumberedList', 'BulletedList',
+                '-', 'Link', 'Image', 'Table', 'RemoveFormat', 'Maximize']],
+                filebrowserBrowseUrl: "@Constants.Admin_Url/ckfinder/",
+                entities_latin: false,
+                htmlEncodeOutput: true,
+                resize_dir: "vertical",
+                width: "100%",
+                padding: "0px !important"
+            });
+              CKEDITOR.replace('@field.GetName(t => t.Des)',
+          {
+          toolbar: [['Source', 'Format', 'FontSize', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'Outdent', 'Indent',
+              '-', 'Bold', 'Italic', 'Underline', 'Strike',
+              '-', 'TextColor', 'BGColor', 'NumberedList', 'BulletedList',
+              '-', 'Link', 'Image', 'Table', 'RemoveFormat', 'Maximize']],
+              filebrowserBrowseUrl: "@Constants.Admin_Url/ckfinder/",
+              entities_latin: false,
+              htmlEncodeOutput: true,
+              resize_dir: "vertical",
+              width: "100%",
+              padding: "0px !important"
+          });
+        $(document).ready(function () {
+
+            $(document).on("click", ".btn-ckfinder-popup", function (e) {
+                event.preventDefault();
+                var targetId = $(this).attr('target');
+
+                window["callback_" + targetId] = function (fileUrl) {
+                    var url = new URL(fileUrl);
+                    $('#'+targetId).val(url.pathname);
+                    $('#img-'+targetId).attr("src", url.pathname);
+                }
+
+                CKFinder.popup({
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    selectActionFunction: window["callback_" + targetId]
+                });
+            });
+
+            $("#@field.GetName(t=>t.Title)").stringToSlug({
+                getPut: '#@field.GetName(t => t.NodePath)',
+            });
+
+            $(".validable").parsley();
+        });
+
+    </script>
+}

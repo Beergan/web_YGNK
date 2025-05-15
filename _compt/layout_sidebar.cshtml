@@ -1,0 +1,63 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Element,
+        ComptName = "en:Cart sidebar tempalte|vi:Giỏ hàng thanh bên")]
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public static ViewModel Default => new ViewModel() { };
+    }/*end_viewmodel*/
+    private ViewModel _data = null;
+    private ViewModel Data => _data;
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+}
+@{
+    var query = Request.Url.Query;
+    var cart = new ShoppingCart(this.Context);
+    Layout = null;
+}
+<div class="sidebar-cart-all">
+    <a id="cart-close" class="cart-close"><i class="icofont-close-line"></i></a>
+    <div class="cart-content">
+        <h3>@Text["Shopping Cart", "Giỏ hàng"]</h3>
+        <ul>
+            @foreach (var item in cart.GetCartLines())
+            {
+                <li class="single-product-cart">
+                    <div class="cart-img">
+                        <a href="#"><img src="@item.Product.ImageUrl" alt=""></a>
+                    </div>
+                    <div class="cart-title">
+                        <h4><a href="#">@item.Product.Title</a></h4>
+                        @if (@item.Variation != null)
+                        {
+                            <div style="width: 100%">Phân loại: <b>@item.Variation</b></div>
+                        }
+                        @if (item.Product.PromotionPrice > 0 && item.Product.PromotionEnabled == true)
+                        {
+                            <span> @item.Quantity × @($"{item.Product.PromotionPrice:C0}")</span>
+                        }
+                        else
+                        {
+                            <span> @item.Quantity × @($"{item.Product.Price:C0}")</span>
+                        }
+
+                    </div>
+                    <div class="cart-delete">
+                        <a data-product-id="@item.Product.Id" data-variation-id="@item.Variation">×</a>
+                    </div>
+                </li>
+            }
+        </ul>
+        <div class="cart-total">
+            <h4>@Text["Subtotal", "Tạm tính"]: <span>@($"{cart.GetTotal():C0}")</span></h4>
+        </div>
+        <div class="cart-checkout-btn">
+            <a class="btn-hover cart-btn-style" href="@Root.Config.Link.PageCart">@Text["View cart", "Xem giỏ hàng"]</a>
+            <a class="no-mrg btn-hover cart-btn-style" href="@Root.Config.Link.PageMakeOrder">@Text["Make order", "Mua ngay"]</a>
+        </div>
+    </div>
+</div>
