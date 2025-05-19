@@ -304,7 +304,7 @@
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
             <div data-elementor-type="wp-page" data-elementor-id="3438" class="elementor elementor-3438" data-elementor-post-type="page">
                 <div class="row m-0 p-0">
-                    <div class="col-lg-12 m-0 p-0">
+                    <div class="col-lg-12 m-0 p-0" >
                         <div class="f-carousel" id="myCarousel">
                             @foreach (var item in Data._banner.EmptyIfNull())
                             {
@@ -336,8 +336,8 @@
                         <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-a26d4e7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="a26d4e7" data-element_type="column">
                             <div class="elementor-widget-wrap elementor-element-populated">
                                 <div class="elementor-element elementor-element-4a5479a sc_fly_static elementor-widget elementor-widget-heading" data-id="4a5479a" data-element_type="widget" data-widget_type="heading.default">
-                                    <div class="elementor-widget-container">
-                                        <h3 class="elementor-heading-title elementor-size-default">@Data._news.Title</h3>
+                                    <div class="elementor-widget-container" >
+                                        <h3 class="elementor-heading-title elementor-size-default wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s" >@Data._news.Title</h3>
                                     </div>
                                 </div>
                             </div>
@@ -363,7 +363,7 @@
                                                     <div class="slider_outer slider_swiper_outer slider_style_default slider_source_posts_post slider_outer_direction_horizontal slider_outer_multi slider_outer_nopagination slider_outer_controls slider_outer_controls_bottom slider_outer_nocentered slider_outer_overflow_hidden slider_outer_titles_center slider_outer_height_auto">
                                                         <div class="slider_container slider_swiper swiper-slider-container slider_direction_horizontal slider_nopagination slider_multi slider_type_images slider_controls slider_controls_bottom slider_nocentered slider_overflow_hidden slider_titles_center slider_resize slider_swipe slider_height_auto" data-ratio="1200:800" data-interval="7000" data-speed="600" data-effect="slide" data-pagination="bullets" data-direction="horizontal" data-slides-per-view="2" data-slides-space="50" data-slides-parallax="0" data-slides-centered="0" data-slides-overflow="0" data-mouse-wheel="0" data-autoplay="1" data-loop="1" data-free-mode="0" data-slides-min-width="220" data-slides-per-view-breakpoints="{&quot;999999&quot;:2}" data-slides-space-breakpoints="{&quot;999999&quot;:&quot;50&quot;}">
                                                             <div class="slider-wrapper swiper-wrapper">
-                                                                @foreach (var item in Data.Items.EmptyIfNull().Select((x,y)=> new { x,y }))
+                                                                @foreach (var item in Data.Items.EmptyIfNull().Select((x, y) => new { x, y }))
                                                                 {
                                                                     <div class="slider-slide swiper-slide with_titles" data-title="@item.x.Title" style="">
                                                                         <img decoding="async" src="@item.x.ImageUrl" alt="@item.x.ImageUrl">
@@ -451,10 +451,10 @@
                                                 <div data-animation-type="sequental" data-animation-stagger="" class="elementor-element elementor-element-875f625 animation_type_sequental sc_fly_static elementor-invisible elementor-widget elementor-widget-trx_sc_icons" data-id="875f625" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;globallogistics-fadeinup&quot;,&quot;_animation_delay&quot;:100}" data-widget_type="trx_sc_icons.default">
                                                     <div class="elementor-widget-container">
                                                         <div class="sc_icons sc_icons_default sc_icons_size_small sc_align_center">
-                                                            <div class="sc_icons_columns_wrap sc_item_columns trx_addons_columns_wrap columns_padding_bottom columns_in_single_row">
-                                                                @foreach (var item in Data._about._list.EmptyIfNull().Select((x,y) => new {x,y} ))
+                                                            <div class="columns_padding_bottom row ">
+                                                                @foreach (var item in Data._about._list.EmptyIfNull().Select((x, y) => new { x, y }))
                                                                 {
-                                                                    <div class="trx_addons_column-1_4 trx_addons_column-1_2-tablet">
+                                                                    <div class="col-lg-3 col-6 wow fadeInUp" data-wow-delay="1.@(item.y + 1)s" data-wow-duration="1s">
                                                                         <div class="sc_icons_item sc_icons_item_linked with_more">
                                                                             <div class="@(item.y + 1  == 1 ? "sc_icons_icon sc_icon_type_ icon-dollar" : (item.y + 1 == 2 ? "sc_icons_icon sc_icon_type_ icon-delivery" : (item.y + 1 == 3 ? "sc_icons_icon sc_icon_type_ icon-cart-1" : "sc_icons_icon sc_icon_type_ icon-search-light" )) )">
                                                                                 <span class=" @(item.y + 1  == 1 ? "sc_icon_type_ icon-dollar" : (item.y + 1 == 2 ? "sc_icon_type_ icon-delivery" : (item.y + 1 == 3 ? "sc_icon_type_ icon-cart-1" : "sc_icon_type_ icon-search-light" )) ) "></span>
@@ -496,43 +496,25 @@
                         </div>
                     </div>
                 </section>
-                <section class="elementor-section elementor-top-section elementor-element elementor-element-de77fd8 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="de77fd8" data-element_type="section">
-                    <div class="elementor-container elementor-column-gap-extended">
-                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-efa40fa sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="efa40fa" data-element_type="column">
-                            <div class="elementor-widget-wrap elementor-element-populated">
-                                <div class="elementor-element elementor-element-2c91ad1 sc_fly_static elementor-widget elementor-widget-spacer" data-id="2c91ad1" data-element_type="widget" data-widget_type="spacer.default">
-                                    <div class="elementor-widget-container">
-                                        <div class="elementor-spacer">
-                                            <div class="elementor-spacer-inner"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="elementor-element elementor-element-fe8f0ad sc_fly_static elementor-widget elementor-widget-heading" data-id="fe8f0ad" data-element_type="widget" data-widget_type="heading.default">
-                                    <div class="elementor-widget-container">
-                                        <h4 class="elementor-heading-title elementor-size-default">@Data._item.Title</h4>
-                                    </div>
-                                </div>
-                                <div class="elementor-element elementor-element-195e87d sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="195e87d" data-element_type="widget" data-widget_type="spacer.default">
-                                    <div class="elementor-widget-container">
-                                        <div class="elementor-spacer">
-                                            <div class="elementor-spacer-inner"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                <div class="elementor-element mt-lg-4 mb-lg-4 mb-2 mt-2 elementor-element-fe8f0ad sc_fly_static elementor-widget elementor-widget-heading" data-id="fe8f0ad" data-element_type="widget" data-widget_type="heading.default">
+                    <div class="elementor-widget-container">
+                        <div class="row">
+                            <div class="col-lg-12  text-center">
+                                <h4 class="elementor-heading-title elementor-size-default">@Data._item.Title</h4>
                             </div>
                         </div>
                     </div>
-                </section>
-                <section  class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static" >
+                </div>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static">
                     <div class="elementor-container elementor-column-gap-extended">
                         <div class="row">
                             @foreach (var item in Data._item._list.EmptyIfNull())
                             {
-                                <div class="col-lg-3 col-sm-4 col-12 mb-1">
+                                <div class="col-lg-3 col-sm-4 col-12 mb-1 wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s">
                                     <div class="row">
                                         <div class="col-lg-12">
                                             <div class="elementor-widget-container">
-                                                <img loading="lazy" decoding="async" width="800" height="800" src="@item.Image" class="attachment-large size-large wp-image-3750" alt="@item.Title" >
+                                                <img loading="lazy" decoding="async" width="800" height="800" src="@item.Image" class="attachment-large size-large wp-image-3750" alt="@item.Title">
                                             </div>
                                         </div>
                                         <div class="col-lg-12 mt-2">
@@ -540,10 +522,10 @@
                                         </div>
                                     </div>
                                 </div>
-                             
+
                             }
                         </div>
-                      </div>
+                    </div>
                 </section>
                 <section class="elementor-section elementor-top-section elementor-element elementor-element-d1728d9 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="d1728d9" data-element_type="section">
                     <div class="elementor-container elementor-column-gap-extended">
@@ -578,7 +560,7 @@
                                 </div>
                                 <div class="elementor-element elementor-element-0f19b32 elementor-arrows-yes elementor-pagination-type-bullets elementor-review--has-separator elementor--star-style-star_fontawesome sc_fly_static elementor-widget elementor-widget-reviews" data-id="0f19b32" data-element_type="widget" data-settings="{&quot;show_arrows&quot;:&quot;yes&quot;,&quot;pagination&quot;:&quot;bullets&quot;,&quot;speed&quot;:500,&quot;autoplay&quot;:&quot;yes&quot;,&quot;autoplay_speed&quot;:5000,&quot;loop&quot;:&quot;yes&quot;,&quot;pause_on_hover&quot;:&quot;yes&quot;,&quot;pause_on_interaction&quot;:&quot;yes&quot;,&quot;space_between&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]}}" data-widget_type="reviews.default">
                                     <div class="elementor-widget-container">
-                                        <div  class="f-carousel1" id="myCarousel1" style="background-color:white" >
+                                        <div class="f-carousel1" id="myCarousel1" style="background-color:white">
                                             @foreach (var item in Data._comment._list.EmptyIfNull())
                                             {
                                                 <div class="f-carousel__slide">

@@ -25,6 +25,7 @@ public class MyDbContext : DbContext
         modelBuilder.Entity<PP_Comment>();
         modelBuilder.Entity<PP_Register>();
         modelBuilder.Entity<PP_User_log>();
-		modelBuilder.Entity<PP_Category_details>();
-	}
+        modelBuilder.Entity<PP_Category_details>();
+        modelBuilder.Entity<PP_Customer>();
+    }
 }

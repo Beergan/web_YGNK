@@ -1,0 +1,178 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+             ComptName = "en:Page contact template|vi:Mẫu trang đăng nhập")]
+
+
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+
+
+        public static ViewModel Default => new ViewModel()
+        {
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+    private FieldExtractor<VM_login> field = new FieldExtractor<VM_login>();
+}
+@{
+    var query = "dang-nhap";
+
+    if (IsPost && query == "dang-nhap")
+    {
+        new Func<Action>(() =>
+        {
+            try
+            {
+
+                AntiForgery.Validate();
+                string captcha = Request.Form[nameof(captcha)].ToLower();
+                Validation.RequireField(field.GetName(t => t.Email));
+                Validation.RequireField(field.GetName(t => t.Password));
+                Validation.Add(field.GetName(t => t.Password),
+                Validator.StringLength(
+                maxLength: Int32.MaxValue,
+                minLength: 6,
+                errorMessage: Text["Password must be at least 6 characters.", "Mật khẩu phải gồm ít nhất 6 ký tự."]));
+
+                if (captcha != this.Context.Session["CaptchaVerify"].ToString())
+                {
+                    Response.Write("Sai mã capcha");
+                }
+
+
+                var model = new PP_Customer();
+                var Emails = Request.Form[field.GetName(x => x.Email).NullIfWhiteSpace()];
+
+                var Passwords = Crypto.SHA256(Request.Form[field.GetName(t => t.Password)].NullIfWhiteSpace());
+
+                var check = Db.Table<PP_Customer>().SingleOrDefault(x => x.Email.ToLower() == Emails.ToLower() && x.PASSWORD == Passwords);
+
+
+                if (check == null)
+                {
+                    Response.Write("Thông tin đăng nhập chưa chính xác");
+                    return () => Response.End();
+
+                }
+
+                model.ModifiedTime = DateTime.Now;
+                Db.Update<PP_Customer>(model);
+                HttpContext context = HttpContext.Current;
+
+                var userId = check.Id;
+
+
+
+                Session["username"] = userId;
+                userId = (int)(Session["username"]);
+                context.Session["username"] = userId;
+                userId = (int)(Session["username"]);
+
+
+                Response.Write("Cám ơn bạn đã đăng nhập");
+                return () => Response.End();
+            }
+            catch (Exception ex)
+            {
+                Response.Write("Thông tin đăng nhập chưa chính xác");
+                return () => Response.End();
+            }
+        })()();
+    }
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? ViewModel.Default;
+
+        var page = Db.GetOne<PP_Page>(PageId);
+
+        if (page == null)
+        {
+            return model;
+        }
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+
+        return model;
+    });
+
+
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Đăng nhập</h5>
+    <a class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
+</div>
+<div class="modal-body container" style="max-width: 450px;">
+    <form id="login-form" action="dang-nhap" method="post">
+        @AntiForgery.GetHtml()
+        @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Email</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" class="form-control" id="Email" name="Email" aria-describedby="emailHelp" placeholder="Email">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Mật Khẩu</label>
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="Password" name="Password" placeholder="Mật khẩu">
+            </div>
+        </div>
+        <div class="row">
+            <div class="mb-3 form-check col-lg-6 col-6">
+                <input type="checkbox" style="margin-left: -5px;" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Nhớ mật khẩu</label>
+            </div>
+            <div class="col-lg-6 text-lg-end text-lg-start col-6">
+                <a class="" data-bs-toggle="modal" data-bs-target="#check" data-url="/_compt/emailcheck.cshtml">Quên mật khẩu</a>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-lg-6 col-6">
+                <button type="submit" class="btn btn-login login">Đăng nhập</button>
+            </div>
+            <div class="col-lg-6 col-6 ">
+                <p style="padding-top: 20px;">Chưa tài khoản?  <a class="link" data-bs-toggle="modal" data-bs-target="#logup" data-url="/_compt/loginFb.cshtml">Đăng ký</a> </p>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+<div class="modal-footer container" style="display: block; max-width: 450px;">
+    <p>Hoặc đăng nhập với</p>
+    <div class="row">
+        <div class="col-lg-6 col-6">
+            <button class="text-center btn-fb" onclick="loginWithFacebook()"><i class="fa-brands fa-facebook-f"></i> Facebook</button>
+        </div>
+
+        <div class="col-lg-6 col-6 ml-auto ">
+            <button id="google-signin" class="text-center btn-gg" onclick="loginWithGoogle()"><i class="fa-brands fa-google-plus-g"></i> Google</button>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+}

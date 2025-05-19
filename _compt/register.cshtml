@@ -1,0 +1,193 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(
+        Type = ComptType.Page_Template,
+        ComptName = "en:Page contact template|vi:Mẫu trang đăng ký ")]
+
+    public class ViewModel
+    {
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string Title { get; set; }
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+
+
+        public static ViewModel Default => new ViewModel()
+        {
+
+        };
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+    private FieldExtractor<VM_Register> field = new FieldExtractor<VM_Register>();
+}
+@{
+    var query = "dang-ky";
+
+    if (IsPost && query == "dang-ky")
+    {
+        new Func<Action>(() =>
+        {
+            try
+            {
+                AntiForgery.Validate();
+                string captcha = Request.Form[nameof(captcha)].ToLower();
+                Validation.RequireField(field.GetName(t => t.FullName));
+                Validation.RequireField(field.GetName(t => t.Email));
+                Validation.RequireField(field.GetName(t => t.Password));
+                Validation.RequireField(field.GetName(t => t.ConfirmPassword));
+
+
+
+                Validation.Add(field.GetName(t => t.Password),
+                Validator.StringLength(
+                maxLength: Int32.MaxValue,
+                minLength: 6,
+                errorMessage: Text["Password must be at least 6 characters.", "Mật khẩu phải gồm ít nhất 6 ký tự."]));
+
+
+                if (!Validation.IsValid())
+                {
+                    Response.Write("Thông tin bạn nhập bị thiếu");
+                }
+
+                if (captcha != this.Context.Session["CaptchaVerify"].ToString())
+                {
+                    Response.Write("mã capcha không hợp lệ");
+                }
+
+
+                var pass = Request.Form[field.GetName(t => t.Password)].NullIfWhiteSpace();
+                var passconfirm = Request.Form[field.GetName(t => t.ConfirmPassword)].NullIfWhiteSpace();
+                var email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+
+                var customer = Db.Table<PP_Customer>().SingleOrDefault(X => X.Email.ToLower() == email);
+                if (customer != null)
+                {
+                    Response.Write("Email này đã đăng ký");
+
+                    return () => Response.End();
+                }
+
+                if (pass == passconfirm)
+                {
+                    var model = new PP_Customer() { Active = true };
+                    model.Name = Request.Form[field.GetName(t => t.FullName)].NullIfWhiteSpace();
+                    model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+                    model.PASSWORD = Crypto.SHA256(Request.Form[field.GetName(t => t.Password)].NullIfWhiteSpace());
+                    Db.Insert<PP_Customer>(model);
+                    HttpContext context = HttpContext.Current;
+
+                    var userId = model.Id;
+
+                    Session["username"] = userId;
+                    userId = (int)(Session["username"]);
+                    context.Session["username"] = userId;
+                    userId = (int)(Session["username"]);
+
+                    model.CreatedTime = DateTime.Now;
+
+
+                    Response.Write("Cám ơn bạn đã đăng ký");
+                    return () => Response.End();
+                }
+                return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
+            }
+            catch (Exception ex)
+
+            {
+                ModelState.AddFormError(ex.Message);
+                return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
+            }
+        })()();
+    }
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+    {
+        model = model ?? ViewModel.Default;
+
+        var page = Db.GetOne<PP_Page>(PageId);
+
+        if (page == null)
+        {
+            return model;
+        }
+
+        model.Title = page.Title;
+        model.MetaDescription = page.MetaDescription;
+        model.MetaKeywords = page.MetaKeywords;
+
+        return model;
+    });
+
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+}
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Đăng ký</h5>
+    <a class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
+</div>
+<div class="modal-body container" style="max-width: 450px;">
+    <form id="contact-form" action="dang-ky" method="post">
+        @AntiForgery.GetHtml()
+        @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
+                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Họ và tên">
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu">
+            </div>
+        </div>
+        <div class="mb-3">
+            <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" placeholder="Mật khẩu">
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="mb-3 form-check ">
+                <input type="checkbox" style="margin-left: -5px;" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Tôi đồng ý với <a href="/dieu-khoan" class="link">điều khoản sự dụng</a></label>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-lg-4 col-6">
+                <button type="submit" class="btn btn-login contact">Đăng ký</button>
+            </div>
+            <div class="col-lg-8 col-6 text-lg-end text-sm-start ">
+                <p style="padding-top: 20px;"> <a class="link" data-bs-toggle="modal" data-bs-target="#login" data-url="/_compt/login.cshtml"> Đăng nhập</a> </p>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer container" style="display: block; max-width: 450px;">
+    <p>Hoặc đăng nhập với</p>
+    <div class="row">
+        <div class="col-lg-6 col-6">
+            <button class="text-center btn-fb" onclick="loginWithFacebook()"><i class="fa-brands fa-facebook-f"></i> Facebook</button>
+        </div>
+        <div class="col-lg-6 col-6 ml-auto ">
+            <button class="text-center btn-gg" id="google-login" onclick="loginWithGoogle()"><i class="fa-brands fa-google-plus-g"></i> Google</button>
+        </div>
+    </div>
+</div>
+

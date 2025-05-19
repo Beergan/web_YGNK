@@ -85,6 +85,10 @@
     <link property="stylesheet" rel='stylesheet' id='font-awesome-official-css' href='assets/releases/v6.7.2/css/all.css' type='text/css' media='all' integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous">
     <link property="stylesheet" rel='stylesheet' id='elementor-icons-css' href='assets/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.34.0' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='elementor-frontend-css' href='assets/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.26.4' type='text/css' media='all'>
+    <link href="~/assets/wp-content/themes/globallogistics/aos.css" rel="stylesheet" />
+    <!-- Trong <head> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+
 
     <style id='elementor-frontend-inline-css' type='text/css'>
         .elementor-kit-3504 {
@@ -1148,6 +1152,7 @@
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/auto.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.thumbs.umd.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.umd.js"></script>
+
     <script>
         window.addEventListener("load", function () {
             const loadingScreen = document.getElementById("loading-screen");
@@ -1394,6 +1399,12 @@
 
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         });
+    </script>
+    <script src="~/assets/wp-content/themes/globallogistics/aos.js"></script>
+    <!-- Trước </body> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        new WOW().init();
     </script>
 
 </body>

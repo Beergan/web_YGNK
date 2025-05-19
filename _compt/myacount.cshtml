@@ -1,0 +1,1082 @@
+﻿@inherits MyWebPage
+@using SLK.Common
+@functions {
+    [Component(Type = ComptType.Page_Template,
+        ComptName = "en:Homepage template|vi:Mẫu trang cá nhân")]
+
+
+    public class ViewModel
+    {
+
+        public PP_Customer Customer { get; set; }
+
+        public string Title { get; set; }
+
+        public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
+
+        public string MetaDescription { get; set; }
+
+        public string MetaKeywords { get; set; }
+
+        public string CategoryPath { get; set; }
+
+
+
+        public static ViewModel Default => new ViewModel()
+        {
+        };
+
+    }/*end_viewmodel*/
+    private ViewModel _data;
+    private ViewModel Data => _data ?? (_data = ViewModel.Default);
+    private MyTranslator Text => new MyTranslator(Data?.Phrases);
+    private FieldExtractor<VM_Myacount> field = new FieldExtractor<VM_Myacount>();
+    private FieldExtractor<PP_Node> field2 = new FieldExtractor<PP_Node>();
+}
+
+@{
+
+    _data = LoadData<ViewModel>(key: $"{LangId}-{FileName}#{NodeSlug}", setup: (model) =>
+
+    {
+        model = model ?? ViewModel.Default;
+
+        HttpContext context = HttpContext.Current;
+
+        var customerID = (Session["username"]);
+
+        if (customerID != null)
+        {
+            model.Customer = Db.Table<PP_Customer>().AsNoTracking().SingleOrDefault(x => x.Id == (int)customerID);
+
+        }
+
+        return model;
+
+    });
+    var query = Request.Url.Query;
+
+    if (IsPost && query == "?myacount")
+    {
+
+        try
+        {
+            AntiForgery.Validate();
+
+            Validation.RequireField(field.GetName(t => t.FullName));
+            Validation.RequireField(field.GetName(t => t.Email));
+            Validation.RequireField(field.GetName(t => t.instro));
+            Validation.RequireField(field.GetName(t => t.City));
+            Validation.RequireField(field.GetName(t => t.Phone));
+            Validation.RequireField(field.GetName(t => t.acount));
+            Validation.RequireField(field.GetName(t => t.Name));
+            Validation.RequireField(field.GetName(t => t.Adress));
+
+
+
+
+
+
+
+            var email = Request.Form[field.GetName(t => t.acount)].NullIfWhiteSpace();
+
+
+            var customerID = (Session["username"]);
+
+            var model = Db.GetOne<PP_Customer>(x => x.Id == (int)customerID);
+            model.Active = true;
+            model.FullName = Request.Form[field.GetName(t => t.FullName)].NullIfWhiteSpace();
+            model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
+            model.Adress = Request.Form[field.GetName(t => t.Adress)].NullIfWhiteSpace();
+            model.Name = Request.Form[field.GetName(t => t.Name)].NullIfWhiteSpace();
+            model.Phone = Request.Form[field.GetName(t => t.Phone)].NullIfWhiteSpace();
+ 
+            model.CreatedTime = DateTime.Now;
+            Db.Update<PP_Customer>(model);
+
+
+            Response.Write("Cám ơn bạn đã đăng ký");
+
+
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddFormError(ex.Message);
+
+            Response.Write("Lưu thất bại");
+
+        }
+
+    }
+
+
+
+
+    if (IsPost && query == "?hieuchinh")
+    {
+
+        try
+        {
+            HttpContext context = HttpContext.Current;
+            AntiForgery.Validate();
+
+
+            var customerID = (Session["username"]);
+
+
+            //if (customerID != null)
+            //{
+            //    Validation.RequireField(field2.GetName(t => t.Title), "Tiêu đề không thể để trống!");
+            //    Validation.RequireField(field2.GetName(t => t.NodePath), "Alias không thể để trống!");
+            //    Validation.Add(field2.GetName(t => t.NodePath), Validator.Regex(@"^[a-z0-9]+(\-[a-z0-9]+)*$", "Alias không đúng định dạng!"));
+
+            //    modelss.LangId = "vi";
+
+            //    modelss.userid = (int)customerID;
+
+
+
+            //    modelss.Title = Request.Form[field2.GetName(t => t.Title)].NullIfWhiteSpace();
+            //    modelss.Summary = Server.HtmlDecode(Request.Form[field2.GetName(t => t.Summary)]).NullIfWhiteSpace();
+            //    //model.Content = Server.HtmlDecode(Request.Form[field.GetName(t => t.Content)]).NullIfWhiteSpace();
+            //    modelss.Featured = Request.Form[field2.GetName(t => t.Featured)].AsBool();
+
+            //    modelss.MetaDescription = Request.Form[field2.GetName(t => t.MetaDescription)].NullIfWhiteSpace();
+            //    modelss.MetaKeywords = Request.Form[field2.GetName(t => t.MetaKeywords)].NullIfWhiteSpace();
+            //    modelss.ImageUrl = Request.Form[field2.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+            //    modelss.CategoryId = Request.Form[field2.GetName(t => t.CategoryId)].AsInt();
+            //    modelss.Idnode = Request.Form["idnode"].AsInt();
+            //    if (!Validation.IsValid())
+            //    {
+            //        ModelState.AddFormError("Bạn nhập thiếu thông tin!");
+
+            //    }
+
+            //    var category = Db.GetOne<PP_Category>(modelss.CategoryId ?? 0);
+            //    var page = Db.GetOne<PP_Page>(category.PageIdItem);
+            //    var lk = new link();
+            //    var tilelink = lk.GenerateNodePath(Request.Form[field2.GetName(t => t.Title)]);
+            //    modelss.NodePath = string.Format(page.PathPattern, tilelink.ToLower().Trim());
+            //    if (Db.Exists<PP_Nodes>(t => t.NodePath == models.NodePath))
+            //    {
+            //        ModelState.AddFormError($"Đường dẫn [{models.NodePath}] đã tồn tại!");
+            //        Response.Redirect($"/tai-khoan");
+            //    }
+            //    if (Request.Files["File2"] != null && Request.Files["File2"].ContentLength > 0)
+            //    {
+            //        var file = Request.Files["File"];
+            //        var fileName = Path.GetFileName(file.FileName);
+            //        var relativePath = "/upload/" + fileName;
+
+            //        var filePath = Server.MapPath(relativePath);
+            //        modelss.ImageUrl = relativePath;
+            //    }
+            //    var imageFiles = Request.Files.GetMultiple("File");
+            //    List<string> fileNames = new List<string>();
+            //    foreach (var imageFile in imageFiles)
+            //    {
+            //        if (imageFile.ContentLength > 0)
+            //        {
+
+            //            string fileName = Path.GetFileName(imageFile.FileName);
+            //            var relativePath = "/upload/" + fileName;
+            //            string paths = Server.MapPath(relativePath);
+            //            imageFile.SaveAs(paths);
+            //            fileNames.Add(relativePath);
+            //        }
+
+            //    }
+            //    modelss.Listimage = string.Join(",", fileNames);
+
+            //    Db.Insert<PP_Nodes>(modelss);
+            //    string path = NodeSlug;
+            //    int indexOfFirstSlash = path.IndexOf('/');
+            //    string dataAfterFirstSlash = indexOfFirstSlash != -1 ? path.Substring(indexOfFirstSlash + 1) : path;
+            //    Response.Redirect($"/tai-khoan");
+
+            //}
+        }
+        catch
+        {
+
+        }
+    }
+
+    if (IsPost && query == "?add")
+    {
+
+        try
+        {
+            HttpContext context = HttpContext.Current;
+            AntiForgery.Validate();
+
+
+            var customerID = (Session["username"]);
+
+            //if (customerID != null)
+            //{
+            //    Validation.RequireField(field2.GetName(t => t.Title), "Tiêu đề không thể để trống!");
+            //    Validation.RequireField(field2.GetName(t => t.NodePath), "Alias không thể để trống!");
+            //    Validation.Add(field2.GetName(t => t.NodePath), Validator.Regex(@"^[a-z0-9]+(\-[a-z0-9]+)*$", "Alias không đúng định dạng!"));
+
+            //    models.LangId = "vi";
+
+            //    models.userid = (int)customerID;
+
+            //    models.userid = (int)customerID;
+
+            //    models.Title = Request.Form[field2.GetName(t => t.Title)].NullIfWhiteSpace();
+            //    models.Summary = Server.HtmlDecode(Request.Form[field2.GetName(t => t.Summary)]).NullIfWhiteSpace();
+            //    //model.Content = Server.HtmlDecode(Request.Form[field.GetName(t => t.Content)]).NullIfWhiteSpace();
+            //    models.Featured = Request.Form[field2.GetName(t => t.Featured)].AsBool();
+
+            //    models.MetaDescription = Request.Form[field2.GetName(t => t.MetaDescription)].NullIfWhiteSpace();
+            //    models.MetaKeywords = Request.Form[field2.GetName(t => t.MetaKeywords)].NullIfWhiteSpace();
+            //    models.ImageUrl = Request.Form[field2.GetName(t => t.ImageUrl)].NullIfWhiteSpace();
+            //    models.CategoryId = Request.Form[field2.GetName(t => t.CategoryId)].AsInt();
+            //    if (!Validation.IsValid())
+            //    {
+            //        ModelState.AddFormError("Tài khoản của bạn không có quyền!");
+            //    }
+            //    var category = Db.GetOne<PP_Category>(models.CategoryId ?? 0);
+            //    var page = Db.GetOne<PP_Page>(category.PageIdItem);
+            //    var lk = new link();
+            //    var tilelink = lk.GenerateNodePath(Request.Form[field2.GetName(t => t.Title)]);
+            //    models.NodePath = string.Format(page.PathPattern, tilelink.ToLower().Trim());
+            //    if (Db.Exists<PP_Node>(t => t.NodePath == models.NodePath))
+            //    {
+            //        ModelState.AddFormError($"Đường dẫn [{models.NodePath}] đã tồn tại!");
+            //        Response.Redirect($"/tai-khoan");
+            //    }
+            //    if (Request.Files["File2"] != null && Request.Files["File2"].ContentLength > 0)
+            //    {
+            //        var file = Request.Files["File"];
+            //        var fileName = Path.GetFileName(file.FileName);
+            //        var relativePath = "/upload/" + fileName;
+
+            //        var filePath = Server.MapPath(relativePath);
+            //        models.ImageUrl = relativePath;
+            //    }
+            //    var imageFiles = Request.Files.GetMultiple("File");
+            //    List<string> fileNames = new List<string>();
+            //    foreach (var imageFile in imageFiles)
+            //    {
+            //        if (imageFile.ContentLength > 0)
+            //        {
+
+            //            string fileName = Path.GetFileName(imageFile.FileName);
+            //            var relativePath = "/upload/" + fileName;
+            //            string paths = Server.MapPath(relativePath);
+            //            imageFile.SaveAs(paths);
+            //            fileNames.Add(relativePath);
+            //        }
+
+            //    }
+            //    models.Listimage = string.Join(",", fileNames);
+
+
+            //    Db.Insert<PP_Node>(models);
+            //    string path = NodeSlug;
+            //    int indexOfFirstSlash = path.IndexOf('/');
+            //    string dataAfterFirstSlash = indexOfFirstSlash != -1 ? path.Substring(indexOfFirstSlash + 1) : path;
+            //    Response.Redirect($"{dataAfterFirstSlash}");
+
+            //}
+        }
+        catch
+        {
+
+        }
+    }
+    if (IsPost && query == "?pass")
+    {
+
+        try
+        {
+            AntiForgery.Validate();
+            Validation.RequireField(field.GetName(t => t.PASSWORD));
+            Validation.RequireField(field.GetName(t => t.ConfirmPassword));
+
+
+
+            Validation.Add(field.GetName(t => t.PASSWORD),
+            Validator.StringLength(
+            maxLength: Int32.MaxValue,
+            minLength: 6,
+            errorMessage: Text["Password must be at least 6 characters.", "Mật khẩu phải gồm ít nhất 6 ký tự."]));
+
+            var pass = Request.Form[field.GetName(t => t.PASSWORD)].NullIfWhiteSpace();
+            var passconfirm = Request.Form[field.GetName(t => t.ConfirmPassword)].NullIfWhiteSpace();
+            var email = Request.Form[field.GetName(t => t.acount)].NullIfWhiteSpace();
+
+            var customerID = (Session["username"]);
+
+            var customer = Db.Table<PP_Customer>().SingleOrDefault(X => X.Id == (int)customerID);
+
+
+
+            if (pass == passconfirm)
+            {
+
+                Response.Write("Mật khẩu không trùng khớp!");
+                Response.Redirect(NodeSlug);
+
+            }
+            var model = new PP_Customer() { Active = false };
+
+            model.PASSWORD = Crypto.SHA256(Request.Form["pass-new"].NullIfWhiteSpace());
+            model.CreatedTime = DateTime.Now;
+            Db.Insert<PP_Customer>(model);
+            HttpContext context = HttpContext.Current;
+
+            var userId = model.Id;
+
+
+            model.CreatedTime = DateTime.Now;
+            Response.Write("Đổi mật khẩu thành công");
+            Response.Redirect(NodeSlug);
+
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddFormError(ex.Message);
+
+            Response.Write("Cám ơn bạn đã đăng ký");
+
+        }
+    }
+    if (IsPost && query == "?logout")
+    {
+        string customHandler = "logout";
+        if (Request.Form["id"] == customHandler)
+        {
+
+            Context.Session.Remove("username");
+            Response.Redirect("/");
+        }
+    }
+}
+
+@{
+    Layout = $"~/_layouts/_layout.cshtml";
+    Page.Title = Data.Title;
+    Page.Description = Data.MetaDescription;
+    Page.Keywords = Data.MetaKeywords;
+    var bard = Db.Table<PP_Category>().Where(x => x.ParentId == 1062).ToList();
+}
+<div class="main-banner-page" style="background-color: #f2f2f2 ">
+    <div class="row  m-0 p-0" style="background-color: #DCDCDC">
+        <div class="container" style="max-width:1320px">
+            <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                <ol class="breadcrumb m-0 mt-3">
+                    <li class="breadcrumb-item"><a href="#">Trang chủ</a></li>
+                    <li class="breadcrumb-item active " aria-current="page">@Data.Title</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    @if (Session["username"] != null)
+    {
+
+
+        var iduser = (Session["username"]);
+        <div class="container badge-light " style="background-color:#ffffff">
+            <div class="row m-0 p-0 mt-2 pb-2  position-relative">
+                <div class="col-lg-2 col-12">
+                    <div class="img-container">
+                        <img class="img-fluid" src="~/assets/images/logo.png" title="" alt="" loading="lazy" />
+                    </div>
+
+                </div>
+                <div class="col-lg-9 col-9">
+
+                </div>
+                <div class="row border-bottom  top-20 ">
+                    <div class="col-lg-9 col-12">
+                        <h4>@Data.Customer.Name</h4>
+                        <h4>@Data.Customer.Email</h4>
+                    </div>
+                    <div class="col-lg-1">
+                        <form action="@NodeSlug?logout" method="post" id="logout">
+                            <input type="hidden" name="id" value="logout" />
+                            <button class="cat border-0 mt-1" type="submit"><h6 class="text-link"> <strong>Đăng xuât</strong></h6></button>
+                        </form>
+
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-12 mt-lg-4 mb-lg-4 mt-2 mb-2 text-center">
+                    <div class="d-lg-flex d-block " id="indrydetalis">
+                        <button class="cat border-0 mt-1 active1" onclick="toggleCollapse('multiCollapseExample1', this)"><h6 class="text-link"> <strong>Thông tin</strong></h6></button>
+                        <button class="cat border-0 mt-1" onclick="toggleCollapse('multiCollapseExample2', this)"><h6 class="text-link"> <strong>Danh sách sản phẩm</strong></h6></button>
+                        <button class="cat border-0 mt-1" onclick="toggleCollapse('multiCollapseExample3', this)"><h6 class="text-link"> <strong>Thêm sản phẩm</strong></h6></button>
+                        <button class="cat border-0 mt-1" onclick="toggleCollapse('multiCollapseExample4', this)"><h6 class="text-link"> <strong>Đổi mật khẩu</strong></h6></button>
+                    </div>
+                </div>
+                <div class="collapse col-lg-12 show multi-collapse" id="multiCollapseExample1">
+                    <div class="row">
+                        <div class="user_acount">
+                            <form action="@NodeSlug?myacount" id="myacount" method="post">
+                                <div class="row">
+                                    @AntiForgery.GetHtml()
+                                    @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                        <input type="text" id="full-acount" value="@Data.Customer.FullName" name="@field.GetName(x => x.FullName)" placeholder="Họ Tên CEO" required>
+                                    </div>
+                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                        <input type="text" id="business-acount" value="@Data.Customer.Name" name="@field.GetName(x=>x.Name)" placeholder="Tên Doanh Nghiệp" required>
+                                    </div>
+                                 
+                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                        <input type="email" id="email-acount" name="@field.GetName(x=>x.Email)" value="@Data.Customer.Email" placeholder="Email" required>
+                                    </div>
+                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                        <input type="tel" id="phone-acount" name="@field.GetName(x=>x.Phone)" value="@Data.Customer.Phone" placeholder="Số điện thoại" required>
+                                    </div>
+                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                        <input type="text" id="address-acount" name="@field.GetName(x=>x.Adress)" value="@Data.Customer.Adress" placeholder="Địa chỉ" required>
+                                    </div>
+                                </div>
+                                <div class="row m-0 p-0  mb-4">
+                                    <div class="col-lg-12 m-0 p-0 text-end position-relative">
+                                        <div class="action_btns p-b-4 ">
+                                            <div class="one_half last"><button class="btn btn_red " type="submit" style="left:0; margin-bottom:5%; position: absolute;  width: 150px; color: white; padding: 10px 20px; border: none; text-align: center; ">Lưu</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse col-lg-12 multi-collapse" id="multiCollapseExample2">
+                    <div class="row">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr class="none">
+                                        <th>STT</th>
+                                        <th>Tên</th>
+                                        <th>Danh mục</th>
+                                        <th>Ngày đăng</th>
+                                        <th>Tình trạng</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @*@for (int i = 0; i < id.Count; i++)
+                                    {
+                                        <tr>
+
+                                            <td>@(i+1)</td>
+                                            <td>@id[i].Title</td>
+                                            <td>@bard.EmptyIfNull().Where(x => x.Id == @id[i].CategoryId).First().Title </td>
+                                            <td>@id[i].CreatedTime.ToString("dd/MM/yyyy")</td>
+                                            <td>
+                                                @if (id[i].Featured = true)
+                                                {
+                                                    <p>Đã duyệt</p>
+                                                }
+                                                else
+                                                {
+                                                    <p>đang xử lý</p>
+                                                }
+
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#xem@(i+1)">
+                                                    <i class="glyphicon glyphicon-eye-open"></i> Xem
+                                                </button>
+                                                <button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#chinhSua@(i+1)">
+                                                    <i class="glyphicon glyphicon-pencil"></i> Sửa
+                                                </button>
+                                                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#xoa@(i+1)">
+                                                    <i class="glyphicon glyphicon-trash"></i> Xóa
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <div class="modal fade" id="xem@(i+1)" tabindex="-1" role="dialog" aria-labelledby="xem@(i+1)" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="xemChiTietModalLabel1">@id[i].Title</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="user_acount">
+                                                            <form action="/register" method="post">
+                                                                <div class="row">
+                                                                    <div class="row mb-4">
+                                                                        <div class="col-lg-12">
+                                                                            <h3 class="text-center">
+                                                                                Thông tin sản phẩm
+                                                                            </h3>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-12 border-bottom mt-lg-4 mt-3">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <p class="text-dark"> Tiêu đề:</p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p class="text-dark"> @id[i].Title</p>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="col-lg-12 border-bottom mt-lg-4 mt-3">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <p class="text-dark"> Danh mục:</p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p class="text-dark"> @bard.EmptyIfNull().Where(x => x.Id == @id[i].CategoryId).First().Title</p>
+                                                                            </div>
+                                                                        </div>
+
+
+                                                                    </div>
+
+                                                                    <div class="col-lg-12 border-bottom mt-lg-4 mt-3">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <p class="text-dark"> Mô tả:</p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p class="text-dark"> @id[i].Summary</p>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                    <div class="row border-bottom mt-3">
+                                                                        <p>Ảnh đại diện</p>
+                                                                        <div class="mb-3 col-lg-12">
+                                                                            <img src="@id[i].ImageUrl" alt="@id[i].Title" title="@id[i].Title" />
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row mt-3">
+                                                                        <p>Danh sách hình ảnh</p>
+                                                                        <div class="mb-3 col-lg-12">
+                                                                            <div class="row">
+                                                                                @foreach (var items in @id[i].Listimage.Split(','))
+                                                                                {
+                                                                                    <div class="col-lg-2 col-2 p-1 ">
+                                                                                        <img src="@items" class="img-fluid border-img-child" alt="" title="" loading="lazy" />
+                                                                                    </div>
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div id="image-list" class="row mt-3">
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </form>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="chinhSua@(i+1)" tabindex="-1" role="dialog" aria-labelledby="chinhSuaModalLabel1" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="chinhSuaModalLabel1">Chỉnh sửa @id[i].Title</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="user_acount">
+                                                            <form action="@NodeSlug?hieuchinh" enctype="multipart/form-data" method="post">
+                                                                @AntiForgery.GetHtml()
+                                                                @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+                                                                <div class="row">
+                                                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                                                        <label class="text-dark"> Tiêu đề</label>
+                                                                        <input type="text" id="full-name" value="@id[i].Title" name="@field2.GetName(t => t.Title)" required>
+                                                                        <input type="text" style="display:none;" id="idnode" value="@id[i].Id" name="idnode" required>
+                                                                    </div>
+
+                                                                    <div class="col-lg-6 mt-lg-4 mt-3">
+                                                                        <label class="text-dark"> Chọn ngành nghề</label>
+                                                                        <select class="form-select" id="industry-acount" name="@field2.GetName(t => t.CategoryId)">
+                                                                            <option value="">Chọn ngành nghề</option>
+                                                                            @foreach (var item in bard.EmptyIfNull())
+                                                                            {
+                                                                                <option value="@item.Id">@item.Title</option>
+                                                                            }
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-lg-12 mt-lg-4 mt-3">
+                                                                        <label class="text-dark"> Mô tả</label>
+                                                                        <textarea name="@field2.GetName(t => t.Summary)" type="text" class="form-control message" rows="6" cols="800" id="message" placeholder="mô tả"> @id[i].Summary</textarea>
+                                                                    </div>
+                                                                    <div class="row ">
+                                                                        <div class="mb-3 col-lg-12">
+                                                                            <label class="text-dark">Hình ảnh</label>
+                                                                            <input class="form-control" type="file" id="File2" name="File2" accept="image/gif, image/jpeg, image/png" title="Chọn ảnh" onchange="previewImage(event)">
+                                                                            <img id="preview" src="@id[i].ImageUrl" alt="Ảnh" style="max-width: 100%; margin-top: 10px;">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="row">
+                                                                        <div class="mb-3 col-lg-12">
+                                                                            <label class="text-dark">Danh sách hình ảnh</label>
+                                                                            <input class="form-control" type="file" id="File" name="File" multiple accept="image/gif, image/jpeg, image/png" title="Chọn ảnh" onchange="previewImages(event)">
+                                                                            <div id="image-preview2" class="mt-2">
+                                                                                <div class="row">
+                                                                                    @foreach (var item in @id[i].Listimage.Split(','))
+                                                                                    {
+                                                                                        <div class="col-lg-2 col-2 p-1">
+                                                                                            <img src="@item" class="img-fluid border-img-child" alt="" title="" loading="lazy" />
+                                                                                            <button class="btn btn-danger btn-sm mt-1" onclick="removeImage(this)">Xóa</button>
+                                                                                        </div>
+                                                                                    }
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div id="image-list" class="row mt-3">
+
+                                                                    </div>
+
+                                                                </div>
+                                                                <div class="row m-0 p-0  mb-4">
+                                                                    <div class="col-lg-12 m-0 p-0 text-end position-relative">
+                                                                        <div class="action_btns p-b-4 ">
+                                                                            <div class="one_half last"><button type="submit" class="btn btn_red " style="left:0; margin-bottom:5%; position: absolute;  width: 150px; color: white; padding: 10px 20px; border: none; text-align: center; ">Đăng</button></div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal fade" id="xoa@(i+1)" tabindex="-1" role="dialog" aria-labelledby="xoaModalLabel1" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <form>
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="xoaModalLabel1">Xóa @id[i].Title</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Bạn có chắc chắn muốn xóa @id[i].Title không?</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                                                            <a href="javascript:delele(@id[i].Id)" type="button" class="btn btn-danger">Xóa</a>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }*@
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="collapse col-lg-12 multi-collapse" id="multiCollapseExample3">
+                    <div class="container " style="max-width:1200px; background-color:">
+                        <div class="row">
+                            <div class="table-container">
+                                <div class="user_acount">
+                                    <form action="@NodeSlug?add" enctype="multipart/form-data" method="post">
+                                        @AntiForgery.GetHtml()
+                                        @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+                                        <div class="row">
+                                            <div class="col-lg-6 mt-lg-4 mt-3">
+                                                <label class="text-dark"> Tiêu đề</label>
+                                                <input type="text" id="full-name" name="@field2.GetName(t => t.Title)" required>
+                                            </div>
+                                            <div class="col-lg-6 mt-lg-4 mt-3">
+                                                <label class="text-dark"> Chọn ngành nghề</label>
+                                                <select class="form-select" id="industry-acount" name="@field2.GetName(t => t.CategoryId)">
+                                                    <option value="">Chọn ngành nghề</option>
+                                                    @foreach (var item in bard.EmptyIfNull())
+                                                    {
+                                                        <option value="@item.Id">@item.Title</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="col-lg-12 mt-lg-4 mt-3">
+                                                <label class="text-dark"> Mô tả</label>
+                                                <textarea name="@field2.GetName(t => t.Summary)" type="text" class="form-control message" rows="6" cols="800" id="message" placeholder="mô tả"></textarea>
+                                            </div>
+                                            <div class="row ">
+
+                                                <div class="mb-3 col-lg-12">
+                                                    <label class="text-dark"> Hình ảnh </label>
+                                                    <input class="form-control" type="file" id="File-new2" name="File2" accept="image/gif, image/jpeg, image/png" title="Chọn ảnh">
+                                                </div>
+                                            </div>
+                                            <div id="image2" class="row ">
+
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="mb-3 col-lg-12">
+                                                    <label class="text-dark"> Danh sách hình ảnh</label>
+                                                    <input class="form-control" type="file" id="File-new" name="File" multiple accept="image/gif, image/jpeg, image/png" title="Chọn ảnh">
+                                                </div>
+                                            </div>
+
+                                            <div id="image-list2" class="row mt-3">
+
+                                            </div>
+
+                                        </div>
+                                        <div class="row m-0 p-0  mb-4">
+                                            <div class="col-lg-12 m-0 p-0 text-end position-relative">
+                                                <div class="action_btns p-b-4 ">
+                                                    <div class="one_half last"><button type="submit" class="btn btn_red " style="left:0; margin-bottom:5%; position: absolute;  width: 150px; color: white; padding: 10px 20px; border: none; text-align: center; ">Đăng</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="collapse col-lg-12 multi-collapse" id="multiCollapseExample4">
+                    <div class="row">
+                        <div class="user_acount">
+                            <form action="@NodeSlug?pass" id="myacount" method="post">
+                                <div class="row">
+                                    @AntiForgery.GetHtml()
+                                    <div class="col-lg-12 col-lg-12 mt-lg-4 mt-3">
+                                        <input type="password" id="password" name="@field.GetName(x=>x.PASSWORD)" placeholder="@(LangId == "vi" ? "Mật khẩu" : "Password" )" required>
+                                    </div>
+                                    <div class="col-lg-12 col-lg-12 mt-lg-4 mt-3">
+                                        <input type="password" id="confirm-password" name="@field.GetName(x=>x.ConfirmPassword)" placeholder="@(LangId == "vi" ? "Nhập lại mật khẩu" : "Password confirmation" )" required>
+                                    </div>
+                                    <div class="col-lg-12 col-lg-12 mt-lg-4 mt-3">
+                                        <input type="password" id="password" name="pass-new" placeholder="@(LangId == "vi" ? "Mật khẩu mới" : "Password New" )" required>
+                                    </div>
+
+
+                                </div>
+                                <div class="row m-0 p-0  mb-4">
+                                    <div class="col-lg-12 m-0 p-0 text-end position-relative">
+                                        <div class="action_btns p-b-4 ">
+                                            <div class="one_half last"><button class="btn btn_red " type="submit" style="left:0; margin-bottom:5%; position: absolute;  width: 150px; color: white; padding: 10px 20px; border: none; text-align: center; ">Lưu</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    }
+    else
+    {
+        <div class="container badge-light " style="background-color:#ffffff">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+
+                    <h2>Vui lòng đăng nhập để sử dụng tính năng của tài khoản</h2>
+
+                </div>
+                <div class="col-lg-12">
+                    <img src="@Root.Config.Logo" />
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts{
+
+    <script src="@Constants.Admin_Url/ckeditor/ckeditor.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/ckfinder/ckfinder.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/speakingurl/speakingurl.min.js" type="text/javascript"></script>
+    <script src="@Constants.Admin_Url/assets/libs/stringtoslug/jquery.stringtoslug.min.js"></script>
+    <script src="@Constants.Admin_Url/assets/libs/parsleyjs/parsley.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function previewImages(event) {
+            var previewContainer = document.getElementById('image-preview2');
+
+            // Lặp qua từng tệp đã chọn
+            for (var i = 0; i < event.target.files.length; i++) {
+                var file = event.target.files[i];
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    // Tạo một thẻ <img> để hiển thị hình ảnh và nút xóa
+                    var imgElement = document.createElement('img');
+                    imgElement.src = e.target.result;
+                    imgElement.classList.add('img-fluid', 'border-img-child'); // Thêm class để hiển thị hình ảnh nhỏ
+
+                    var removeButton = document.createElement('button');
+                    removeButton.textContent = 'Xóa';
+                    removeButton.className = 'btn btn-danger btn-sm mt-1';
+                    removeButton.onclick = function () {
+                        previewContainer.removeChild(colElement); // Xóa hình ảnh khi người dùng nhấn nút xóa
+                    };
+
+                    // Tạo một thẻ div để chứa hình ảnh và nút xóa
+                    var colElement = document.createElement('div');
+                    colElement.classList.add('col-lg-2', 'col-2', 'p-1');
+                    colElement.appendChild(imgElement);
+                    colElement.appendChild(removeButton);
+
+                    previewContainer.appendChild(colElement); // Thêm thẻ div vào container
+                };
+
+                reader.readAsDataURL(file); // Đọc dữ liệu của tệp hình ảnh
+            }
+        }
+        function removeImage(button) {
+            var imageDiv = button.parentElement;
+            imageDiv.parentElement.removeChild(imageDiv); // Xóa hình ảnh khi người dùng nhấn nút xóa
+        }
+    </script>
+    <script type="text/javascript">
+    // Đợi tải xong trang
+    $(document).ready(function() {
+        // Thay thế CKEditor cho textarea có ID là "message"
+        CKEDITOR.replace('message', {
+            toolbar: [
+                ['Source','Format','FontSize','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent',
+                '-','Bold','Italic','Underline','Strike',
+                '-','TextColor','BGColor','NumberedList','BulletedList',
+                '-','Link','Image','Table','RemoveFormat','Maximize']
+            ],
+            filebrowserBrowseUrl: "@Constants.Admin_Url/ckfinder/",
+            entities_latin: false,
+            htmlEncodeOutput: true,
+            resize_dir: "vertical",
+            width: "100%",
+            padding: "0px !important"
+        });
+
+        // Khởi tạo CKFinder popup khi click vào nút
+        $(document).on("click", ".btn-ckfinder-popup", function(e) {
+            e.preventDefault();
+            var targetId = $(this).attr('target');
+
+            window["callback_" + targetId] = function(fileUrl) {
+                var url = new URL(fileUrl);
+                $('#' + targetId).val(url.pathname);
+                $('#img-' + targetId).attr("src", url.pathname);
+            }
+
+            CKFinder.popup({
+                chooseFiles: true,
+                width: 800,
+                height: 600,
+                selectActionFunction: window["callback_" + targetId]
+            });
+        });
+
+        // Áp dụng Parsley cho các phần tử có class "validable"
+        $(".validable").parsley();
+    });
+    </script>
+    <script type="text/javascript">
+$(document).ready(function() {
+    // Thay thế CKEditor cho textarea có ID là "messages"
+    CKEDITOR.replace('messages', {
+        toolbar: [
+            ['Source','Format','FontSize','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','Outdent','Indent',
+            '-','Bold','Italic','Underline','Strike',
+            '-','TextColor','BGColor','NumberedList','BulletedList',
+            '-','Link','Image','Table','RemoveFormat','Maximize']
+        ],
+        filebrowserBrowseUrl: "@Constants.Admin_Url/ckfinder/",
+        entities_latin: false,
+        htmlEncodeOutput: true,
+        resize_dir: "vertical",
+        width: "100%",
+        padding: "0px !important"
+    });
+
+    // Khởi tạo CKFinder popup khi click vào nút
+    $(document).on("click", ".btn-ckfinder-popup", function(e) {
+        e.preventDefault();
+        var targetId = $(this).attr('target');
+
+        window["callback_" + targetId] = function(fileUrl) {
+            var url = new URL(fileUrl);
+            $('#' + targetId).val(url.pathname);
+            $('#img-' + targetId).attr("src", url.pathname);
+        }
+
+        CKFinder.popup({
+            chooseFiles: true,
+            width: 800,
+            height: 600,
+            selectActionFunction: window["callback_" + targetId]
+        });
+    });
+
+    // Áp dụng Parsley cho các phần tử có class "validable"
+    $(".validable").parsley();
+});
+
+    </script>
+    <script>
+        document.getElementById('File-new').addEventListener('change', function (e) {
+            var fileList = e.target.files;
+            var imageListContainer = document.getElementById('image-list2');
+
+            for (var i = 0; i < fileList.length; i++) {
+                var file = fileList[i];
+                var reader = new FileReader();
+
+                reader.onload = function (event) {
+                    var imageDiv = document.createElement('div');
+                    imageDiv.classList.add('col-lg-3', 'mb-3');
+
+                    var image = document.createElement('img');
+                    image.src = event.target.result;
+                    image.classList.add('img-fluid');
+                    imageDiv.appendChild(image);
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Xóa';
+                    deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mt-2');
+                    deleteButton.addEventListener('click', function () {
+                        imageDiv.remove();
+                    });
+                    imageDiv.appendChild(deleteButton);
+
+                    imageListContainer.appendChild(imageDiv);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+    <script>
+        document.getElementById('File-new2').addEventListener('change', function (e) {
+            var fileList = e.target.files;
+            var imageListContainer = document.getElementById('image2');
+
+            for (var i = 0; i < fileList.length; i++) {
+                var file = fileList[i];
+                var reader = new FileReader();
+
+                reader.onload = function (event) {
+                    var imageDiv = document.createElement('div');
+                    imageDiv.classList.add('col-lg-3', 'mb-3');
+
+                    var image = document.createElement('img');
+                    image.src = event.target.result;
+                    image.classList.add('img-fluid');
+                    imageDiv.appendChild(image);
+
+                    var deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Xóa';
+                    deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mt-2');
+                    deleteButton.addEventListener('click', function () {
+                        // Xóa hình ảnh khi nút xóa được nhấp vào
+                        imageDiv.remove();
+                    });
+                    imageDiv.appendChild(deleteButton);
+
+                    imageListContainer.appendChild(imageDiv);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+    <script>
+        function previewImage(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('preview');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        };
+    </script>
+    <script>
+        function delele(id) {
+            Swal.fire({
+                title: '@Html.Raw(Text["Confirm to delete!","Hãy xác nhận?"])',
+                text: '@Html.Raw(Text["Delete operation cannot be undone","Thao tác xóa không thể hoàn tác"])',
+                type: "warning",
+                showCancelButton: !0,
+                confirmButtonText: '@Text["OK","Được"]',
+                cancelButtonText: '@Text["Wait!","Khoan!"]',
+                confirmButtonClass: "btn btn-success mt-2",
+                cancelButtonClass: "btn btn-danger ml-2 mt-2",
+                buttonsStyling: !1
+            }).then(function (t) {
+                t.value ? $.ajax({
+                    url: "@Constants.Admin_Url/post?delete",
+                    type: "POST",
+                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                    data: { __RequestVerificationToken: '@AntiForgeryTokenForAjaxPost()', Id: id },
+                    success: function (result) {
+                        Swal.fire({
+                            title: '@Html.Raw(Text["Congratulation!", "Chúc mừng!"])',
+                            text: result,
+                            type: "success"
+                        }).then(function (t) { location.reload(); })
+                    },
+                    error: function (errormessage) {
+                        Swal.fire({
+                            title: '@Html.Raw(Text["Oh, no!", "Thôi xong!"])',
+                            text: errormessage.responseText,
+                            type: "error"
+                        })
+                    }
+                }) : {}
+            });
+        }
+
+        $(document).ready(function () {
+            jQuery.extend(jQuery.fn.dataTableExt.oSort, {
+                "formatted-num-pre": function (a) {
+                    a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
+                    return parseFloat(a);
+                },
+                "formatted-num-asc": function (a, b) {
+                    return a - b;
+                },
+                "formatted-num-desc": function (a, b) {
+                    return b - a;
+                }
+            });
+
+            $('#datatable').DataTable({
+                "aaSorting": [],
+                "columnDefs": [{ type: 'formatted-num', targets: 0 }],
+                "pageLength": 100,
+                "lengthChange": false,
+            });
+        });
+    </script>
+}
