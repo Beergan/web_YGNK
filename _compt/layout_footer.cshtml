@@ -6,8 +6,107 @@
         ComptName = "en:Page footer component|vi:Thành phần chân trang")]
     public class ViewModel : PageListModel
     {
+        public class KoreanOffice
+        {
+            [Field(
+            Title = "Tiêu đề",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Title { get; set; }
 
+            public class Infor
+            {
+                [Field(
+                Title = "Địa chỉ",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Adress { get; set; }
+                [Field(
+                Title = "Thecbe",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Thecbe { get; set; }
+                [Field(
+                Title = "Hotline",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Hotline { get; set; }
+                [Field(
+                Title = "Email",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Email { get; set; }
+                [Field(
+                Title = "Số đăng ký",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Number { get; set; }
+                [Field(
+                Title = "Giờ làm việc",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Time { get; set; }
+            }
+            [Field(
+            Title = "Thông tin")]
+            public Infor _infor { get; set; }
+        }
+        [Field(
+        Title = "Văn phòng Hàn Quốc")]
+        public KoreanOffice _koreanOffice { get; set; }
 
+        public class KoreanVN
+        {
+            [Field(
+            Title = "Tiêu đề",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Title { get; set; }
+
+            public class Office
+            {
+                [Field(
+                Title = "Địa chỉ",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Adress { get; set; }
+                [Field(
+                Title = "Hotline",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Hotline { get; set; }
+                [Field(
+                Title = "Email",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Email { get; set; }
+                [Field(
+                Title = "Giờ làm việc",
+                Required = false,
+                Control = InputControlType.TextBox)]
+                public string Time { get; set; }
+            }
+            [Field(
+        Title = "Thông tin")]
+            public KoreanOffice _koreanOffice { get; set; }
+
+        }
+        [Field(
+    Title = "Văn phòng Việt Nam")]
+        public KoreanVN _koreanVN { get; set; }
+
+        public class PageFacebook
+        {
+            [Field(
+            Title = "Đường dẫn",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Title { get; set; }
+          
+        }
+        [Field(
+    Title = "Page Facebook")]
+        public PageFacebook _pageFacebook { get; set; }
 
         public static ViewModel Default => new ViewModel
         {

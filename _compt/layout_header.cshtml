@@ -8,9 +8,6 @@
         public IDictionary<string, string> Phrases { get; set; } = new Dictionary<string, string>();
 
 
-
-
-
         public static ViewModel Default => new ViewModel()
         {
 
@@ -35,7 +32,7 @@
                     <div class="elementor-widget-wrap elementor-element-populated">
                         <div class="sc_layouts_item elementor-element elementor-element-a22dd0e sc_fly_static elementor-widget elementor-widget-trx_sc_layouts_logo" data-id="a22dd0e" data-element_type="widget" data-widget_type="trx_sc_layouts_logo.default">
                             <div class="elementor-widget-container">
-                                <a href="#" class="sc_layouts_logo sc_layouts_logo_default trx_addons_inline_766195019"><img class="logo_image" src="wp-content/uploads/2021/02/LOGO-9.png" srcset="wp-content/uploads/2021/02/LOGO-9.png 2x" alt="NHBLOGISTICS" width="451" height="95"></a>
+                                <a href="#" class="sc_layouts_logo sc_layouts_logo_default trx_addons_inline_766195019"><img class="logo_image" src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle" width="451" height="95"></a>
                             </div>
                         </div>
                     </div>
@@ -52,9 +49,21 @@
                                             <li class="menu-item menu-item-type-custom menu-item-object-custom @((Request.Url.AbsolutePath.TrimEnd('/') == item.Href.TrimEnd('/')) ? "current-menu-item" : "") current_page_item menu-item-home"><a href="@item.Href" aria-current="page" title="@item.Title"><span>@item.Title</span></a></li>
 
                                         }
-                                             </ul>
+                                        <li>
+                                            <div class="menu-cart-wrapper">
+                                                <div class="menu-cart-icon">
+                                                    <a class="cart-active">
+                                                        <i class="fa-solid fa-cart-shopping"></i>
+
+                                                    </a>
+                                                    <div class="cart-count"><span class="cart-count1">@cart.GetCartLines().Sum(x => x.Quantity)</span></div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
                                 </nav>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -66,7 +75,7 @@
                     <div class="elementor-widget-wrap elementor-element-populated">
                         <div class="sc_layouts_item elementor-element elementor-element-248be5c sc_fly_static elementor-widget elementor-widget-trx_sc_layouts_logo" data-id="248be5c" data-element_type="widget" data-widget_type="trx_sc_layouts_logo.default">
                             <div class="elementor-widget-container">
-                                <a href="#" class="sc_layouts_logo sc_layouts_logo_default trx_addons_inline_961151386"><img class="logo_image" src="wp-content/uploads/2021/02/LOGO-9.png" srcset="wp-content/uploads/2021/02/LOGO-9.png 2x" alt="NHBLOGISTICS" width="451" height="95"></a>
+                                <a href="#" class="sc_layouts_logo sc_layouts_logo_default trx_addons_inline_961151386"><img class="logo_image" src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle" width="451" height="95"></a>
                             </div>
                         </div>
                     </div>
@@ -89,7 +98,7 @@
                                         <span class="search_submit"></span>
                                         <div class="search_wrap scheme_dark">
                                             <div class="search_header_wrap">
-                                                <img class="logo_image" src="//localhost/nhblogistics/nhblogistics/wp-content/uploads/2022/04/logo.png" srcset="//localhost/nhblogistics/nhblogistics/wp-content/uploads/2022/04/logo@2x.png" alt="NHBLOGISTICS">                <a class="search_close"></a>
+                                                <img class="logo_image" src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle">                <a class="search_close"></a>
                                             </div>
                                             <div class="search_form_wrap">
                                                 <form role="search" method="get" class="search_form" action="https://nhblogistics.com/">
@@ -124,41 +133,50 @@
     <div class="menu_mobile_inner with_widgets">
         <div class="menu_mobile_header_wrap">
             <a class="sc_layouts_logo" href="index.htm">
-                <img src="wp-content/uploads/2021/02/LOGO-9.png" srcset="wp-content/uploads/2021/02/LOGO-9.png 2x" alt="NHBLOGISTICS" width="451" height="95">
+                <img src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle" width="451" height="95">
             </a>
 
             <a class="menu_mobile_close menu_button_close" tabindex="0"><span class="menu_button_close_text">Close</span><span class="menu_button_close_icon"></span></a>
         </div>
         <div class="menu_mobile_content_wrap content_wrap">
-            <div class="menu_mobile_content_wrap_inner without_socials"><nav class="menu_mobile_nav_area" itemscope="itemscope" itemtype="https://schema.org/SiteNavigationElement"><ul id="menu_mobile" class=" menu_mobile_nav"><li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-373"><a href="index.htm" aria-current="page" title="						"><span>Trang chủ</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-1470"><a href="bang-gia/index.htm"><span>Bảng giá</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-1251"><a href="gui-yeu-cau-van-chuyen-hang-va-nhan-bao-gia/index.htm"><span>Gửi yêu cầu vận chuyển</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-1527"><a href="tra-cuu-don-hang/index.htm"><span>Tra cứu đơn hàng</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-1475"><a href="quy-trinh-van-chuyen/index.htm"><span>Quy trình vận chuyển</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-1426"><a href="quy-dinh-ve-van-chuyen-hang-hoa/index.htm"><span>Quy định vận chuyển</span></a></li><li class="menu-item menu-item-type-post_type menu-item-object-post menu-item-2819"><a href="dich-vu-mua-ho-hang-hoa-tu-han-quoc-gui-ve-viet-nam/index.htm"><span>Dịch vụ mua hộ</span></a></li><li class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-2067"><a href="category/tin-tuc/index.htm"><span>Tin tức</span></a></li></ul></nav>            </div>
+            <div class="menu_mobile_content_wrap_inner without_socials">
+                <nav class="menu_mobile_nav_area" itemscope="itemscope" itemtype="https://schema.org/SiteNavigationElement">
+                    <ul id="menu_mobile" class=" menu_mobile_nav">
+                        @foreach (var item in Root.Config.MainMenus.EmptyIfNull())
+                        {
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-373">
+                                <a href="@item.Href" aria-current="page" title="@item.Title"><span>@item.Title</span></a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
         </div><div class="menu_mobile_widgets_area">
             <div class="widgets_additional_menu_mobile_fullscreen widgets_additional_menu_mobile_fullscreen_wrap widget_area">
                 <div class="widgets_additional_menu_mobile_fullscreen_inner widgets_additional_menu_mobile_fullscreen_inner widget_area_inner">
-                    <aside class="widget_text widget widget_custom_html">
-                        <div class="textwidget custom-html-widget">
-                            <div class="extra_item">
-                                <h6>Have a Project?</h6>
-                                <a href="mailto:info@website.com">info@website.com</a>
-                            </div>
+                    @*<aside class="widget_text widget widget_custom_html">
+                            <div class="textwidget custom-html-widget">
+                                <div class="extra_item">
+                                    <h6>Have a Project?</h6>
+                                    <a href="mailto:info@website.com">info@website.com</a>
+                                </div>
 
-                            <div class="extra_item">
-                                <h6>Want to Work With Us?</h6>
-                                <a href="http://localhost/nhblogistics/contact-us/">Send Brief</a>
-                            </div>
+                                <div class="extra_item">
+                                    <h6>Want to Work With Us?</h6>
+                                    <a href="http://localhost/nhblogistics/contact-us/">Send Brief</a>
+                                </div>
 
-                            <div class="extra_item">
-                                <h6>Interested in Our Services?</h6>
-                                <a href="http://localhost/nhblogistics/pricing/">View Pricing</a>
+                                <div class="extra_item">
+                                    <h6>Interested in Our Services?</h6>
+                                    <a href="http://localhost/nhblogistics/pricing/">View Pricing</a>
+                                </div>
                             </div>
-                        </div>
-                    </aside>
+                        </aside>*@
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
-
-
+<div class="sidebar-cart-active" >
+    @RenderPage("/_compt/layout_sidebar.cshtml")
+    </div>

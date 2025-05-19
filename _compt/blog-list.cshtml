@@ -177,17 +177,17 @@ Control = InputControlType.RichTextBox)]
     Page.Description = Data.MetaDescription;
     Page.Keywords = Data.MetaKeywords;
 }
-<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal">
+<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal  border-bottom">
     <div class="content_wrap">
         <div class="sc_layouts_column sc_layouts_column_align_center">
             <div class="sc_layouts_item">
                 <div class="sc_layouts_title sc_align_center">
                     <div class="sc_layouts_title_title">
                         <h1 itemprop="headline" class="sc_layouts_title_caption">
-                            Tin tức
+                            @Data.Title
                         </h1>
                     </div>
-                    <div class="sc_layouts_title_breadcrumbs"><div class="breadcrumbs"><a class="breadcrumbs_item home underline_hover" href="../../index.htm">Home</a><span class="breadcrumbs_delimiter"></span><a class="breadcrumbs_item all_posts underline_hover" href="../../blog-standard/index.htm">Tất cả bài viết</a><span class="breadcrumbs_delimiter"></span><span class="breadcrumbs_item current">Tin tức</span></div></div>
+                    <div class="sc_layouts_title_breadcrumbs"><div class="breadcrumbs"><a class="breadcrumbs_item home underline_hover" href="@Root.Config.MainMenus.FirstOrDefault().Href">@Root.Config.MainMenus.FirstOrDefault().Title</a><span class="breadcrumbs_delimiter"></span><span class="breadcrumbs_item current">@Data.Title</span></div></div>
                 </div>
             </div>
         </div>
@@ -198,15 +198,18 @@ Control = InputControlType.RichTextBox)]
         <div class="content">
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
             <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
-                <div class="column-1_3">
-                    <article class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4193 post type-post status-publish format-standard hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3">
-                        <div class="post_header entry-header">
-                            <h4 class="post_title entry-title"><a href="../../gui-hang-tu-han-quoc-ve-viet-nam-gia-re-nhat/index.htm" rel="bookmark">Gửi hàng từ Hàn Quốc về Việt Nam giá rẻ nhất – Giải pháp tối ưu cùng NHB Logistics</a></h4>
-                        </div>
+                @foreach (var item in Data.Items.EmptyIfNull().Take(1))
+                {
+                    <div class="column-1_3">
+                        <article class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4193 post type-post status-publish format-standard hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3">
+                            <div class="post_header entry-header">
+                                <h4 class="post_title entry-title"><a href="@item.Path" rel="bookmark">@item.Title</a></h4>
+                            </div>
 
-                    </article>
-                </div>
-                @foreach (var item in Data.Items.EmptyIfNull())
+                        </article>
+                    </div>
+                }
+                @foreach (var item in Data.Items.EmptyIfNull().Skip(1))
                 {
 
                     <div class="column-1_3">

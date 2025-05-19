@@ -66,8 +66,8 @@
     </script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=@Root.Config.GoogleGtag">
     </script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-
+    <link href="~/assets/wp-content/themes/globallogistics/skins/fancy.carousel.css" rel="stylesheet" />
+    <link href="~/assets/wp-content/themes/globallogistics/skins/fancybox.carousel.thumbs.css" rel="stylesheet" />
 
     <script type="text/javascript" src="assets/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
     @* css *@
@@ -77,17 +77,15 @@
     <link property="stylesheet" rel='stylesheet' id='advanced-popups-css' href='assets/wp-content/plugins/advanced-popups/public/css/advanced-popups-public.css?ver=1.2.1' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='contact-form-7-css' href='assets/wp-content/plugins/contact-form-7/includes/css/styles.css?ver=5.3.2' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='rs-plugin-settings-css' href='assets/wp-content/plugins/revslider/public/assets/css/rs6.css?ver=6.1.7' type='text/css' media='all'>
-    <style id='rs-plugin-settings-inline-css' type='text/css'>
-    </style>
     <link property="stylesheet" rel='stylesheet' id='magnific-popup-css' href='assets/wp-content/plugins/trx_addons/js/magnific/magnific-popup.min.css' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='pzf-style-css' href='assets/wp-content/plugins/button-contact-vr/css/style.css?ver=6.7.2' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='wpforms-modern-full-css' href='assets/wp-content/plugins/wpforms/assets/css/frontend/modern/wpforms-full.min.css?ver=1.9.2.3' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='tablepress-default-css' href='assets/wp-content/tablepress-combined.min.css?ver=7' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='tablepress-responsive-tables-css' href='assets/wp-content/plugins/tablepress-responsive-tables/css/tablepress-responsive.min.css?ver=1.7' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='font-awesome-official-css' href='assets/releases/v6.7.2/css/all.css' type='text/css' media='all' integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous">
-
     <link property="stylesheet" rel='stylesheet' id='elementor-icons-css' href='assets/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.34.0' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='elementor-frontend-css' href='assets/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.26.4' type='text/css' media='all'>
+
     <style id='elementor-frontend-inline-css' type='text/css'>
         .elementor-kit-3504 {
             --e-global-color-primary: #6EC1E4;
@@ -732,6 +730,8 @@
     <link property="stylesheet" rel='stylesheet' id='widget-testimonial-carousel-css' href='assets/wp-content/plugins/elementor-pro/assets/css/widget-testimonial-carousel.min.css?ver=3.26.2' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='widget-reviews-css' href='assets/wp-content/plugins/elementor-pro/assets/css/widget-reviews.min.css?ver=3.26.2' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='widget-carousel-module-base-css' href='assets/wp-content/plugins/elementor-pro/assets/css/widget-carousel-module-base.min.css?ver=3.26.2' type='text/css' media='all'>
+    <link href="~/assets/toasts/jquery.toast.min.css" rel="stylesheet" />
+
     <style id="elementor-post-3413">
         .elementor-3413 .elementor-element.elementor-element-0e8aff4 > .elementor-container > .elementor-column > .elementor-widget-wrap {
             align-content: center;
@@ -1020,12 +1020,13 @@
     <link property="stylesheet" rel='stylesheet' id='globallogistics-plugins-css' href='assets/wp-content/themes/globallogistics/skins/default/css/__plugins.css' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='globallogistics-extra-skin-default-css' href='assets/wp-content/themes/globallogistics/skins/default/extra-style.css' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='globallogistics-custom-css' href='assets/wp-content/themes/globallogistics/skins/default/css/__custom.css' type='text/css' media='all'>
-    <link property="stylesheet" rel='stylesheet' id='trx_addons-responsive-css' href='assets/wp-content/plugins/trx_addons/css/__responsive.css' type='text/css' media='(max-width:1439px)'>
+    @*<link property="stylesheet" rel='stylesheet' id='trx_addons-responsive-css' href='assets/wp-content/plugins/trx_addons/css/__responsive.css' type='text/css' media='(max-width:1439px)'>*@
     <link property="stylesheet" rel='stylesheet' id='trx_addons_qw_extension-icons-responsive-css' href='assets/wp-content/plugins/trx_addons/addons/qw-extension/css/qw_extension_icons.responsive.css' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='trx_addons-sc_icons-responsive-css' href='assets/wp-content/plugins/trx_addons/components/shortcodes/icons/icons.responsive.css' type='text/css' media='(max-width:1279px)'>
-    <link property="stylesheet" rel='stylesheet' id='globallogistics-responsive-css' href='assets/wp-content/themes/globallogistics/skins/default/css/__responsive.css' type='text/css' media='(max-width:1679px)'>
+    @*<link property="stylesheet" rel='stylesheet' id='globallogistics-responsive-css' href='assets/wp-content/themes/globallogistics/skins/default/css/__responsive.css' type='text/css' media='(max-width:1679px)'>*@
     <link property="stylesheet" rel='stylesheet' id='font-awesome-official-v4shim-css' href='assets/releases/v6.7.2/css/v4-shims.css' type='text/css' media='all' integrity="sha384-npPMK6zwqNmU3qyCCxEcWJkLBNYxEFM1nGgSoAWuCCXqVVz0cvwKEMfyTNkOxM2N" crossorigin="anonymous">
     <script type="text/javascript" src="assets/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+    <script src="~/assets/toasts/jquery.toast.min.js"></script>
     <style>
         .e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload),
         .e-con.e-parent:nth-of-type(n+4):not(.e-lazyloaded):not(.e-no-lazyload) * {
@@ -1095,6 +1096,14 @@
     @RenderSection("head", required: false)
 </head>
 <body class="home page-template page-template-elementor_header_footer page page-id-3438 wp-custom-logo hide_fixed_rows_enabled frontpage skin_default scheme_default blog_mode_front body_style_fullscreen is_stream blog_style_excerpt sidebar_hide expand_content trx_addons_present header_type_custom header_style_header-custom-3413 header_position_over menu_side_none fixed_blocks_sticky elementor-default elementor-template-full-width elementor-kit-3504 elementor-page elementor-page-3438 ua_retina ua_firefox ua_gecko sc_layouts_row_fixed_inited added_to_cart_inited desktop_layout">
+    <div id="loading-screen">
+        <div class="loading-text">
+            <span>Y</span>
+            <span>G</span>
+            <span>N</span>
+            <span>K</span>
+        </div>
+    </div>
     <div class="page_wrap">
 
 
@@ -1135,6 +1144,20 @@
         </div>
     </div>
     @*--Contact form---*@
+
+    <script src="~/assets/wp-content/themes/globallogistics/skins/default/auto.js"></script>
+    <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.thumbs.umd.js"></script>
+    <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.umd.js"></script>
+    <script>
+        window.addEventListener("load", function () {
+            const loadingScreen = document.getElementById("loading-screen");
+            // Cho chữ YGNK đủ thời gian hiện trước khi ẩn loading
+            setTimeout(() => {
+                loadingScreen.classList.add("hidden");
+            }, 1000); // có thể chỉnh thời gian dài hơn nếu bạn thích
+        });
+    </script>
+
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
             $('#all-in-one-vr').click(function () {
@@ -1169,32 +1192,7 @@
             });
         });
     </script>
-    <script type='text/javascript'>
-        const lazyloadRunObserver = () => {
-            const lazyloadBackgrounds = document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`);
-            const lazyloadBackgroundObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        let lazyloadBackground = entry.target;
-                        if (lazyloadBackground) {
-                            lazyloadBackground.classList.add('e-lazyloaded');
-                        }
-                        lazyloadBackgroundObserver.unobserve(entry.target);
-                    }
-                });
-            }, { rootMargin: '200px 0px 200px 0px' });
-            lazyloadBackgrounds.forEach((lazyloadBackground) => {
-                lazyloadBackgroundObserver.observe(lazyloadBackground);
-            });
-        };
-        const events = [
-            'DOMContentLoaded',
-            'elementor/lazyload/observe',
-        ];
-        events.forEach((event) => {
-            document.addEventListener(event, lazyloadRunObserver);
-        });
-    </script>
+
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/advanced-popups/public/js/advanced-popups-public.js"></script>
@@ -1222,31 +1220,47 @@
     <script type="text/javascript" src="assets/wp-content/plugins/elementor-pro/assets/js/elements-handlers.min.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/wpforms/assets/lib/jquery.validate.min.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/wpforms/assets/js/share/utils.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const input = document.getElementById("quantity");
+            const minusBtn = document.querySelector(".minus");
+            const plusBtn = document.querySelector(".plus");
 
-    @*<script>
-       
-        </script>
+            minusBtn.addEventListener("click", function () {
+                let val = parseInt(input.value) || 1;
+                if (val > 1) input.value = val - 1;
+            });
 
-        <script>
+            plusBtn.addEventListener("click", function () {
+                let val = parseInt(input.value) || 1;
+                input.value = val + 1;
+            });
+        });
+    </script>
+    <script>
+
+    </script>
+
+    <script>
         $(".product-action-cart").click(function () {
         var button = $(this);
         var productId = $(this).attr("data-product-id");
 
         if (productId == '') return;
-        button.html('<i class="fa fa-shopping-bag me-2 text-primary"></i> Đang xử lý..');
+        button.html('<i class="fa fa-shopping-bag me-2 "></i> Đang xử lý..');
 
         $.post("@Root.Config.Link.PageCart?add", { __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()", "productId": productId }, function (data) {
         $(".sidebar-cart-active").html(data);
-        button.html('<i class="fa fa-shopping-bag me-2 text-primary"></i> Đã thêm!');
-        $(".cart-count1").load(window.location.href + " .cart-count1");
+        button.html('<i class="fa fa-shopping-bag me-2 "></i> Đã thêm!');
+            $(".cart-count1").load(window.location.href + " .cart-count1");
         $(".cart-count2").load(window.location.href + " .cart-count2");
         setTimeout(function () {
-        button.html('<i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ');
+        button.html('<i class="fa fa-shopping-bag me-2 "></i> Thêm vào giỏ');
         }, 1000);
         }).fail(function () {
-        button.html('<i class="fa fa-shopping-bag me-2 text-primary"></i> Không thành công!');
+        button.html('<i class="fa fa-shopping-bag me-2 "></i> Không thành công!');
         setTimeout(function () {
-        button.html('<i class="fa fa-shopping-bag me-2 text-primary"></i> Thêm vào giỏ');
+        button.html('<i class="fa fa-shopping-bag me-2 "></i> Thêm vào giỏ');
         }, 1000);
         });
         });
@@ -1285,7 +1299,7 @@
         $(".cart-total h4 span").html(data);
         });
         });
-        </script>*@
+    </script>
 
     <script type="text/javascript">
         jQuery(document).ready(function ($) {
@@ -1333,33 +1347,54 @@
             document.addEventListener(event, lazyloadRunObserver);
         });
     </script>
+    <script>
+        function miniCart() {
+            var navbarTrigger = $('.cart-active'),
+                container = $('.sidebar-cart-active'),
+                wrapper2 = $('.main-wrapper');
 
+            if ($('.body-overlay').length === 0) {
+                wrapper2.prepend('<div class="body-overlay"></div>');
+            }
 
+            navbarTrigger.on('click', function (e) {
+                e.preventDefault();
+                container.addClass('inside');
+                wrapper2.addClass('overlay-active');
+            });
 
-
+            $(document).on('click', '.cart-close, .body-overlay', function () {
+                container.removeClass('inside');
+                $('body').removeClass('overlay-active');
+            });
+        }
+        $(document).ready(function () {
+            miniCart();
+        });
+    </script>
 
     @RenderSection("scripts", required: false)
 
-<script>
-    let lastScrollTop = 0;
-    const header = document.querySelector('.top_panel');
+    <script>
+        let lastScrollTop = 0;
+        const header = document.querySelector('.top_panel');
 
-    window.addEventListener('scroll', function () {
-        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        window.addEventListener('scroll', function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
 
-        if (scrollTop > lastScrollTop) {
-            // Đang cuộn xuống
-            header.classList.remove('show-on-scroll');
-            header.classList.add('hide-on-scroll');
-        } else {
-            // Đang cuộn lên
-            header.classList.remove('hide-on-scroll');
-            header.classList.add('show-on-scroll');
-        }
+            if (scrollTop > lastScrollTop) {
+                // Đang cuộn xuống
+                header.classList.remove('show-on-scroll');
+                header.classList.add('hide-on-scroll');
+            } else {
+                // Đang cuộn lên
+                header.classList.remove('hide-on-scroll');
+                header.classList.add('show-on-scroll');
+            }
 
-        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-    });
-</script>
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+        });
+    </script>
 
 </body>
 </html>
