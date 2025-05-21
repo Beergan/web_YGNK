@@ -94,7 +94,6 @@
                     cookie.Expires = DateTime.Now.AddDays(1);
                     Response.Cookies.Add(cookie);
                     model.CreatedTime = DateTime.Now;
-                    Response.Write("Cám ơn bạn đã đăng ký");
                     Response.Write("redirect:/tai-khoan");
                     return () => Response.End();
                 }
@@ -136,7 +135,7 @@
         <div class="row signup-form ">
             <div class="col-lg-12">
                 <div class="modal-header">
-                    <h5 class="w-100 text-center" >ĐĂNG KÝ</h5>
+                    <h5 class="w-100 text-center">ĐĂNG KÝ</h5>
                 </div>
                 <div class="modal-body container" style="max-width: 800px;">
                     <form action="?register" class="location-selector" method="post">
@@ -175,11 +174,11 @@
                                     <div class="password-wrapper position-relative">
                                         <label for="password"><i class="fa-solid fa-circle-user"></i></label>
                                         <input class="border-radius-4px  input-small mb-20px" style="width:88%"
-                                               id="password-input"
+                                               id="password-input2"
                                                name="@field.GetName(x=>x.Password)"
                                                type="password"
                                                placeholder="@(LangId == "en" ? "House number and street name" : "Nhập mật khẩu")">
-                                        <i class="fa fa-eye toggle-password position-absolute" id="togglePassword" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
+                                        <i class="fa fa-eye toggle-password position-absolute" id="togglePassword2" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
                                     </div>
                                 </div>
                             </div>
@@ -227,78 +226,10 @@
     </div>
 </div>
 
-@section scripts{
-
-    <script>
-     $(document).ready(function () {
-         $(document).on("click", ".register", function () {
-                 event.preventDefault();
-                 Swal.fire({
-                  title: 'Nhập mã captcha',
-            input: 'text',
-            inputAttributes: {
-	            autocapitalize: 'off'
-            },
-            imageUrl: '/captcha.ashx',
-            imageWidth: 300,
-            imageHeight: 150,
-                  showCancelButton: true,
-                  confirmButtonText: 'Ok',
-                     showLoaderOnConfirm: true,
-                  preConfirm: (value) => {
-                   $("input[name='captcha']", this).val(value);
-                         return value;
-                  },
-                  allowOutsideClick: () => !Swal.isLoading()
-                 }).then((result) => {
-                  if (!result.isConfirmed)
-                   return;
-
-                     Swal.fire({
-	            title: 'Xin chờ đợi!',
-	            html: 'Hệ thống đang ghi nhận thông tin ..',
-	            didOpen: () => { Swal.showLoading(); },
-                     });
-
-                     $.post(window.location.pathname + "?register",
-                     {
-                         __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()",
-                         @field.GetName(x=>x.FullName): $("input[name='@field.GetName(x=>x.FullName)']").val(),
-                         @field.GetName(x=>x.Address): $("input[name='@field.GetName(x=>x.Address)']").val(),
-                         @field.GetName(x=>x.Province): $("select[name='@field.GetName(x=>x.Province)']").val(),
-                         @field.GetName(x=>x.District): $("select[name='@field.GetName(x=>x.District)']").val(),
-                         @field.GetName(x=>x.Ward): $("select[name='@field.GetName(x=>x.Ward)']").val(),
-                         @field.GetName(x=>x.Phone): $("input[name='@field.GetName(x=>x.Phone)']").val(),
-                         @field.GetName(x=>x.Password): $("input[name='@field.GetName(x=>x.Password)']").val(),
-                         @field.GetName(x=>x.ConfirmPassword): $("input[name='@field.GetName(x=>x.ConfirmPassword)']").val(),
-                         @field.GetName(x=>x.Email): $("input[name='@field.GetName(x=>x.Email)']").val(),
-                         captcha: result.value
-                     },
-                         function (data) {
-                             if (typeof data === "string" && data.startsWith("redirect:")) {
-                                 const redirectUrl = data.replace("redirect:", "").trim();
-                                 window.location.href = redirectUrl;
-                             } else {
-                                 Swal.fire({
-                                     title: 'Thông báo',
-                                     text: data,
-                                     icon: 'success'
-                                 });
-                             }
-            })
-            .fail(function (error) {
-	            Swal.fire({
-		            title: 'Thôi xong!',
-		            text: error.responseText,
-		            type: "error"
-	            });
-            });
-                 })
-             });
-     });
-    </script>
+@section scripts {
     <script>
         $(document).ready(function () {
+            // Location selector initialization
             $(".location-selector").vnLocationSelector({
                 provinceId: "province",
                 districtId: "districts",
@@ -306,7 +237,7 @@
                 provinceNameId: "ProvinceName",
                 districtNameId: "DistrictName",
                 wardNameId: "WardName",
-                savedProvince: null, // Không có dữ liệu
+                savedProvince: null,
                 savedDistrict: null,
                 savedWard: null,
                 savedProvinceName: "",
@@ -316,12 +247,74 @@
 
             // Toggle password visibility
             $('.toggle-password').on('click', function () {
+                console.log('Toggle password clicked'); // Debug log
                 const passwordField = $(this).prev('input');
                 const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
                 passwordField.attr('type', type);
                 $(this).toggleClass('fa-eye fa-eye-slash');
             });
+
+            // Form submission with CAPTCHA
+            $(document).on("click", ".register", function (event) {
+                event.preventDefault();
+                Swal.fire({
+                    title: 'Nhập mã captcha',
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    imageUrl: '/captcha.ashx',
+                    imageWidth: 300,
+                    imageHeight: 150,
+                    showCancelButton: true,
+                    confirmButtonText: 'Ok',
+                    showLoaderOnConfirm: true,
+                    preConfirm: (value) => {
+                        $("input[name='captcha']", this).val(value);
+                        return value;
+                    },
+                    allowOutsideClick: () => !Swal.isLoading()
+                }).then((result) => {
+                    if (!result.isConfirmed) return;
+
+                    Swal.fire({
+                        title: 'Xin chờ đợi!',
+                        html: 'Hệ thống đang ghi nhận thông tin ..',
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    $.post(window.location.pathname + "?register", {
+                        __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()",
+                        @field.GetName(x => x.FullName): $("input[name='@field.GetName(x => x.FullName)']").val(),
+                        @field.GetName(x => x.Address): $("input[name='@field.GetName(x => x.Address)']").val(),
+                        @field.GetName(x => x.Province): $("select[name='@field.GetName(x => x.Province)']").val(),
+                        @field.GetName(x => x.District): $("select[name='@field.GetName(x => x.District)']").val(),
+                        @field.GetName(x => x.Ward): $("select[name='@field.GetName(x => x.Ward)']").val(),
+                        @field.GetName(x => x.Phone): $("input[name='@field.GetName(x => x.Phone)']").val(),
+                        @field.GetName(x => x.Password): $("input[name='@field.GetName(x => x.Password)']").val(),
+                        @field.GetName(x => x.ConfirmPassword): $("input[name='@field.GetName(x => x.ConfirmPassword)']").val(),
+                        @field.GetName(x => x.Email): $("input[name='@field.GetName(x => x.Email)']").val(),
+                        captcha: result.value
+                    }, function (data) {
+                        if (typeof data === "string" && data.startsWith("redirect:")) {
+                            const redirectUrl = data.replace("redirect:", "").trim();
+                            window.location.href = redirectUrl;
+                        } else {
+                            Swal.fire({
+                                title: 'Thông báo',
+                                text: data,
+                                icon: 'success'
+                            });
+                        }
+                    }).fail(function (error) {
+                        Swal.fire({
+                            title: 'Thôi xong!',
+                            text: error.responseText,
+                            type: "error"
+                        });
+                    });
+                });
+            });
         });
     </script>
-
 }
