@@ -52,12 +52,13 @@
                 model.Order = Db.Table<PP_Order>().AsNoTracking().Where(x => x.Iduser == (int)customerId).ToArray();
             }
         }
-        return model;
-
-        if (model == null)
+        if (model.Customer == null)
         {
             Response.Redirect("/");
         }
+        return model;
+
+
     });
 
     var query = Request.Url.Query;
@@ -129,9 +130,9 @@
                     Response.Redirect(NodeSlug);
                 }
                 var model = new PP_Customer() { Active = false };
-                model.PASSWORD = Crypto.SHA256(Request.Form["pass-new"].NullIfWhiteSpace());
-                model.CreatedTime = DateTime.Now;
-                Db.Insert<PP_Customer>(model);
+                customer.PASSWORD = Crypto.SHA256(Request.Form["pass-new"].NullIfWhiteSpace());
+                customer.CreatedTime = DateTime.Now;
+                Db.Update<PP_Customer>(customer);
                 HttpContext context = HttpContext.Current;
                 var userId = model.Id;
                 model.CreatedTime = DateTime.Now;
@@ -289,7 +290,7 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="main-banner-page" style="background-color: #f2f2f2">
-                    @if (Request.Cookies["UserId"] != null)
+                    @if (Data.Customer != null)
                     {
                         var iduser = (Request.Cookies["UserId"]);
                         <div class="container badge-light" style="background-color:#ffffff">
@@ -626,11 +627,11 @@
                                                         <input type="password" id="password" name="pass-new" placeholder="@(LangId == "vi" ? "Mật khẩu mới" : "Password New" )" required>
                                                     </div>
                                                 </div>
-                                                <div class="row mb-4">
-                                                    <div class="col-lg-12 text-end position-relative">
+                                                <div class="row mt-3 mb-4">
+                                                    <div class="col-lg-12 text-left">
                                                         <div class="action_btns p-b-4">
                                                             <div class="one_half last">
-                                                                <button class="btn btn_red" type="submit" style="left:0; margin-bottom:5%; position: absolute; width: 150px; color: white; padding: 10px 20px; border: none; text-align: center;">Lưu</button>
+                                                                <button class="btn btn_red" type="submit" style="left:0; margin-bottom:5%; width: 150px; color: white; padding: 10px 20px; border: none; text-align: center;">Lưu</button>
                                                             </div>
                                                         </div>
                                                     </div>

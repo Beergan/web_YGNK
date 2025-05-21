@@ -330,8 +330,8 @@ margin: 0 auto; /* Căn giữa hình ảnh */
         }
     </style>
 }
-<div class="page_content_wrap">
-    <div class="content_wrap border-bottom">
+<div class="page_content_wrap pt-2 pb-2 pb-lg-3 pt-lg-3">
+    <div class="content_wrap border-bottom pt-2 pb-2 pb-lg-3 pt-lg-3">
         <div class="sc_layouts_column sc_layouts_column_align_center">
             <div class="sc_layouts_item">
                 <div class="sc_layouts_title sc_align_center">
@@ -347,199 +347,215 @@ margin: 0 auto; /* Căn giữa hình ảnh */
     </div>
     <div class="content_wrap">
         <div class="container-fluid">
-            <div class="container py-5">
-                <h1 class="mb-4">Thông tin giỏ hàng</h1>
-                <div class="row">
-                    <div class="col-lg-7">
-                        <div class="col-lg-12 p-lg-4 p-1 mt-4">
-                            <h4>Thêm sản phẩm tùy chỉnh</h4>
-                            <form id="customProductForm" class="row g-3">
-                                <div class="col-12">
-                                    <label class="form-label">Tên sản phẩm <sup>*</sup></label>
-                                    <input type="text" class="form-control" id="customProductName" required>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Đơn giá (VND) <sup>*</sup></label>
-                                    <input type="number" class="form-control" id="customProductPrice" required>
-                                </div>
-                                <div class="col-6">
-                                    <label class="form-label">Số lượng <sup>*</sup></label>
-                                    <input type="number" class="form-control" id="customProductQuantity" value="1" min="1" required>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">URL chi tiết</label>
-                                    <input type="url" class="form-control" id="customProductUrl">
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label">URL hình ảnh</label>
-                                    <input type="url" class="form-control" id="customProductImageUrl">
-                                </div>
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-primary">Thêm vào giỏ hàng</button>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-12 p-lg-4 p-1">
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Sản phẩm</th>
-                                            <th scope="col">Tên</th>
-                                            <th scope="col">Đơn giá</th>
-                                            <th scope="col">Số lượng</th>
-                                            <th scope="col">Tổng</th>
-                                            <th scope="col">Xử lý</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in cart.GetCartLines())
-                                        {
-                                            <tr class="cart-item">
-                                                <th scope="row">
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="@item.Product.ImageUrl" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
-                                                    </div>
-                                                </th>
-                                                <td class="w-sm50">
-                                                    <p class="mb-0 mt-4">@item.Product.Title</p>
-                                                </td>
-                                                <td>
-                                                    <p class="mb-0 mt-4">@($"{item.Price:C0}")</p>
-                                                </td>
-                                                <td class="cart-item">
-                                                    <div class="input-group cart-plus-minus quantity mt-4" data-product-id="@item.Product.Id" style="width: 100px;">
-                                                        <div class="input-group-btn">
-                                                            <button class="btn p-1 cart-plus-minus btn-sm btn-minus rounded-circle bg-light border dec">
-                                                                <i class="fa fa-minus"></i>
-                                                            </button>
-                                                        </div>
-                                                        <input type="text" name="quantity" value="@item.Quantity" class="form-control quantity form-control-sm text-center border-0">
-                                                        <div class="input-group-btn">
-                                                            <button class="btn p-1 cart-plus-minus btn-sm btn-plus rounded-circle bg-light border dec">
-                                                                <i class="fa fa-plus"></i>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="">
-                                                    <div class="mb-0 mt-4 rowtotal">
-                                                        @if (item.Product.PromotionEnabled == true && item.Product.PromotionPrice > 0)
-                                                        {
-                                                            @($"{item.Product.PromotionPrice * item.Quantity:C0}")
-                                                        }
-                                                        else
-                                                        {
-                                                            @($"{item.Product.Price * item.Quantity:C0}")
-                                                        }
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <button data-product-id="@item.Product.Id" data-product-variation="@item.Variation" class="btn p-1 btn-md rounded-circle inject-me bg-light border mt-4">
-                                                        <i class="fa fa-times text-danger"></i>
-                                                    </button>
-                                                </td>
+            @if (Data.Customer != null)
+            {
+                <div class="container py-5">
+                    <h1 class="mb-4">Thông tin giỏ hàng</h1>
+                    <div class="row">
+                        <div class="col-lg-7">
+                            <div class="col-lg-12 p-lg-4 p-1 mt-4">
+                                <h4>Thêm sản phẩm tùy chỉnh</h4>
+                                <form id="customProductForm" class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Tên sản phẩm <sup>*</sup></label>
+                                        <input type="text" class="form-control" id="customProductName" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Đơn giá (VND) <sup>*</sup></label>
+                                        <input type="number" class="form-control" id="customProductPrice" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Số lượng <sup>*</sup></label>
+                                        <input type="number" class="form-control" id="customProductQuantity" value="1" min="1" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">URL chi tiết</label>
+                                        <input type="url" class="form-control" id="customProductUrl">
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">URL hình ảnh</label>
+                                        <input type="url" class="form-control" id="customProductImageUrl">
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">Thêm vào giỏ hàng</button>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-lg-12 p-lg-4 p-1">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Sản phẩm</th>
+                                                <th scope="col">Tên</th>
+                                                <th scope="col">Đơn giá</th>
+                                                <th scope="col">Số lượng</th>
+                                                <th scope="col">Tổng</th>
+                                                <th scope="col">Xử lý</th>
                                             </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in cart.GetCartLines())
+                                            {
+                                                <tr class="cart-item">
+                                                    <th scope="row">
+                                                        <div class="d-flex align-items-center">
+                                                            <img src="@item.Product.ImageUrl" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt="">
+                                                        </div>
+                                                    </th>
+                                                    <td class="w-sm50">
+                                                        <p class="mb-0 mt-4">@item.Product.Title</p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-0 mt-4">@($"{item.Price:C0}")</p>
+                                                    </td>
+                                                    <td class="cart-item">
+                                                        <div class="input-group cart-plus-minus quantity mt-4" data-product-id="@item.Product.Id" style="width: 100px;">
+                                                            <div class="input-group-btn">
+                                                                <button class="btn p-1 cart-plus-minus btn-sm btn-minus rounded-circle bg-light border dec">
+                                                                    <i class="fa fa-minus"></i>
+                                                                </button>
+                                                            </div>
+                                                            <input type="text" name="quantity" value="@item.Quantity" class="form-control quantity form-control-sm text-center border-0">
+                                                            <div class="input-group-btn">
+                                                                <button class="btn p-1 cart-plus-minus btn-sm btn-plus rounded-circle bg-light border dec">
+                                                                    <i class="fa fa-plus"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="">
+                                                        <div class="mb-0 mt-4 rowtotal">
+                                                            @if (item.Product.PromotionEnabled == true && item.Product.PromotionPrice > 0)
+                                                            {
+                                                                @($"{item.Product.PromotionPrice * item.Quantity:C0}")
+                                                            }
+                                                            else
+                                                            {
+                                                                @($"{item.Product.Price * item.Quantity:C0}")
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <button data-product-id="@item.Product.Id" data-product-variation="@item.Variation" class="btn p-1 btn-md rounded-circle inject-me bg-light border mt-4">
+                                                            <i class="fa fa-times text-danger"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
-                        </div>
-                        <div class="col-md-12 col-lg-12 p-lg-4 p-1 col-xl-12 ">
-                            <div class="table-responsive">
-                                <div class="row m-0 p-0">
-                                    <div class="col-lg-12">
-                                        <div class="d-flex justify-content-between">
-                                            <h5>Tổng tiền:</h5>
-                                            <h5 class=" price-sum">@($"{cart.GetTotal():C0}")</h5>
+                            <div class="col-md-12 col-lg-12 p-lg-4 p-1 col-xl-12 ">
+                                <div class="table-responsive">
+                                    <div class="row m-0 p-0">
+                                        <div class="col-lg-12">
+                                            <div class="d-flex justify-content-between">
+                                                <h5>Tổng tiền:</h5>
+                                                <h5 class=" price-sum">@($"{cart.GetTotal():C0}")</h5>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
-                                @foreach (var item in Data.Text.EmptyIfNull())
-                                {
-                                    <div class="col-12 p-lg-4 p-1">
-                                        <div class="form-check text-start my-3">
-                                            <p type="checkbox" class="form-check-input bg-primary border-0" id="Transfer-1" name="Transfer" value="Transfer"></p>
-                                            <label class="form-check-label" for="Transfer-1">@item.Title</label>
+                                <div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+                                    @foreach (var item in Data.Text.EmptyIfNull())
+                                    {
+                                        <div class="col-12 p-lg-4 p-1">
+                                            <div class="form-check text-start my-3">
+                                                <p type="checkbox" class="form-check-input bg-primary border-0" id="Transfer-1" name="Transfer" value="Transfer"></p>
+                                                <label class="form-check-label" for="Transfer-1">@item.Title</label>
+                                            </div>
+                                            <p class="text-start text-dark">@item.Content</p>
                                         </div>
-                                        <p class="text-start text-dark">@item.Content</p>
-                                    </div>
-                                }
-                            </div>
+                                    }
+                                </div>
 
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            @if (Data.Customer != null)
+                            {
+                                <form class="location-selector" action="@NodeSlug?order" method="post">
+                                    @AntiForgery.GetHtml()
+                                    @Html.ValidationSummary("", excludeFieldErrors: false, htmlAttributes: null)
+                                    <input type="hidden" name="ProvinceName" id="ProvinceName" />
+                                    <input type="hidden" name="DistrictName" id="DistrictName" />
+                                    <input type="hidden" name="WardName" id="WardName" />
+                                    <div class="row ">
+                                        <div class="col-md-12 col-lg-12 col-xl-12 ">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <h3 style="color:red">Thông tin thanh toán</h3>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="form-item w-100">
+                                                        <label class="form-label my-3">Họ và tên<sup>*</sup></label>
+                                                        <input type="text" id="name" name="@field.GetName(x => x.Name)" value="@Data.Customer.FullName" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="form-item w-100">
+                                                        <label class="form-label my-3">Email<sup>*</sup></label>
+                                                        <input type="text" id="name" name="@field.GetName(x => x.Email)" value="@Data.Customer.Email" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="form-item w-100">
+                                                        <label class="form-label my-3">SĐT<sup>*</sup></label>
+                                                        <input type="text" id="name" name="@field.GetName(x => x.Phone)" value="@Data.Customer.Phone" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-lg-12">
+                                                    <div class="form-item w-100">
+                                                        <label class="form-label my-3">Địa chỉ<sup>*</sup></label>
+                                                        <input type="text" id="name" name="@field.GetName(x => x.DeliveryAddress)" value="@Data.Customer.Adress" class="form-control" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 col-md-4 mt-3">
+                                                    <select id="province" class="form-select select-small border-radius-4px" required name="@field.GetName(x => x.Province)"></select>
+                                                    <small class="text-danger">@Html.ValidationMessage("province")</small>
+                                                </div>
+                                                <div class="col-12 col-md-4 mt-3">
+                                                    <select id="districts" class="form-select select-small border-radius-4px" required name="@field.GetName(x => x.District)"></select>
+                                                    <small class="text-danger">@Html.ValidationMessage("districts")</small>
+                                                </div>
+                                                <div class="col-12 col-md-4 mt-3">
+                                                    <select id="wards" class="form-select select-small border-radius-4px" required name="@field.GetName(x => x.Ward)"></select>
+                                                    <small class="text-danger">@Html.ValidationMessage("wards")</small>
+                                                </div>
+                                            </div>
+                                            <div class="form-item my-3">
+                                                <textarea name="@field.GetName(x => x.Note)" id="Note" class="form-control" spellcheck="false" cols="30" rows="5" placeholder="Ghi chú"></textarea>
+                                            </div>
+                                            <div class="form-item d-flex justify-content-between ">
+                                                <a href="/"><button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4" type="button">Tiếp tục mua hàng</button></a>
+
+
+                                                <button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4 ms-4" type="submit"> Đặt hàng </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            }
                         </div>
                     </div>
-                    <div class="col-lg-5">
-                        @if (Request.Cookies["UserId"] != null)
-                        {
-                            <form class="location-selector" action="@NodeSlug?order" method="post">
-                                @AntiForgery.GetHtml()
-                                @Html.ValidationSummary("", excludeFieldErrors: false, htmlAttributes: null)
-                                <input type="hidden" name="ProvinceName" id="ProvinceName" />
-                                <input type="hidden" name="DistrictName" id="DistrictName" />
-                                <input type="hidden" name="WardName" id="WardName" />
-                                <div class="row ">
-                                    <div class="col-md-12 col-lg-12 col-xl-12 ">
-                                        <div class="row">
-                                            <div class="col-lg-12">
-                                                <h3 style="color:red">Thông tin thanh toán</h3>
-                                            </div>
-                                            <div class="col-md-12 col-lg-12">
-                                                <div class="form-item w-100">
-                                                    <label class="form-label my-3">Họ và tên<sup>*</sup></label>
-                                                    <input type="text" id="name" name="@field.GetName(x=>x.Name)" value="@Data.Customer.FullName" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 col-lg-12">
-                                                <div class="form-item w-100">
-                                                    <label class="form-label my-3">Email<sup>*</sup></label>
-                                                    <input type="text" id="name" name="@field.GetName(x=>x.Email)" value="@Data.Customer.Email" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 col-lg-12">
-                                                <div class="form-item w-100">
-                                                    <label class="form-label my-3">SĐT<sup>*</sup></label>
-                                                    <input type="text" id="name" name="@field.GetName(x=>x.Phone)" value="@Data.Customer.Phone" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 col-lg-12">
-                                                <div class="form-item w-100">
-                                                    <label class="form-label my-3">Địa chỉ<sup>*</sup></label>
-                                                    <input type="text" id="name" name="@field.GetName(x=>x.DeliveryAddress)" value="@Data.Customer.Adress" class="form-control" required>
-                                                </div>
-                                            </div>
-                                            <div class="col-12 col-md-4 mt-3">
-                                                <select id="province" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Province)"></select>
-                                                <small class="text-danger">@Html.ValidationMessage("province")</small>
-                                            </div>
-                                            <div class="col-12 col-md-4 mt-3">
-                                                <select id="districts" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.District)"></select>
-                                                <small class="text-danger">@Html.ValidationMessage("districts")</small>
-                                            </div>
-                                            <div class="col-12 col-md-4 mt-3">
-                                                <select id="wards" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Ward)"></select>
-                                                <small class="text-danger">@Html.ValidationMessage("wards")</small>
-                                            </div>
-                                        </div>
-                                        <div class="form-item my-3">
-                                            <textarea name="@field.GetName(x=>x.Note)" id="Note" class="form-control" spellcheck="false" cols="30" rows="5" placeholder="Ghi chú"></textarea>
-                                        </div>
-                                        <div class="form-item d-flex justify-content-between ">
-                                            <a href="/"><button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4" type="button">Tiếp tục mua hàng</button></a>
 
-
-                                            <button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4 ms-4" type="submit"> Đặt hàng </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        }
+                </div>
+            }
+            else
+            {
+                <div class="container badge-light" style="background-color:#ffffff">
+                    <div class="row">
+                        <div class="col-lg-12 text-center">
+                            <h5>Vui lòng đăng nhập để sử dụng tính năng của tài khoản <a href="/dang-nhap">Đăng nhập</a></h5>
+                        </div>
+                        <div class="col-lg-12 text-center">
+                            <img src="@Root.Config.Logo" />
+                        </div>
                     </div>
                 </div>
-
-            </div>
+            }
         </div>
     </div>
 </div>
@@ -676,34 +692,39 @@ margin: 0 auto; /* Căn giữa hình ảnh */
             button.parent().parent().find('input').val(newVal);
         });
     </script>
-    <script>
-  $(document).ready(function () {
-          console.log("jQuery loaded:", typeof $ !== "undefined");
-          console.log("vnLocationSelector loaded:", typeof $.fn.vnLocationSelector !== "undefined");
-          console.log("Container exists:", $(".location-selector").length);
-          console.log("Saved Province:", "@Data.Customer.Provinces");
-          console.log("Saved District:", "@Data.Customer.Districts");
-          console.log("Saved Ward:", "@Data.Customer.wards");
-          console.log("Saved ProvinceId:", "@Data.Customer.ProvincesId");
-          console.log("Saved DistrictId:", "@Data.Customer.DistrictsId");
-          console.log("Saved WardId:", "@Data.Customer.wardsId");
-          $(".location-selector").vnLocationSelector({
-              provinceId: "province",
-              districtId: "districts",
-              wardId: "wards",
-              provinceNameId: "ProvinceName",
-              districtNameId: "DistrictName",
-              wardNameId: "WardName",
-              savedProvince: "@Data.Customer.ProvincesId",
-              savedDistrict: "@Data.Customer.DistrictsId",
-              savedWard: "@Data.Customer.wardsId",
-              savedProvinceName: "@Data.Customer.Provinces",
-              savedDistrictName: "@Data.Customer.Districts",
-              savedWardName: "@Data.Customer.wards"
-          });
-      });
-    </script>
-    <script>
+
+    @if (Data.Customer != null)
+    {
+        <script>
+         $(document).ready(function() {
+        console.log("jQuery loaded:", typeof $ !== "undefined");
+        console.log("vnLocationSelector loaded:", typeof $.fn.vnLocationSelector !== "undefined");
+        console.log("Container exists:", $(".location-selector").length);
+        console.log("Saved Province:", "@Data.Customer.Provinces");
+        console.log("Saved District:", "@Data.Customer.Districts");
+        console.log("Saved Ward:", "@Data.Customer.wards");
+        console.log("Saved ProvinceId:", "@Data.Customer.ProvincesId");
+        console.log("Saved DistrictId:", "@Data.Customer.DistrictsId");
+        console.log("Saved WardId:", "@Data.Customer.wardsId");
+         $(".location-selector").vnLocationSelector({
+        provinceId: "province",
+             districtId: "districts",
+             wardId: "wards",
+             provinceNameId: "ProvinceName",
+             districtNameId: "DistrictName",
+             wardNameId: "WardName",
+             savedProvince: "@Data.Customer.ProvincesId",
+             savedDistrict: "@Data.Customer.DistrictsId",
+             savedWard: "@Data.Customer.wardsId",
+             savedProvinceName: "@Data.Customer.Provinces",
+             savedDistrictName: "@Data.Customer.Districts",
+             savedWardName: "@Data.Customer.wards"
+         });
+         });
+        </script>
+    }
+
+        <script>
 $(document).ready(function () {
     $('#customProductForm').on('submit', function (e) {
         e.preventDefault();
@@ -775,5 +796,5 @@ $(document).ready(function () {
     });
 });
 
-    </script>
-}
+        </script>
+    }

@@ -86,12 +86,19 @@
             </a>
         </li>
         <li>
+            <a href="@Constants.Admin_Url/customer" class="@(Page.Menu == "customer" ? "active" : "")">
+                <i class="fe-box"></i>
+                <span class="badge badge-danger badge-pill float-right">@contacts</span>
+                <span>@Text["Contact", "Danh sách khách"]</span>
+            </a>
+        </li>
+        @*<li>
             <a href="@Constants.Admin_Url/comment" class="@(Page.Menu == "comment" ? "active" : "")">
                 <i class="fe-box"></i>
                 <span class="badge badge-danger badge-pill float-right">@comment</span>
                 <span>@Text["Comment", "Bình luận"]</span>
             </a>
-        </li>
+        </li>*@
         <li>
             <a href="@Constants.Admin_Url/visit" class="@(Page.Menu == "visit" ? "active" : "")">
                 <i class="fe-airplay"></i>

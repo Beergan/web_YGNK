@@ -103,6 +103,23 @@
         public About _about { get; set; }
 
 
+        public class Product
+        {
+            [Field(
+            Title = "Tiêu đề",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Title { get; set; }
+
+            [Field(
+  Title = "Đường dẫn",
+  Required = false,
+  Control = InputControlType.Link)]
+            public string Link { get; set; }
+        }
+        [Field(
+        Title = "Danh sách sản phẩm")]
+        public Product _product { get; set; }
 
         public class Item
         {
@@ -282,12 +299,47 @@
 .OrderByDescending(b => b.CreatedTime)
 .ToArray();
 
+        var link2 = model._product.Link.GetAfter("/");
+        var category2 = Db.GetOne<PP_Category>(t => t.CategoryPath == link2);
+        if (category2 == null) return null;
+        var arrCategory2 = Root.CategoryIndexes[category2.Id].ToList();
+
+        var news2 =
+(from cat_blog in Db.Table<PP_Category_details>()
+ join catnew in Db.Table<PP_Category>() on cat_blog.Idcat equals catnew.Id
+ join node in Db.Table<PP_Product>() on cat_blog.Idproduct equals node.Id
+ where node.NodeType == "product" && arrCategory2.Contains(cat_blog.Idcat ?? 0)
+
+ select new VM_Product
+ {
+     JsonContent = node.Content,
+     Title = node.Title,
+     Path = node.NodePath,
+     Summary = node.Content,
+     ImageUrl = node.ImageUrl,
+     CreatedTime = node.CreatedTime,
+     CategoryId = catnew.Id,
+     BestSeller = node.BestSeller,
+     CategoryName = catnew.Title,
+     CategoryPath = catnew.CategoryPath,
+     catid = catnew.Id,
+     listcat = node.listcat,
+     Price = node.Price,
+     idnode = cat_blog.Idproduct,
+     PromotionPrice = node.PromotionPrice,
+     PromotionEnabled = node.PromotionEnabled,
+ }).AsEnumerable()
+.GroupBy(b => b.Title)
+.Select(g => g.OrderByDescending(b => b.CreatedTime).First())
+.OrderByDescending(b => b.CreatedTime)
+.ToArray();
+
 
         model.Items = news;
         model.Title = page.Title;
         model.MetaDescription = page.MetaDescription;
         model.MetaKeywords = page.MetaKeywords;
-
+        model.RecentItems = news2;
         return model;
     });
     Layout = $"~/_layouts/_layout.cshtml";
@@ -304,7 +356,7 @@
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
             <div data-elementor-type="wp-page" data-elementor-id="3438" class="elementor elementor-3438" data-elementor-post-type="page">
                 <div class="row m-0 p-0">
-                    <div class="col-lg-12 m-0 p-0 wow zoomIn" >
+                    <div class="col-lg-12 m-0 p-0 wow zoomIn">
                         <div class="f-carousel" id="myCarousel">
                             @foreach (var item in Data._banner.EmptyIfNull())
                             {
@@ -336,8 +388,8 @@
                         <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-a26d4e7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="a26d4e7" data-element_type="column">
                             <div class="elementor-widget-wrap elementor-element-populated">
                                 <div class="elementor-element elementor-element-4a5479a sc_fly_static elementor-widget elementor-widget-heading" data-id="4a5479a" data-element_type="widget" data-widget_type="heading.default">
-                                    <div class="elementor-widget-container" >
-                                        <h3 class="elementor-heading-title elementor-size-default wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s" >@Data._news.Title</h3>
+                                    <div class="elementor-widget-container">
+                                        <h3 class="elementor-heading-title elementor-size-default wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s">@Data._news.Title</h3>
                                     </div>
                                 </div>
                             </div>
@@ -404,6 +456,62 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-6ba8477 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle sc_gradient_animation_none sc_fly_static" data-id="6ba8477" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-a26d4e7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="a26d4e7" data-element_type="column">
+                            <div class="elementor-widget-wrap elementor-element-populated">
+                                <div class="elementor-element elementor-element-4a5479a sc_fly_static elementor-widget elementor-widget-heading" data-id="4a5479a" data-element_type="widget" data-widget_type="heading.default">
+                                    <div class="elementor-widget-container">
+                                        <h3 class="elementor-heading-title elementor-size-default wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s">@Data._product.Title</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static">
+                    <div class="elementor-container elementor-column-gap-extended">
+                        <div class="row m-0 mt-3">
+                            @foreach (var item in Data.RecentItems.EmptyIfNull().Select((x, y) => new { x, y }).Take(8))
+                            {
+                                <div class="col-lg-3 col-sm-6 col-12 mb-1 wow fadeIn" data-wow-duration="0.@(item.y + 5)s" data-wow-delay="0.@(item.y + 5)s">
+                                    <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
+                                        <div class="post_featured with_thumb hover_link mb-0">
+                                            <img fetchpriority="high" width="890" height="628" src="@item.x.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.x.Title" title="@item.x.Title" decoding="async">
+                                            <div class="mask"></div>
+                                            <a href="@item.x.Path" aria-hidden="true" class="link"></a>
+                                            <button class="add-to-cart-button  product-action-cart font-14 " data-product-id="@item.x.idnode" data-product-title="@item.x.Title"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                        <div class="w-100 p-1">
+                                            <h6 class=" limited-title mt-2 mb-2" title="@item.x.Title">@item.x.Title</h6>
+                                            <div class="d-flex mb-2">
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                                <i class="fa fa-star text-secondary"></i>
+                                            </div>
+                                            <div class="d-flex mb-2">
+                                                @if (item.x.PromotionEnabled == true)
+                                                {
+                                                    <h6 class="fw-bold mt-2 me-2">@item.x.PromotionPrice.ToString("#,##0") đ</h6>
+                                                    @*<h5 class="text-danger mt-2 text-decoration-line-through">@item.x.Price.ToString("#,##0") đ</h5>*@
+                                                }
+                                                else
+                                                {
+                                                    <h6 class="fw-bold mt-2 me-2">@item.x.Price.ToString("#,##0") đ</h6>
+                                                }
+
+                                            </div>
+                                        </div>
+                                    </article>
+
+                                </div>
+
+                            }
                         </div>
                     </div>
                 </section>
@@ -485,6 +593,7 @@
                         </div>
                     </div>
                 </section>
+
                 <div class="elementor-element mt-lg-4 mb-lg-4 mb-2 mt-2 elementor-element-fe8f0ad sc_fly_static elementor-widget elementor-widget-heading" data-id="fe8f0ad" data-element_type="widget" data-widget_type="heading.default">
                     <div class="elementor-widget-container">
                         <div class="row">
@@ -497,7 +606,7 @@
                 <section class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static">
                     <div class="elementor-container elementor-column-gap-extended">
                         <div class="row m-0">
-                            @foreach (var item in Data._item._list.EmptyIfNull().Select((x,y)=>  new{ x,y}))
+                            @foreach (var item in Data._item._list.EmptyIfNull().Select((x, y) => new { x, y }))
                             {
                                 <div class="col-lg-3 col-sm-6 col-12 mb-1 wow fadeIn" data-wow-duration="0.@(item.y + 5)s" data-wow-delay="0.@(item.y + 5)s">
                                     <div class="row m-0">

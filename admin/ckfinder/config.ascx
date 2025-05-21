@@ -164,7 +164,9 @@
         type.Url = BaseUrl;// + "images/";
         type.Dir = BaseDir == "" ? "" : BaseDir;// + "images/";
         type.MaxSize = 0;
-        type.AllowedExtensions = new string[] { "bmp", "gif", "jpeg", "jpg", "png" };
+type.AllowedExtensions = new string[] {
+    "bmp", "gif", "jpeg", "jpg", "png", "tiff", "tif", "webp", "svg", "heic", "ico"
+};
         type.DeniedExtensions = new string[] { };
 
         //type = ResourceType.Add( "Flash" );
