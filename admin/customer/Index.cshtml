@@ -39,7 +39,7 @@
     Page.Title = $"{Text["LIST OF text", "DANH SÁCH TÀI KHOẢN"]}";
     Page.Menu = "customer";
 
-    var items = (from x in Db.Table<PP_Customer>() select new { x.Id, x.Active, x.Name, x.Email,x.PASSWORD,x.IdFacebook,x.IdGoogle,x.CreatedTime, x.ModifiedTime }).ToList();
+    var items = (from x in Db.Table<PP_Customer>() select new { x.Id, x.Active, x.Name, x.Email,x.PASSWORD,x.CreatedTime, x.ModifiedTime }).ToList();
 
 }
 

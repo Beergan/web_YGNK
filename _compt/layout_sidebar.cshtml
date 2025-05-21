@@ -56,7 +56,7 @@
             <h4>@Text["Subtotal", "Tạm tính"]: <span>@($"{cart.GetTotal():C0}")</span></h4>
         </div>
         <div class="cart-checkout-btn">
-            <a class="btn-hover cart-btn-style" href="@Root.Config.Link.PageCart">@Text["View cart", "Xem giỏ hàng"]</a>
+            @*<a class="btn-hover cart-btn-style" href="@Root.Config.Link.PageCart">@Text["View cart", "Xem giỏ hàng"]</a>*@
             <a class="no-mrg btn-hover cart-btn-style" href="@Root.Config.Link.PageMakeOrder">@Text["Make order", "Mua ngay"]</a>
         </div>
     </div>

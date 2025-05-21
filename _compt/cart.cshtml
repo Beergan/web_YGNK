@@ -159,7 +159,66 @@
         Response.Write($"{cart.GetTotal():C0}");
 
     }
+    else if (IsPost && query == "?add-custom")
+    {
+        AntiForgery.Validate(); // Xác thực token chống CSRF
 
+        string name = Request.Form["name"].NullIfWhiteSpace();
+        decimal price = Request.Form["price"].AsDecimal();
+        int quantity = Request.Form["quantity"].AsInt();
+        string url = Request.Form["url"].NullIfWhiteSpace();
+        string imageUrl = Request.Form["imageUrl"].NullIfWhiteSpace();
+        string variation = Request.Form["variation"].NullIfWhiteSpace();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            Response.StatusCode = 400;
+            Response.ContentType = "application/json";
+            Response.Write(Json.Encode(new { success = false, error = "Tên sản phẩm không được để trống!" }));
+            Response.End(); return;
+        }
+
+        if (price <= 0)
+        {
+            Response.StatusCode = 400;
+            Response.ContentType = "application/json";
+            Response.Write(Json.Encode(new { success = false, error = "Đơn giá phải lớn hơn 0!" }));
+            Response.End(); return;
+        }
+
+        if (quantity <= 0)
+        {
+            Response.StatusCode = 400;
+            Response.ContentType = "application/json";
+            Response.Write(Json.Encode(new { success = false, error = "Số lượng phải lớn hơn 0!" }));
+            Response.End(); return;
+        }
+
+        int customId = (Db.Table<PP_Product>().Max(p => (int?)p.Id) ?? 0) + 1;
+
+        var customProduct = new PP_Product
+        {
+            Id = customId,
+            Title = name,
+            Price = price,
+            ImageUrl = string.IsNullOrEmpty(imageUrl) ? "/default-image.jpg" : imageUrl,
+            NodePath = url
+        };
+
+        cart.AddToCart(customProduct, variation, quantity);
+
+        Response.ContentType = "application/json";
+        Response.Write(Json.Encode(new
+        {
+            success = true,
+            RowTotal = $"{cart.GetProductTotal(customProduct):C0}",
+            newTotal = cart.GetTotal(),
+            cartCount = cart.GetQuantity(),
+            CartSidebar = RenderPage("layout_sidebar.cshtml").ToHtmlString(),
+            customId = customId
+        }));
+        Response.End();
+    }
 
 
 

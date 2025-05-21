@@ -1,11 +1,13 @@
 ﻿@inherits MyAdminPage
-@functions{
+@using Newtonsoft.Json
+@functions {
     private FieldExtractor<PP_Order> field = new FieldExtractor<PP_Order>();
 }
 @{
     CheckAuthen()();
     var query = Request.Url.Query;
     var dbQuery = Db.Query<PP_Order>();
+
     if (IsPost && query == "?delete")
     {
         new Func<Action>(() =>
@@ -13,9 +15,8 @@
             try
             {
                 AntiForgery.Validate();
-
                 int itemId;
-                if (!int.TryParse(Request.Form[field.GetName(t => t.Id)], out itemId))
+                if (!int.TryParse(Request.Form[field.GetName(t => t.Id)], out itemId) || itemId <= 0)
                 {
                     return AjaxResult.BadRequest();
                 }
@@ -26,9 +27,26 @@
                     return AjaxResult.NotFound();
                 }
 
-                Db.Delete<PP_Order>(item.Id);
-                return AjaxResult.Ok(Text[$"Item [{item.OrderCode}] has been deleted!", $"Đơn [{item.OrderCode}] đã được xóa!"]);
+                // Delete associated image files
+                if (!string.IsNullOrEmpty(item.Image))
+                {
+                    try
+                    {
+                        var imageUrls = JsonConvert.DeserializeObject<List<string>>(item.Image) ?? new List<string>();
+                        foreach (var imageUrl in imageUrls)
+                        {
+                            var filePath = Server.MapPath("~" + imageUrl);
+                            if (File.Exists(filePath))
+                            {
+                                File.Delete(filePath);
+                            }
+                        }
+                    }
+                    catch { /* Ignore JSON parsing errors */ }
+                }
 
+                Db.Delete<PP_Order>(itemId);
+                return AjaxResult.Ok(Text[$"Item [{item.OrderCode}] has been deleted!", $"Đơn [{item.OrderCode}] đã được xóa!"]);
             }
             catch (Exception ex)
             {
@@ -36,27 +54,154 @@
             }
         })()();
     }
-    if (query == "?update_status")
+    if (IsPost && query == "?update_status")
     {
-        int id = Request.Form[nameof(id)].AsInt();
-        string status = Request.Form[nameof(status)];
-        string note = Request.Form[nameof(note)];
+        int id = Request.Form["id"].AsInt();
+        string status = Request.Form["status"];
+        string note = Request.Form["note"];
+        decimal ship = Request.Form["ship"].AsDecimal();
+        var files = Request.Files;
+        var existingImages = Request.Form.GetValues("existingImages[]")?.ToList() ?? new List<string>();
 
+        // Validate input
+        if (id <= 0 || string.IsNullOrEmpty(status))
+        {
+            AjaxResult.BadRequest("Invalid input data")();
+            return;
+        }
+
+        // Get order
         var order = Db.GetOne<PP_Order>(id);
+        if (order == null)
+        {
+            AjaxResult.NotFound()();
+            return;
+        }
+
+        // Handle file uploads
+        var imageUrls = existingImages.Where(x => !string.IsNullOrEmpty(x) && x.StartsWith("/Uploads/images/")).ToList();
+        if (files != null && files.Count > 0)
+        {
+            var uploadPath = Server.MapPath("~/Uploads/images");
+            if (!Directory.Exists(uploadPath))
+            {
+                Directory.CreateDirectory(uploadPath);
+            }
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                var file = files[i];
+                if (file != null && file.ContentLength > 0 && file.ContentLength <= 5 * 1024 * 1024 && file.ContentType.StartsWith("image/"))
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var filePath = Path.Combine(uploadPath, fileName);
+                    file.SaveAs(filePath);
+                    imageUrls.Add("/Uploads/images/" + fileName);
+                }
+            }
+        }
+
+        // Limit to 5 images
+        if (imageUrls.Count > 5)
+        {
+            AjaxResult.BadRequest("Tối đa 5 hình ảnh được phép!")();
+            return;
+        }
+
+        // Delete old images not in the updated list
+        if (!string.IsNullOrEmpty(order.Image))
+        {
+            try
+            {
+                var oldImages = JsonConvert.DeserializeObject<List<string>>(order.Image) ?? new List<string>();
+                foreach (var oldImage in oldImages)
+                {
+                    if (!imageUrls.Contains(oldImage))
+                    {
+                        var filePath = Server.MapPath("~" + oldImage);
+                        if (File.Exists(filePath))
+                        {
+                            File.Delete(filePath);
+                        }
+                    }
+                }
+            }
+            catch { /* Ignore JSON parsing errors */ }
+        }
+
+        // Update order
         order.OrderStatus = status;
         order.Note = note;
+        order.ShipFee = ship;
+        order.Image = JsonConvert.SerializeObject(imageUrls);
         Db.Update<PP_Order>(order);
 
         AjaxResult.Ok("Thông tin đã được ghi nhận!")();
     }
-    else if (query == "?get-order-details")
+    if (IsPost && query == "?update_status2")
     {
-        Response.Write("OK");
+        int id2 = Request.Form["id2"].AsInt();
+        string status2 = Request.Form["status2"];
+        string note2 = Request.Form["note2"];
+        decimal costs = Request.Form["Costs"].AsDecimal();
+
+        if (id2 <= 0 || string.IsNullOrEmpty(status2))
+        {
+            AjaxResult.BadRequest("Invalid input data")();
+            return;
+        }
+
+        var order = Db.GetOne<PP_Order>(id2);
+        if (order == null)
+        {
+            AjaxResult.NotFound()();
+            return;
+        }
+
+        if (status2 == "SUCCESS")
+        {
+            order.Check2 = "DELIVERING";
+        }
+       
+        order.OrderStatus = status2;
+        order.Note = note2;
+        order.Costs = costs;
+        order.Check1 = status2;
+        Db.Update<PP_Order>(order);
+        AjaxResult.Ok("Thông tin đã được ghi nhận!")();
+    }
+    if (query == "?get-order-details")
+    {
+        int id = Request.Form["id"].AsInt();
+        var order = Db.GetOne<PP_Order>(id);
+        if (order != null)
+        {
+            var orderLines = JsonConvert.DeserializeObject<List<OrderLine>>(order.JsonData) ?? new List<OrderLine>();
+            var html = $"<h5>Chi tiết đơn hàng: {order.OrderCode}</h5><table class='table'><thead><tr><th>Sản phẩm</th><th>Số lượng</th><th>Giá</th></tr></thead><tbody>";
+            foreach (var line in orderLines)
+            {
+                html += $"<tr><td>{line.Title}</td><td>{line.Quantity}</td><td>{line.Price:C0}</td></tr>";
+            }
+            html += "</tbody></table>";
+            Response.Write(html);
+        }
+        else
+        {
+            Response.Write("Không tìm thấy đơn hàng");
+        }
         Response.End();
     }
-    else if (query == "?delivering")
+    if (query == "?delivering")
     {
-        dbQuery = dbQuery = dbQuery.Where(t => t.OrderStatus == "DELIVERING");
+        dbQuery = dbQuery.Where(t => t.OrderStatus == "DELIVERING");
+    }
+    else if (query == "?check1")
+    {
+        dbQuery = dbQuery.Where(t => t.OrderStatus == "DELIVERING" && t.Check1 != null && String.IsNullOrEmpty(t.Check2));
+    }
+    else if (query == "?check2")
+    {
+        dbQuery = dbQuery.Where(t => t.Check2 != null && t.Check1 == "SUCCESS");
     }
     else if (query == "?cancelled")
     {
@@ -64,7 +209,7 @@
     }
     else if (query == "?success")
     {
-        dbQuery = dbQuery.Where(t => t.OrderStatus == "SUCCESS");
+        dbQuery = dbQuery.Where(t => t.OrderStatus == "SUCCESS" && t.Check2 == "SUCCESS");
     }
     else if (query == "?all")
     {
@@ -75,7 +220,6 @@
     }
 
     var items = dbQuery.ToList();
-
     Page.Title = Text["LIST OF ORDERS", "DANH SÁCH ĐƠN HÀNG"];
     Page.Menu = "order";
 }
@@ -94,6 +238,16 @@
                     <li class="nav-item">
                         <a href="?new" aria-expanded="true" class="nav-link @(query=="?new"||query==string.Empty?"active":string.Empty)">
                             <i class="fas fa-list-ol"></i> @Text["Đơn hàng mới"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="?check1" aria-expanded="true" class="nav-link @(query=="?check1"?"active":string.Empty)">
+                            <i class="fas fa-list-ol"></i> @Text["Đơn Y/C Thanh toán lần 1"]
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="?check2" aria-expanded="true" class="nav-link @(query=="?check2"?"active":string.Empty)">
+                            <i class="fas fa-list-ol"></i> @Text["Đơn Y/C Thanh toán lần 2"]
                         </a>
                     </li>
                     <li class="nav-item">
@@ -116,11 +270,6 @@
                             <i class="fas fa-list-ol"></i> @Text["All of orders", "Tất cả đơn hàng"]
                         </a>
                     </li>
-                    @*<li class="nav-item">
-                            <a href="@Constants.Admin_Url/page/create" aria-expanded="false" class="nav-link">
-                                <i class="fas fa-plus-circle"></i> @Text["Create new page", "Tạo trang mới"]
-                            </a>
-                        </li>*@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane show active" id="list">
@@ -132,21 +281,41 @@
                                     <th>@Text[field.GetTitle(t => t.OrderStatus)]</th>
                                     <th>@Text[field.GetTitle(t => t.CreatedTime)]</th>
                                     <th>@Text[field.GetTitle(t => t.PayMethod)]</th>
-                                    <th style="min-width: 80px;"> @Text[field.GetTitle(t => t.TotalAmount)]</th>
-
+                                    <th style="min-width: 80px;">@Text[field.GetTitle(t => t.TotalAmount)]</th>
                                     <th style="width:1%;min-width:80px;">@Text["Control", "Thao tác"]</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-                                @for (int i = items.Count - 1; i >= 0 ; i--)
+                                @for (int i = items.Count - 1; i >= 0; i--)
                                 {
+                                    var images = new List<string>();
+                                    if (!string.IsNullOrEmpty(items[i].Image))
+                                    {
+                                        try
+                                        {
+                                            // Kiểm tra và chuẩn hóa JSON
+                                            string cleanedImage = items[i].Image.Trim();
+                                            if (cleanedImage.StartsWith("{") && cleanedImage.EndsWith("}"))
+                                            {
+                                                // Loại bỏ {} thừa
+                                                cleanedImage = cleanedImage.Substring(1, cleanedImage.Length - 2);
+                                            }
+                                            if (cleanedImage.StartsWith("[") && cleanedImage.EndsWith("]"))
+                                            {
+                                                images = JsonConvert.DeserializeObject<List<string>>(cleanedImage) ?? new List<string>();
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            images = new List<string>();
+                                        }
+                                    }
+                                    var imageJson = JsonConvert.SerializeObject(images);
                                     <tr>
                                         <td style="min-width: 230px; width: 40%;">
                                             <h5>@items[i].OrderCode</h5>
-                                            <div><u>Người nhận:</u> @items[i].Name </div>
+                                            <div><u>Người nhận:</u> @items[i].Name</div>
                                             <div><u>Phone:</u> @items[i].Phone</div>
-                                            @*<div><u>Thông tin đơn hàng:</u> @items[i].JsonData</div>*@
                                             @if (!string.IsNullOrEmpty(items[i].Note))
                                             {
                                                 <div><u>Ghi chú:</u> <span class="data-order-process">@items[i].Note</span></div>
@@ -164,10 +333,21 @@
                                                 <a title="@Text["View", "Xem"]" data-toggle="modal" data-target="#order-details-modal-center" data-order-code="@items[i].OrderCode" href="javascript:void(0)" type="button" class="btn btn-warning btn-view-order">
                                                     <span class="fa fa-eye"></span>
                                                 </a>
-                                                <a href="javascript:void(0)" type="button" class="btn btn-info waves-effect waves-light btn-update" data-toggle="modal" data-target="#update-modal" data-order-id="@items[i].Id"><span class="fa fa-edit"></span></a>
-                                                <a title="@Text["Delete", "Xóa"]" href="javascript:delele(@items[i].Id)" type="button" class="btn btn-danger">
+                                                @if (string.IsNullOrEmpty(items[i].Check2))
+                                                {
+                                                    <a href="javascript:void(0)" type="button" class="btn btn-info waves-effect waves-light btn-update2" data-toggle="modal" data-target="#update-modal2" data-order-id2="@items[i].Id" data-costs="@items[i].Costs">
+                                                        <span class="fa fa-edit"></span>
+                                                    </a>
+                                                }
+                                                @if (!string.IsNullOrEmpty(items[i].Check2) && items[i].Check1 == "SUCCESS")
+                                                {
+                                                    <a href="javascript:void(0)" type="button" class="btn btn-info waves-effect waves-light btn-update" data-toggle="modal" data-target="#update-modal" data-order-id="@items[i].Id" data-status="@items[i].Check2" data-ship="@items[i].ShipFee" data-images="@imageJson">
+                                                        <span class="fa fa-edit"></span>
+                                                    </a>
+                                                }
+                                                @*<a title="@Text["Delete", "Xóa"]" href="javascript:deleteOrder(@items[i].Id)" type="button" class="btn btn-danger">
                                                     <span class="mdi mdi-delete"></span>
-                                                </a>
+                                                </a>*@
                                             </div>
                                         </td>
                                     </tr>
@@ -181,14 +361,13 @@
     </div>
 </div>
 
-<div class="modal fade" id="order-details-modal-center" tabindex="-1" role="dialog"
-     aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+<div class="modal fade" id="order-details-modal-center" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="order-details-modal-title">Chi tiết đơn hàng</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body orderbody">
@@ -201,7 +380,7 @@
     </div>
 </div>
 
-<div id="update-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true" style="display: none;">
+<div id="update-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
@@ -210,10 +389,12 @@
                         <span><img src="/admin/assets/images/logo-sm.png" alt="" height="90"></span>
                     </a>
                 </h2>
-
-                <form class="form-horizontal form-update-status" action="#">
+                <form class="form-horizontal form-update-status" action="#" enctype="multipart/form-data">
                     @AntiForgery.GetHtml()
                     <input type="hidden" name="id" id="id" />
+                    <div class="col-12 text-center">
+                        <h3>Yêu cầu thanh toán đợt 2</h3>
+                    </div>
                     <div class="form-group">
                         <div class="col-12">
                             <label for="status">Trạng thái</label>
@@ -225,28 +406,86 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <div class="col-12">
-                            <label for="password1">Nội dung cập nhật</label>
-                            <textarea class="form-control" type="text" required id="note" name="note" placeholder="Nội dung xử lý .." rows="5"></textarea>
+                            <label for="ship">Chi phí vận chuyển</label>
+                            <input class="form-control" type="number" required id="ship" name="ship" placeholder="Nhập số tiền" />
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <div class="col-12">
+                            <label for="images">Hình ảnh</label>
+                            <div id="image-picker-container"></div>
+                            <button type="button" class="btn btn-success btn-sm add-image-picker">Thêm hình ảnh</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-12">
+                            <label for="note">Nội dung cập nhật</label>
+                            <textarea class="form-control" required id="note" name="note" placeholder="Nội dung xử lý .." rows="5"></textarea>
+                        </div>
+                    </div>
                     <div class="form-group account-btn text-center">
                         <div class="col-12">
                             <button class="btn width-lg btn-rounded btn-primary waves-effect waves-light" type="submit">Xác nhận</button>
                         </div>
                     </div>
                 </form>
-
             </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+        </div>
+    </div>
+</div>
 
-@section head{
-    <!-- third party css -->
+<div id="update-modal2" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="custom-width-modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="text-uppercase text-center mb-4">
+                    <a href="index.html" class="text-success">
+                        <span><img src="/admin/assets/images/logo-sm.png" alt="" height="90"></span>
+                    </a>
+                </h2>
+                <form class="form-horizontal form-update-status2" action="#">
+                    @AntiForgery.GetHtml()
+                    <input type="hidden" name="id2" id="id2" />
+                    <div class="col-12 text-center">
+                        <h3>Yêu cầu thanh toán đợt 1</h3>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-12">
+                            <label for="status2">Trạng thái</label>
+                            <select class="form-control" name="status2" id="status2">
+                                <option value="NEW">Mới</option>
+                                <option value="DELIVERING">Đang xử lý</option>
+                                <option value="SUCCESS">Thành công</option>
+                                <option value="CANCELLED">Hủy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-12">
+                            <label for="Costs">Số tiền phát sinh (nếu có)</label>
+                            <input class="form-control" type="number" required id="Costs" name="Costs" placeholder="Nhập số tiền" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-12">
+                            <label for="note2">Nội dung cập nhật</label>
+                            <textarea class="form-control" required id="note2" name="note2" placeholder="Nội dung xử lý .." rows="5"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group account-btn text-center">
+                        <div class="col-12">
+                            <button class="btn width-lg btn-rounded btn-primary waves-effect waves-light" type="submit">Xác nhận</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section head {
     <link href="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.css" rel="stylesheet" type="text/css" />
     <link href="@Constants.Admin_Url/assets/libs/datatables/buttons.bootstrap4.css" rel="stylesheet" type="text/css" />
     <link href="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.css" rel="stylesheet" type="text/css" />
@@ -255,57 +494,88 @@
         .modal-dialog {
             max-width: 800px;
         }
+
+        .image-preview {
+            margin-top: 10px;
+            max-height: 250px;
+            max-width: 100%;
+            object-fit: contain;
+        }
+
+        .image-picker-item {
+            margin-bottom: 15px;
+        }
     </style>
 }
-@section scripts{
+
+@section scripts {
     <script src="@Constants.Admin_Url/assets/libs/datatables/jquery.dataTables.min.js"></script>
     <script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.bootstrap4.min.js"></script>
-    <script src="@Constants.Admin_Url/assets/libs/datatables/dataTables.responsive.min.js"></script>
     <script src="@Constants.Admin_Url/assets/libs/datatables/responsive.bootstrap4.min.js"></script>
     <script src="@Constants.Admin_Url/assets/libs/sweetalert2/sweetalert2.min.js"></script>
-
+    <script src="@Constants.Admin_Url/assets/libs/parsleyjs/parsley.min.js"></script>
     <script>
+        // Image picker functions
+        function addImagePicker(fieldName, fieldTitle, imageUrl = null) {
+            const container = document.getElementById('image-picker-container');
+            const index = container.querySelectorAll('.image-picker-item').length;
+            const newImagePicker = `
+        <div class="form-group row image-picker-item">
+            <label for="${fieldName}-${index}" class="col-12 col-md-2 col-form-label">${fieldTitle}</label>
+            <div class="col-12 col-md-8">
+                <input type="file" class="form-control-file" name="${fieldName}[]" id="${fieldName}-${index}" accept="image/*" onchange="previewImage(this)" />
+                <input type="hidden" name="existingImages[]" id="existing-${fieldName}-${index}" value="${imageUrl || ''}" />
+                <img id="img-${fieldName}-${index}" src="${imageUrl || '/assets/images/no-image.jpg'}" class="image-preview" />
+            </div>
+            <div class="col-md-2">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info btn-sm move-up-btn" onclick="moveUpImage(this)"><i class="fa fa-arrow-up"></i></button>
+                    <button type="button" class="btn btn-info btn-sm move-down-btn" onclick="moveDownImage(this)"><i class="fa fa-arrow-down"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm delete-btn" onclick="deleteImage(this)"><i class="fa fa-trash"></i></button>
+                </div>
+            </div>
+        </div>`;
+            container.insertAdjacentHTML('beforeend', newImagePicker);
+        }
+
+        function previewImage(input) {
+            const imgId = `img-${input.id}`;
+            const img = document.getElementById(imgId);
+            const existingInput = document.getElementById(`existing-${input.id}`);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    img.src = e.target.result;
+                    existingInput.value = ''; // Clear existing image URL if new file is selected
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                img.src = existingInput.value || '/assets/images/no-image.jpg';
+            }
+        }
+
+        function moveUpImage(button) {
+            const item = button.closest('.image-picker-item');
+            const previousItem = item.previousElementSibling;
+            if (previousItem && previousItem.classList.contains('image-picker-item')) {
+                item.parentNode.insertBefore(item, previousItem);
+            }
+        }
+
+        function moveDownImage(button) {
+            const item = button.closest('.image-picker-item');
+            const nextItem = item.nextElementSibling;
+            if (nextItem && nextItem.classList.contains('image-picker-item')) {
+                item.parentNode.insertBefore(nextItem, item);
+            }
+        }
+
+        function deleteImage(button) {
+            const item = button.closest('.image-picker-item');
+            item.remove();
+        }
+
         $(document).ready(function () {
-
-            $(document).on("click", ".btn-update", function () {
-				var orderId = $(this).attr("data-order-id");
-				var status = $(this).parents("tr").find(".data-order-status").html();
-				var process = $(this).parents("tr").find(".data-order-process").html();
-
-				$("#id").val(orderId)
-				$("#note").val(process)
-				$("#status").val(status)
-			});
-
-			$('.form-update-status').on('submit', function (event) {
-				event.preventDefault();
-				console.log($(this).serialize());
-
-				$('#update-modal').modal('hide');
-				Swal.fire({
-					title: 'Xin chờ đợi!',
-					html: 'Hệ thống đang ghi nhận thông tin ..',
-					didOpen: () => { Swal.showLoading(); },
-				});
-
-				$.post("@Constants.Admin_Url/order?update_status",
-					$(this).serialize(),
-					function (data) {
-						Swal.fire({
-							title: 'Chúc mừng!',
-							text: data,
-							type: "success"
-						}).then(() => { window.location.reload(); });
-					})
-					.fail(function (error) {
-						Swal.fire({
-							title: '@Text["Oh, no!", "Thôi xong!"]',
-							text: error.responseText,
-							type: "error"
-						});
-					});
-			});
-
             jQuery.extend(jQuery.fn.dataTableExt.oSort, {
                 "formatted-num-pre": function (a) {
                     a = (a === "-" || a === "") ? 0 : a.replace(/[^\d\-\.]/g, "");
@@ -331,64 +601,226 @@
 
             $(document).on("click", ".submit-to-ghtk", function () {
                 var orderCode = $(this).attr("data-order-code");
-
-                $.post("@Constants.Admin_Url/order/view?push_ghtk", { orderCode : orderCode}, function (rsp) {
+                $.post("@Constants.Admin_Url/order/view?push_ghtk", { orderCode: orderCode }, function (rsp) {
                     Swal.fire({
                         title: 'Chúc mừng!',
                         text: rsp,
-                        type: "success"
-                    }).fail(function (error) {
-                        Swal.fire({
-                            title: 'ERROR',
-                            text: error,
-                            type: "error"
-                        });
-                    })
+                        icon: "success"
+                    });
+                }).fail(function (error) {
+                    Swal.fire({
+                        title: 'ERROR',
+                        text: error.responseText,
+                        icon: "error"
+                    });
                 });
             });
+
+            $(document).on("click", ".btn-update", function () {
+                var orderId = $(this).attr("data-order-id");
+                var status = $(this).attr("data-status");
+                var process = $(this).parents("tr").find(".data-order-process").text() || "";
+                var ship = $(this).attr("data-ship") || 0;
+                var imagesAttr = $(this).attr("data-images");
+                var images = [];
+
+                console.log("Raw data-images:", imagesAttr); // Debugging
+                if (imagesAttr && imagesAttr.trim() !== "") {
+                    try {
+                        // Loại bỏ {} thừa nếu có
+                        let cleanedAttr = imagesAttr.trim();
+                        if (cleanedAttr.startsWith('{') && cleanedAttr.endsWith('}')) {
+                            cleanedAttr = cleanedAttr.substring(1, cleanedAttr.length - 1);
+                        }
+                        if (cleanedAttr.startsWith('[') && cleanedAttr.endsWith(']')) {
+                            images = JSON.parse(cleanedAttr);
+                            if (!Array.isArray(images)) {
+                                images = [];
+                            }
+                        } else {
+                            console.warn("Invalid JSON format for data-images:", imagesAttr);
+                            images = [];
+                        }
+                    } catch (e) {
+                        console.error("Failed to parse data-images:", imagesAttr, e);
+                        images = [];
+                    }
+                }
+                console.log("Parsed images:", images);
+
+                $("#id").val(orderId);
+                $("#status").val(status);
+                $("#note").val(process);
+                $("#ship").val(ship);
+
+                $("#image-picker-container").empty();
+                if (images.length > 0) {
+                    images.forEach((imageUrl) => {
+                        if (imageUrl) {
+                            addImagePicker('images', 'Hình ảnh', imageUrl);
+                        }
+                    });
+                } else {
+                    addImagePicker('images', 'Hình ảnh');
+                }
+            });
+            	$('.form-update-status2').on('submit', function (event) {
+		event.preventDefault();
+		console.log($(this).serialize());
+
+						$('#update-modal').modal('hide');
+		Swal.fire({
+			title: 'Xin chờ đợi!',
+			html: 'Hệ thống đang ghi nhận thông tin ..',
+			didOpen: () => { Swal.showLoading(); },
+		});
+
+		$.post("@Constants.Admin_Url/order?update_status2",
+			$(this).serialize(),
+			function (data) {
+				Swal.fire({
+					title: 'Chúc mừng!',
+					text: data,
+					type: "success"
+				}).then(() => { window.location.reload(); });
+			})
+			.fail(function (error) {
+				Swal.fire({
+					title: '@Text["Oh, no!", "Thôi xong!"]',
+					text: error.responseText,
+					type: "error"
+				});
+			});
+	});
+            $(document).on("click", ".add-image-picker", function () {
+                if ($('#image-picker-container .image-picker-item').length >= 5) {
+                    Swal.fire({
+                        title: 'Lỗi',
+                        text: 'Tối đa 5 hình ảnh!',
+                        icon: 'error'
+                    });
+                    return;
+                }
+                addImagePicker('images', 'Hình ảnh');
+            });
+
+            $(document).on("click", ".btn-update2", function () {
+                var orderId = $(this).attr("data-order-id2");
+                var status = $(this).parents("tr").find(".data-order-status").text();
+                var process = $(this).parents("tr").find(".data-order-process").text() || "";
+                var costs = $(this).attr("data-costs") || 0;
+
+                $("#id2").val(orderId);
+                $("#status2").val(status);
+                $("#note2").val(process);
+                $("#Costs").val(costs);
+            });
+       $('.form-update-status').on('submit', function (event) {
+    event.preventDefault();
+    var $form = $(this);
+    var modalId = $form.closest('.modal').attr('id');
+
+    if (modalId === 'update-modal') {
+        if ($('#image-picker-container .image-picker-item').length > 5) {
+            Swal.fire({
+                title: 'Lỗi',
+                text: 'Tối đa 5 hình ảnh!',
+                icon: 'error'
+            });
+            return;
+        }
+        var formData = new FormData();
+        formData.append('__RequestVerificationToken', $form.find('input[name="__RequestVerificationToken"]').val());
+        formData.append('id', $('#id').val() || 0);
+        formData.append('status', $('#status').val());
+        formData.append('ship', $('#ship').val());
+        formData.append('note', $('#note').val());
+        $('input[name="images[]"]').each(function () {
+            if (this.files[0]) {
+                formData.append('images[]', this.files[0]);
+            }
+        });
+        $('input[name="existingImages[]"]').each(function () {
+            if (this.value) {
+                formData.append('existingImages[]', this.value);
+            }
+        });
+
+        Swal.fire({
+            title: 'Xin chờ đợi!',
+            html: 'Hệ thống đang ghi nhận thông tin ..',
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        $.ajax({
+            url: "@Constants.Admin_Url/order?update_status",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                Swal.fire({
+                    title: 'Chúc mừng!',
+                    text: data,
+                    icon: "success"
+                }).then(() => { window.location.reload(); });
+            },
+            error: function (error) {
+                Swal.fire({
+                    title: '@Text["Oh, no!", "Thôi xong!"]',
+                    text: error.responseText,
+                    icon: "error"
+                });
+            }
+        });
+    } else {
+        // Xử lý update-modal2 như trước
+    }
+});
 
             $('#datatable').DataTable({
                 "aaSorting": [],
                 "columnDefs": [{ type: 'formatted-num', targets: 0 }],
                 "pageLength": 100,
-                "lengthChange": false,
+                "lengthChange": false
             });
-        });
-    </script>
-    <script>
-           function delele(id) {
-            Swal.fire({
-                title: '@Html.Raw(Text["Confirm to delete!","Hãy xác nhận?"])',
-                text: '@Html.Raw(Text["Delete operation cannot be undone","Thao tác xóa không thể hoàn tác"])',
-                type: "warning",
-                showCancelButton: !0,
-                confirmButtonText: '@Html.Raw(Text["OK","Được"])',
-                cancelButtonText: '@Html.Raw(Text["Wait!","Khoan!"])',
-                confirmButtonClass: "btn btn-success mt-2",
-                cancelButtonClass: "btn btn-danger ml-2 mt-2",
-                buttonsStyling: !1
-            }).then(function(t) {
-                t.value?$.ajax({
-                    url: "@Constants.Admin_Url/order?delete",
-                    type: "POST",
-                    contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                    data: { __RequestVerificationToken: '@AntiForgeryTokenForAjaxPost()', Id: id },
-                    success: function(result) {
-                        Swal.fire({
-                            title: '@Html.Raw(Text["Congratulation!", "Chúc mừng!"])',
-                            text: result,
-                            type: "success"
-                        }).then(function(t) { location.reload(); })
-                    },
-                    error: function(errormessage) {
-                        Swal.fire({
-                            title: '@Html.Raw(Text["Oh, no!", "Thôi xong!"])',
-                            text: errormessage.responseText,
-                            type: "error"
-                        })
+
+            function deleteOrder(id) {
+                Swal.fire({
+                    title: '@Html.Raw(Text["Confirm to delete!","Hãy xác nhận?"])',
+                    text: '@Html.Raw(Text["Delete operation cannot be undone","Thao tác xóa không thể hoàn tác"])',
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: '@Html.Raw(Text["OK","Được"])',
+                    cancelButtonText: '@Html.Raw(Text["Wait!","Khoan!"])',
+                    confirmButtonClass: "btn btn-success mt-2",
+                    cancelButtonClass: "btn btn-danger ml-2 mt-2",
+                    buttonsStyling: false
+                }).then(function (t) {
+                    if (t.value) {
+                        $.ajax({
+                            url: "@Constants.Admin_Url/order?delete",
+                            type: "POST",
+                            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                            data: { __RequestVerificationToken: '@AntiForgeryTokenForAjaxPost()', Id: id },
+                            success: function (result) {
+                                Swal.fire({
+                                    title: '@Html.Raw(Text["Congratulation!", "Chúc mừng!"])',
+                                    text: result,
+                                    icon: "success"
+                                }).then(function () { location.reload(); });
+                            },
+                            error: function (errormessage) {
+                                Swal.fire({
+                                    title: '@Html.Raw(Text["Oh, no!", "Thôi xong!"])',
+                                    text: errormessage.responseText,
+                                    icon: "error"
+                                });
+                            }
+                        });
                     }
-                }):{}
-            });
-        }
+                });
+            }
+        });
     </script>
 }

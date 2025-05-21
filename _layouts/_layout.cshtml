@@ -25,10 +25,11 @@
     <meta name="HandheldFriendly" content="true" />
     <meta property="og:type" content="@Root.Config.WebTitle" />
     <meta property="og:title" content="@Root.Config.WebTitle" />
+    <meta property="og:image" content="@Root.Config.BanerNew" />
     <meta property="og:description" content="@Page.Description" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="shortcut icon" type="image/x-icon" href="@Root.Config.Favicon">
-
+    <meta name="referrer" content="origin-when-cross-origin">
     <link rel="icon" href="@Root.Config.Favicon" sizes="32x32">
     <link rel="icon" href="@Root.Config.Favicon" sizes="192x192">
     <script>
@@ -57,15 +58,6 @@
   }
 }
     </script>
-    <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', '@Root.Config.GoogleGtag');
-    </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=@Root.Config.GoogleGtag">
-    </script>
     <link href="~/assets/wp-content/themes/globallogistics/skins/fancy.carousel.css" rel="stylesheet" />
     <link href="~/assets/wp-content/themes/globallogistics/skins/fancybox.carousel.thumbs.css" rel="stylesheet" />
 
@@ -85,10 +77,12 @@
     <link property="stylesheet" rel='stylesheet' id='font-awesome-official-css' href='assets/releases/v6.7.2/css/all.css' type='text/css' media='all' integrity="sha384-nRgPTkuX86pH8yjPJUAFuASXQSSl2/bBUiNV47vSYpKFxHJhbcrGnmlYpYJMeD7a" crossorigin="anonymous">
     <link property="stylesheet" rel='stylesheet' id='elementor-icons-css' href='assets/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.34.0' type='text/css' media='all'>
     <link property="stylesheet" rel='stylesheet' id='elementor-frontend-css' href='assets/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.26.4' type='text/css' media='all'>
-    <link href="~/assets/wp-content/themes/globallogistics/aos.css" rel="stylesheet" />
     <!-- Trong <head> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+        new WOW().init();
+    </script>
 
     <style id='elementor-frontend-inline-css' type='text/css'>
         .elementor-kit-3504 {
@@ -1013,6 +1007,8 @@
             }
         }
     </style>
+
+
     <link href="~/assets/wp-content/themes/bootstrap.min.css" rel="stylesheet" />
     <script src="~/assets/wp-content/themes/globallogistics/js/codejquery.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/js/men.js"></script>
@@ -1051,50 +1047,6 @@
             }
         }
     </style>
-    <script type="text/javascript">
-        function setREVStartSize(e) {
-            try {
-                var pw = document.getElementById(e.c).parentNode.offsetWidth,
-                    newh;
-                pw = pw === 0 || isNaN(pw) ? window.innerWidth : pw;
-                e.tabw = e.tabw === undefined ? 0 : parseInt(e.tabw);
-                e.thumbw = e.thumbw === undefined ? 0 : parseInt(e.thumbw);
-                e.tabh = e.tabh === undefined ? 0 : parseInt(e.tabh);
-                e.thumbh = e.thumbh === undefined ? 0 : parseInt(e.thumbh);
-                e.tabhide = e.tabhide === undefined ? 0 : parseInt(e.tabhide);
-                e.thumbhide = e.thumbhide === undefined ? 0 : parseInt(e.thumbhide);
-                e.mh = e.mh === undefined || e.mh == "" || e.mh === "auto" ? 0 : parseInt(e.mh, 0);
-                if (e.layout === "fullscreen" || e.l === "fullscreen")
-                    newh = Math.max(e.mh, window.innerHeight);
-                else {
-                    e.gw = Array.isArray(e.gw) ? e.gw : [e.gw];
-                    for (var i in e.rl) if (e.gw[i] === undefined || e.gw[i] === 0) e.gw[i] = e.gw[i - 1];
-                    e.gh = e.el === undefined || e.el === "" || (Array.isArray(e.el) && e.el.length == 0) ? e.gh : e.el;
-                    e.gh = Array.isArray(e.gh) ? e.gh : [e.gh];
-                    for (var i in e.rl) if (e.gh[i] === undefined || e.gh[i] === 0) e.gh[i] = e.gh[i - 1];
-
-                    var nl = new Array(e.rl.length),
-                        ix = 0,
-                        sl;
-                    e.tabw = e.tabhide >= pw ? 0 : e.tabw;
-                    e.thumbw = e.thumbhide >= pw ? 0 : e.thumbw;
-                    e.tabh = e.tabhide >= pw ? 0 : e.tabh;
-                    e.thumbh = e.thumbhide >= pw ? 0 : e.thumbh;
-                    for (var i in e.rl) nl[i] = e.rl[i] < window.innerWidth ? 0 : e.rl[i];
-                    sl = nl[0];
-                    for (var i in nl) if (sl > nl[i] && nl[i] > 0) { sl = nl[i]; ix = i; }
-                    var m = pw > (e.gw[ix] + e.tabw + e.thumbw) ? 1 : (pw - (e.tabw + e.thumbw)) / (e.gw[ix]);
-
-                    newh = (e.type === "carousel" && e.justify === "true" ? e.gh[ix] : (e.gh[ix] * m)) + (e.tabh + e.thumbh);
-                }
-
-                if (window.rs_init_css === undefined) window.rs_init_css = document.head.appendChild(document.createElement("style"));
-                document.getElementById(e.c).height = newh;
-                window.rs_init_css.innerHTML += "#" + e.c + "_wrapper { height: " + newh + "px }";
-            } catch (e) {
-                console.log("Failure at Presize of Slider:" + e)
-            }
-        };</script>
 
 
     @RenderSection("head", required: false)
@@ -1102,10 +1054,10 @@
 <body class="home page-template page-template-elementor_header_footer page page-id-3438 wp-custom-logo hide_fixed_rows_enabled frontpage skin_default scheme_default blog_mode_front body_style_fullscreen is_stream blog_style_excerpt sidebar_hide expand_content trx_addons_present header_type_custom header_style_header-custom-3413 header_position_over menu_side_none fixed_blocks_sticky elementor-default elementor-template-full-width elementor-kit-3504 elementor-page elementor-page-3438 ua_retina ua_firefox ua_gecko sc_layouts_row_fixed_inited added_to_cart_inited desktop_layout">
     <div id="loading-screen">
         <div class="loading-text">
-            <span>Y</span>
-            <span>G</span>
-            <span>N</span>
-            <span>K</span>
+            <span>T</span>
+            <span>A</span>
+            <span>P</span>
+            <span>L</span>
         </div>
     </div>
     <div class="page_wrap">
@@ -1197,9 +1149,6 @@
             });
         });
     </script>
-
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/advanced-popups/public/js/advanced-popups-public.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/contact-form-7/includes/js/scripts.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-content/plugins/revslider/public/assets/js/revolution.tools.min.js"></script>
@@ -1213,7 +1162,7 @@
     <script type="text/javascript" defer="defer" src="assets/wp-content/themes/globallogistics/js/__scripts.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-includes/js/mediaelement/mediaelement-and-player.min.js"></script>
     <script type="text/javascript" defer="defer" src="assets/wp-includes/js/mediaelement/mediaelement-migrate.min.js"></script>
-    <script type="text/javascript" defer="defer" src="assets/wp-includes/js/mediaelement/wp-mediaelement.min.js"></script>
+    @*<script type="text/javascript" defer="defer" src="assets/wp-includes/js/mediaelement/wp-mediaelement.min.js"></script>*@
     <script type="text/javascript" defer="defer" src="assets/wp-content/themes/globallogistics/skins/default/skin.js"></script>
     <script type="text/javascript" src="assets/wp-content/plugins/elementor/assets/lib/swiper/v8/swiper.min.js"></script>
     <script type="text/javascript" src="assets/wp-content/plugins/elementor-pro/assets/js/webpack-pro.runtime.min.js"></script>
@@ -1241,9 +1190,6 @@
                 input.value = val + 1;
             });
         });
-    </script>
-    <script>
-
     </script>
 
     <script>
@@ -1326,7 +1272,7 @@
         });
     </script>
 
-    <script type='text/javascript'>
+    @*<script type='text/javascript'>
         const lazyloadRunObserver = () => {
             const lazyloadBackgrounds = document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`);
             const lazyloadBackgroundObserver = new IntersectionObserver((entries) => {
@@ -1351,7 +1297,7 @@
         events.forEach((event) => {
             document.addEventListener(event, lazyloadRunObserver);
         });
-    </script>
+    </script>*@
     <script>
         function miniCart() {
             var navbarTrigger = $('.cart-active'),
@@ -1377,7 +1323,335 @@
             miniCart();
         });
     </script>
+    <script>
+        document.getElementById("togglePassword").addEventListener("click", function () {
+            const passwordInput = document.getElementById("password-input");
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+        document.getElementById("togglePassword1").addEventListener("click", function () {
+            const passwordInput = document.getElementById("password-input1");
+            const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+            passwordInput.setAttribute("type", type);
+            this.classList.toggle("fa-eye");
+            this.classList.toggle("fa-eye-slash");
+        });
+    </script>
+    <script>
+        (function ($) {
+            const cache = {
+                provinces: [],
+                districts: {},
+                wards: {}
+            };
 
+            const i18n = {
+                selectProvince: "Chọn tỉnh/thành",
+                selectDistrict: "Chọn quận/huyện",
+                selectWard: "Chọn xã/phường",
+                noDistricts: "Không có quận/huyện nào.",
+                noWards: "Không có xã/phường nào.",
+                apiError: "Lỗi khi gọi API."
+            };
+
+            const defaultProvinces = [
+                { code: "01", name: "Hà Nội" },
+                { code: "02", name: "Hồ Chí Minh" },
+                { code: "56", name: "Bà Rịa - Vũng Tàu" },
+                { code: "95", name: "Bạc Liêu" },
+                { code: "04", name: "Hải Phòng" }
+            ];
+
+            function showError(msg) {
+                alert(msg);
+            }
+
+            function toggleLoading($container, isLoading) {
+                const $spinner = $container.find(".loading-spinner");
+                if (isLoading) {
+                    if (!$spinner.length) {
+                        $container.prepend('<div class="loading-spinner" style="display: none;">Đang tải...</div>');
+                    }
+                    $spinner.show();
+                } else {
+                    $spinner.hide();
+                }
+            }
+
+            function populateProvinces($province, provinces, selectedProvince) {
+                if (!$province.length) {
+                    console.error("Province dropdown not found!");
+                    return;
+                }
+                console.log("Populating provinces:", provinces);
+                $province.empty().append(`<option value="">${i18n.selectProvince}</option>`);
+                provinces.forEach(p => {
+                    $province.append(`<option value="${p.code}">${p.name}</option>`);
+                });
+
+                if (selectedProvince && selectedProvince !== "0") {
+                    const provinceExists = provinces.some(p => p.code === selectedProvince);
+                    if (provinceExists) {
+                        console.log("Selecting province:", selectedProvince);
+                        $province.val(selectedProvince);
+                    } else {
+                        console.warn("Selected province not found in list:", selectedProvince);
+                    }
+                }
+            }
+
+            function populateDistricts($district, districts, selectedDistrict) {
+                if (!$district.length) {
+                    console.error("District dropdown not found!");
+                    return;
+                }
+                console.log("Populating districts:", districts);
+                $district.empty().append(`<option value="">${i18n.selectDistrict}</option>`);
+                districts.forEach(d => {
+                    $district.append(`<option value="${d.code}">${d.name}</option>`);
+                });
+
+                if (selectedDistrict && selectedDistrict !== "0") {
+                    const districtExists = districts.some(d => d.code === selectedDistrict);
+                    if (districtExists) {
+                        console.log("Selecting district:", selectedDistrict);
+                        $district.val(selectedDistrict);
+                    } else {
+                        console.warn("Selected district not found in list:", selectedDistrict);
+                    }
+                }
+            }
+
+            function populateWards($ward, wards, selectedWard) {
+                if (!$ward.length) {
+                    console.error("Ward dropdown not found!");
+                    return;
+                }
+                console.log("Populating wards:", wards);
+                $ward.empty().append(`<option value="">${i18n.selectWard}</option>`);
+                wards.forEach(w => {
+                    $ward.append(`<option value="${w.code}">${w.name}</option>`);
+                });
+
+                if (selectedWard && selectedWard !== "0") {
+                    const wardExists = wards.some(w => w.code === selectedWard);
+                    if (wardExists) {
+                        console.log("Selecting ward:", selectedWard);
+                        $ward.val(selectedWard);
+                    } else {
+                        console.warn("Selected ward not found in list:", selectedWard);
+                    }
+                }
+            }
+
+            $.fn.vnLocationSelector = function (options) {
+                const settings = $.extend({
+                    provinceId: "province",
+                    districtId: "districts",
+                    wardId: "wards",
+                    provinceNameId: "ProvinceName",
+                    districtNameId: "DistrictName",
+                    wardNameId: "WardName",
+                    savedProvince: null,
+                    savedDistrict: null,
+                    savedWard: null,
+                    savedProvinceName: null,
+                    savedDistrictName: null,
+                    savedWardName: null
+                }, options);
+
+                return this.each(function () {
+                    const $container = $(this);
+                    const $province = $container.find(`#${settings.provinceId}`);
+                    const $district = $container.find(`#${settings.districtId}`);
+                    const $ward = $container.find(`#${settings.wardId}`);
+                    const $provinceName = $container.find(`#${settings.provinceNameId}`);
+                    const $districtName = $container.find(`#${settings.districtNameId}`);
+                    const $wardName = $container.find(`#${settings.wardNameId}`);
+
+                    if (!$province.length || !$district.length || !$ward.length) {
+                        console.error("One or more dropdowns not found!", {
+                            province: $province.length,
+                            district: $district.length,
+                            ward: $ward.length
+                        });
+                        return;
+                    }
+
+                    toggleLoading($container, true);
+                    $.ajax({
+                        url: "https://vn-public-apis.fpo.vn/provinces/getAll?limit=-1",
+                        method: "GET",
+                        timeout: 5000,
+                        success: function (response) {
+                            console.log("API Response:", response);
+                            let provinces = response.data?.data || [];
+                            if (!Array.isArray(provinces) || !provinces.length) {
+                                provinces = defaultProvinces;
+                                console.warn("API returned empty or invalid data, using default provinces:", provinces);
+                            }
+                            cache.provinces = provinces;
+                            populateProvinces($province, provinces, settings.savedProvince);
+
+                            if (settings.savedProvince && settings.savedProvinceName && settings.savedProvince !== "0") {
+                                $provinceName.val(settings.savedProvinceName);
+                            } else {
+                                $provinceName.val("");
+                            }
+
+                            if (settings.savedProvince && settings.savedProvince !== "0") {
+                                const provinceExists = provinces.some(p => p.code === settings.savedProvince);
+                                if (provinceExists) {
+                                    $province.trigger("change");
+                                }
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("API Error:", status, error);
+                            cache.provinces = defaultProvinces;
+                            console.warn("API failed, using default provinces:", defaultProvinces);
+                            populateProvinces($province, defaultProvinces, settings.savedProvince);
+
+                            if (settings.savedProvince && settings.savedProvinceName && settings.savedProvince !== "0") {
+                                $provinceName.val(settings.savedProvinceName);
+                            } else {
+                                $provinceName.val("");
+                            }
+
+                            if (settings.savedProvince && settings.savedProvince !== "0") {
+                                const provinceExists = defaultProvinces.some(p => p.code === settings.savedProvince);
+                                if (provinceExists) {
+                                    $province.trigger("change");
+                                }
+                            }
+                        },
+                        complete: function () {
+                            toggleLoading($container, false);
+                        }
+                    });
+
+                    $province.on("change", function () {
+                        console.log("Province changed to:", $(this).val());
+                        const provinceId = $(this).val();
+                        const provinceName = $province.find("option:selected").text();
+                        $provinceName.val(provinceId ? provinceName : "");
+
+                        $district.empty().append(`<option value="">${i18n.selectDistrict}</option>`);
+                        $ward.empty().append(`<option value="">${i18n.selectWard}</option>`);
+                        $districtName.val("");
+                        $wardName.val("");
+
+                        if (!provinceId) return;
+
+                        if (cache.districts[provinceId]) {
+                            populateDistricts($district, cache.districts[provinceId], settings.savedDistrict);
+                            if (settings.savedDistrict && settings.savedDistrictName && settings.savedDistrict !== "0") {
+                                $districtName.val(settings.savedDistrictName);
+                            }
+                            if (settings.savedDistrict && settings.savedDistrict !== "0") {
+                                const districtExists = cache.districts[provinceId].some(d => d.code === settings.savedDistrict);
+                                if (districtExists) {
+                                    $district.trigger("change");
+                                }
+                            }
+                            return;
+                        }
+
+                        toggleLoading($container, true);
+                        $.ajax({
+                            url: `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceId}`,
+                            method: "GET",
+                            timeout: 5000,
+                            success: function (response) {
+                                console.log("Districts API Response:", response);
+                                let districts = response.data?.data || [];
+                                if (!Array.isArray(districts) || !districts.length) {
+                                    showError(i18n.noDistricts);
+                                    return;
+                                }
+                                cache.districts[provinceId] = districts;
+                                populateDistricts($district, districts, settings.savedDistrict);
+
+                                if (settings.savedDistrict && settings.savedDistrictName && settings.savedDistrict !== "0") {
+                                    $districtName.val(settings.savedDistrictName);
+                                }
+                                if (settings.savedDistrict && settings.savedDistrict !== "0") {
+                                    const districtExists = districts.some(d => d.code === settings.savedDistrict);
+                                    if (districtExists) {
+                                        $district.trigger("change");
+                                    }
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Districts API Error:", status, error);
+                                showError(i18n.apiError);
+                            },
+                            complete: function () {
+                                toggleLoading($container, false);
+                            }
+                        });
+                    });
+
+                    $district.on("change", function () {
+                        console.log("District changed to:", $(this).val());
+                        const districtId = $(this).val();
+                        const districtName = $district.find("option:selected").text();
+                        $districtName.val(districtId ? districtName : "");
+
+                        $ward.empty().append(`<option value="">${i18n.selectWard}</option>`);
+                        $wardName.val("");
+
+                        if (!districtId) return;
+
+                        if (cache.wards[districtId]) {
+                            populateWards($ward, cache.wards[districtId], settings.savedWard);
+                            if (settings.savedWard && settings.savedWardName && settings.savedWard !== "0") {
+                                $wardName.val(settings.savedWardName);
+                            }
+                            return;
+                        }
+
+                        toggleLoading($container, true);
+                        $.ajax({
+                            url: `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtId}`,
+                            method: "GET",
+                            timeout: 5000,
+                            success: function (response) {
+                                console.log("Wards API Response:", response);
+                                let wards = response.data?.data || [];
+                                if (!Array.isArray(wards) || !wards.length) {
+                                    showError(i18n.noWards);
+                                    return;
+                                }
+                                cache.wards[districtId] = wards;
+                                populateWards($ward, wards, settings.savedWard);
+
+                                if (settings.savedWard && settings.savedWardName && settings.savedWard !== "0") {
+                                    $wardName.val(settings.savedWardName);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Wards API Error:", status, error);
+                                showError(i18n.apiError);
+                            },
+                            complete: function () {
+                                toggleLoading($container, false);
+                            }
+                        });
+                    });
+
+                    $ward.on("change", function () {
+                        console.log("Ward changed to:", $(this).val());
+                        const wardId = $(this).val();
+                        const wardName = $ward.find("option:selected").text();
+                        $wardName.val(wardId ? wardName : "");
+                    });
+                });
+            };
+        })(jQuery);
+    </script>
     @RenderSection("scripts", required: false)
 
     <script>
@@ -1400,12 +1674,7 @@
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         });
     </script>
-    <script src="~/assets/wp-content/themes/globallogistics/aos.js"></script>
-    <!-- Trước </body> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
-    <script>
-        new WOW().init();
-    </script>
+  
 
 </body>
 </html>

@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using MimeKit.Tnef;
+using System.Security.Policy;
 
 /// <summary>
 /// Summary description for VM_Product
@@ -89,6 +91,9 @@ public class VM_Product : VM_Base
 	public string listcat { get; set; }
 
 	public string ImagesJson { get; set; }
+
+	public int Id { get; set; }
+	public string Url  { get; set; }
 
 	[NotMapped]
 	[Ignore]

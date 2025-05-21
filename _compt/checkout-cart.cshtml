@@ -14,7 +14,7 @@
 
         public string MetaKeywords { get; set; }
 
-
+        public PP_Customer Customer { get; set; }
         public class text
         {
             [Field(
@@ -61,6 +61,19 @@ Title = "Text")
         {
             return model;
         }
+        HttpContext context = HttpContext.Current;
+
+        HttpCookie cookie = Request.Cookies["UserId"];
+        if (cookie != null)
+        {
+            int customerId;
+            if (cookie != null && int.TryParse(cookie.Value, out customerId))
+            {
+                model.Customer = Db.Table<PP_Customer>()
+                                   .AsNoTracking()
+                                   .SingleOrDefault(x => x.Id == (int)customerId);
+            }
+        }
 
         model.Title = page.Title;
         model.MetaDescription = page.MetaDescription;
@@ -90,9 +103,9 @@ Title = "Text")
             string Phone = Request.Form[field.GetName(t => t.Phone)].NullIfWhiteSpace();
             string Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
             string Address = Request.Form[field.GetName(t => t.DeliveryAddress)].NullIfWhiteSpace();
-            string Province = Request.Form[field.GetName(t => t.Province)].NullIfWhiteSpace();
-            string District = Request.Form[field.GetName(t => t.District)].NullIfWhiteSpace();
-            string Ward = Request.Form[field.GetName(t => t.Ward)].NullIfWhiteSpace();
+            string Province = Request.Form["ProvinceName"].NullIfWhiteSpace();
+            string District = Request.Form["DistrictName"].NullIfWhiteSpace();
+            string Ward = Request.Form["WardName"].NullIfWhiteSpace();
             string Note = Request.Form[field.GetName(t => t.Note)].NullIfWhiteSpace();
             int TotalAmount = Request.Form[field.GetName(t => t.TotalAmount)].AsInt();
             string check = Request.Form["radio-stacked"].NullIfWhiteSpace();
@@ -105,60 +118,42 @@ Title = "Text")
             Validation.RequireField(nameof(Province));
             Validation.RequireField(nameof(Ward));
 
-
-
-            //var q = new REQ_ORDER_FEE
-            //{
-            //    pick_province = Root.Config.PickAddress.Province,
-            //    pick_district = Root.Config.PickAddress.District,
-            //    pick_ward = Root.Config.PickAddress.Ward,
-            //    pick_address = Root.Config.PickAddress.Address,
-            //    province = Province,
-            //    district = District,
-            //    ward = Ward,
-            //    weight = cart.GetTotalWeight(),
-            //    value = cart.GetSubTotal(),
-            //    transport = "road ",
-            //    deliver_option = "none",
-            //};
-
-            //RSP_ORDER_FEE rsp = null;
-            //if (!GHTK_ADAPTER.CaculateFee(q, (result) => { rsp = result; }, (error) => { }))
-            //{
-            //    return AjaxResult.Fail("Đã có lỗi xảy ra!");
-            //}
-            //cart.ShipFee = rsp.fee.fee;
-            //string ip = HttpContext.Current.Request.Params["HTTP_CLIENT_IP"] ?? HttpContext.Current.Request.UserHostAddress;
-
-            if (cartLines.Count() <= 0)
+            HttpCookie cookie = Request.Cookies["UserId"];
+            if (cookie != null)
             {
-                ModelState.AddFormError($"Vui Lòng chọn sản phẩm trước khi đặt hàng!");
-                Response.Redirect(NodeSlug);
-            }
+                int customerId;
+                if (cookie != null && int.TryParse(cookie.Value, out customerId))
+                {
+                    if (cartLines.Count() <= 0)
+                    {
+                        ModelState.AddFormError($"Vui Lòng chọn sản phẩm trước khi đặt hàng!");
+                        Response.Redirect(NodeSlug);
+                    }
 
-            var order = new PP_Order()
-            {
-                OrderCode = $"{DateTime.Now:yyMMddHHmmss}{Root.ShortId()}",
-                OrderStatus = "NEW",
-                SubTotalAmount = cart.GetSubTotal(),
-                TotalAmount = cart.GetTotal(),
-                TotalWeight = cart.GetTotalWeight(),
-                ShipFee = cart.ShipFee,
-                PayMethod = check,
-                Name = Name,
-                Phone = Phone,
-                Email = Email,
-                DeliveryAddress = Address,
-                Province = Province,
-                District = District,
-                Ward = Ward,
-                Note = Note,
-                JsonData = Json.Encode(cart.GetOrderLines())
-            };
+                    var order = new PP_Order()
+                    {
+                        OrderCode = $"{DateTime.Now:yyMMddHHmmss}{Root.ShortId()}",
+                        OrderStatus = "NEW",
+                        SubTotalAmount = cart.GetSubTotal(),
+                        TotalAmount = cart.GetTotal(),
+                        TotalWeight = cart.GetTotalWeight(),
+                        ShipFee = cart.ShipFee,
+                        PayMethod = check,
+                        Name = Name,
+                        Phone = Phone,
+                        Email = Email,
+                        DeliveryAddress = Address,
+                        Province = Province,
+                        District = District,
+                        Ward = Ward,
+                        Note = Note,
+                        Iduser = customerId,
+                        JsonData = Json.Encode(cart.GetOrderLines())
+                    };
 
-            decimal pricesum = cart.GetTotal();
-            SendMail sm = new SendMail();
-            string body = @"
+                    decimal pricesum = cart.GetTotal();
+                    SendMail sm = new SendMail();
+                    string body = @"
 <!DOCTYPE html>
 <html lang=""en"">
 <head>
@@ -217,15 +212,42 @@ margin: 0 auto; /* Căn giữa hình ảnh */
 
 </body>
 </html>";
-            string results =  sm.Send_Mail("Khách hàng liên hệ", body, Root.Config.Company.Email);
-            Db.Insert<PP_Order>(order);
-            HttpContext.Current.Session["makeOrder"] = true;
-            cart.Clear();
-            HttpContext.Current.Session["numbermakeOrder"] = order.OrderCode;
-            decimal ShipFee;
-            Session.Remove(nameof(ShipFee));
-            Response.Redirect("/dat-hang-thanh-cong");
-            AjaxResult.Ok(Json.Encode(new { Message = $"Đặt hàng thành công! Mã đơn hàng {order.OrderCode}", Url = string.Format(Root.Config.Link.PageInfoOrder, order.OrderCode) }));
+                    //string results = sm.Send_Mail("Khách hàng liên hệ", body, Root.Config.Company.Email);
+                    Db.Insert<PP_Order>(order);
+                    HttpContext.Current.Session["makeOrder"] = true;
+                    cart.Clear();
+                    HttpContext.Current.Session["numbermakeOrder"] = order.OrderCode;
+                    decimal ShipFee;
+                    Session.Remove(nameof(ShipFee));
+                    Response.Redirect("/tai-khoan");
+                    AjaxResult.Ok(Json.Encode(new { Message = $"Đặt hàng thành công! Mã đơn hàng {order.OrderCode}", Url = string.Format(Root.Config.Link.PageInfoOrder, order.OrderCode) }));
+
+                }
+            }
+
+            //var q = new REQ_ORDER_FEE
+            //{
+            //    pick_province = Root.Config.PickAddress.Province,
+            //    pick_district = Root.Config.PickAddress.District,
+            //    pick_ward = Root.Config.PickAddress.Ward,
+            //    pick_address = Root.Config.PickAddress.Address,
+            //    province = Province,
+            //    district = District,
+            //    ward = Ward,
+            //    weight = cart.GetTotalWeight(),
+            //    value = cart.GetSubTotal(),
+            //    transport = "road ",
+            //    deliver_option = "none",
+            //};
+
+            //RSP_ORDER_FEE rsp = null;
+            //if (!GHTK_ADAPTER.CaculateFee(q, (result) => { rsp = result; }, (error) => { }))
+            //{
+            //    return AjaxResult.Fail("Đã có lỗi xảy ra!");
+            //}
+            //cart.ShipFee = rsp.fee.fee;
+            //string ip = HttpContext.Current.Request.Params["HTTP_CLIENT_IP"] ?? HttpContext.Current.Request.UserHostAddress;
+
         }
         catch (Exception ex)
         {
@@ -329,6 +351,34 @@ margin: 0 auto; /* Căn giữa hình ảnh */
                 <h1 class="mb-4">Thông tin giỏ hàng</h1>
                 <div class="row">
                     <div class="col-lg-7">
+                        <div class="col-lg-12 p-lg-4 p-1 mt-4">
+                            <h4>Thêm sản phẩm tùy chỉnh</h4>
+                            <form id="customProductForm" class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">Tên sản phẩm <sup>*</sup></label>
+                                    <input type="text" class="form-control" id="customProductName" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Đơn giá (VND) <sup>*</sup></label>
+                                    <input type="number" class="form-control" id="customProductPrice" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Số lượng <sup>*</sup></label>
+                                    <input type="number" class="form-control" id="customProductQuantity" value="1" min="1" required>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">URL chi tiết</label>
+                                    <input type="url" class="form-control" id="customProductUrl">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">URL hình ảnh</label>
+                                    <input type="url" class="form-control" id="customProductImageUrl">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">Thêm vào giỏ hàng</button>
+                                </div>
+                            </form>
+                        </div>
                         <div class="col-lg-12 p-lg-4 p-1">
                             <div class="table-responsive">
                                 <table class="table">
@@ -360,13 +410,13 @@ margin: 0 auto; /* Căn giữa hình ảnh */
                                                 <td class="cart-item">
                                                     <div class="input-group cart-plus-minus quantity mt-4" data-product-id="@item.Product.Id" style="width: 100px;">
                                                         <div class="input-group-btn">
-                                                            <button class="btn cart-plus-minus btn-sm btn-minus rounded-circle bg-light border dec">
+                                                            <button class="btn p-1 cart-plus-minus btn-sm btn-minus rounded-circle bg-light border dec">
                                                                 <i class="fa fa-minus"></i>
                                                             </button>
                                                         </div>
                                                         <input type="text" name="quantity" value="@item.Quantity" class="form-control quantity form-control-sm text-center border-0">
                                                         <div class="input-group-btn">
-                                                            <button class="btn cart-plus-minus btn-sm btn-plus rounded-circle bg-light border dec">
+                                                            <button class="btn p-1 cart-plus-minus btn-sm btn-plus rounded-circle bg-light border dec">
                                                                 <i class="fa fa-plus"></i>
                                                             </button>
                                                         </div>
@@ -385,7 +435,7 @@ margin: 0 auto; /* Căn giữa hình ảnh */
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <button data-product-id="@item.Product.Id" data-product-variation="@item.Variation" class="btn btn-md rounded-circle inject-me bg-light border mt-4">
+                                                    <button data-product-id="@item.Product.Id" data-product-variation="@item.Variation" class="btn p-1 btn-md rounded-circle inject-me bg-light border mt-4">
                                                         <i class="fa fa-times text-danger"></i>
                                                     </button>
                                                 </td>
@@ -422,78 +472,70 @@ margin: 0 auto; /* Căn giữa hình ảnh */
                         </div>
                     </div>
                     <div class="col-lg-5">
-
-                        <form action="@NodeSlug?order" method="post">
-                            @AntiForgery.GetHtml()
-                            @Html.ValidationSummary("", excludeFieldErrors: false, htmlAttributes: null)
-                            <div class="row ">
-                                <div class="col-lg-12">
-                                    <h3 style="color:red">Hình thức thanh toán</h3>
-                                </div>
-                                <div class="col-lg-12">
-                                    <div class="form-check position-relative">
-                                        <input type="radio" class="form-check-input" value="COD" style=" position: absolute; top: 38%; transform: translateY(-50%);" id="Check2" name="radio-stacked" required>
-                                        <label class="form-check-label check-form-out" for="validationFormCheck2">COD</label>
-                                    </div>
-                                    <div class="form-check mb-3 position-relative">
-                                        <input type="radio" class="form-check-input" value="Chuyển khoản" style=" position: absolute; top: 38%; transform: translateY(-50%);" id="Check3" name="radio-stacked" required>
-                                        <label class="form-check-label check-form-out" for="validationFormCheck3">CHUYỂN KHOẢN</label>
-                                        <div class="invalid-feedback">Vùi lòng chọn 1 trong 2 phương thức</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-12 col-lg-12 col-xl-12 ">
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <h3 style="color:red">Thông tin thanh toán</h3>
-                                        </div>
-                                        <div class="col-md-12 col-lg-12">
-                                            <div class="form-item w-100">
-                                                <label class="form-label my-3">Họ và tên<sup>*</sup></label>
-                                                <input type="text" id="name" name="@field.GetName(x=>x.Name)" class="form-control" required>
+                        @if (Request.Cookies["UserId"] != null)
+                        {
+                            <form class="location-selector" action="@NodeSlug?order" method="post">
+                                @AntiForgery.GetHtml()
+                                @Html.ValidationSummary("", excludeFieldErrors: false, htmlAttributes: null)
+                                <input type="hidden" name="ProvinceName" id="ProvinceName" />
+                                <input type="hidden" name="DistrictName" id="DistrictName" />
+                                <input type="hidden" name="WardName" id="WardName" />
+                                <div class="row ">
+                                    <div class="col-md-12 col-lg-12 col-xl-12 ">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <h3 style="color:red">Thông tin thanh toán</h3>
+                                            </div>
+                                            <div class="col-md-12 col-lg-12">
+                                                <div class="form-item w-100">
+                                                    <label class="form-label my-3">Họ và tên<sup>*</sup></label>
+                                                    <input type="text" id="name" name="@field.GetName(x=>x.Name)" value="@Data.Customer.FullName" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-lg-12">
+                                                <div class="form-item w-100">
+                                                    <label class="form-label my-3">Email<sup>*</sup></label>
+                                                    <input type="text" id="name" name="@field.GetName(x=>x.Email)" value="@Data.Customer.Email" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-lg-12">
+                                                <div class="form-item w-100">
+                                                    <label class="form-label my-3">SĐT<sup>*</sup></label>
+                                                    <input type="text" id="name" name="@field.GetName(x=>x.Phone)" value="@Data.Customer.Phone" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-lg-12">
+                                                <div class="form-item w-100">
+                                                    <label class="form-label my-3">Địa chỉ<sup>*</sup></label>
+                                                    <input type="text" id="name" name="@field.GetName(x=>x.DeliveryAddress)" value="@Data.Customer.Adress" class="form-control" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-4 mt-3">
+                                                <select id="province" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Province)"></select>
+                                                <small class="text-danger">@Html.ValidationMessage("province")</small>
+                                            </div>
+                                            <div class="col-12 col-md-4 mt-3">
+                                                <select id="districts" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.District)"></select>
+                                                <small class="text-danger">@Html.ValidationMessage("districts")</small>
+                                            </div>
+                                            <div class="col-12 col-md-4 mt-3">
+                                                <select id="wards" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Ward)"></select>
+                                                <small class="text-danger">@Html.ValidationMessage("wards")</small>
                                             </div>
                                         </div>
-                                    </div>
-                                    @*<div class="form-item">
-                                        <label class="form-label my-3">Company Name<sup>*</sup></label>
-                                        <input type="text" class="form-control">
-                                    </div>*@
-                                    <div class="form-item">
-                                        <label class="form-label my-3">Địa chỉ <sup>*</sup></label>
-                                        <textarea type="text" id="Address" name="@field.GetName(x=>x.DeliveryAddress)" class="form-control" rows="2" placeholder="Số nhà, tên đường, phường" required> </textarea>
-                                    </div>
-                                    @*<div class="form-item">
-                                        <label class="form-label my-3">Country<sup>*</sup></label>
-                                        <input type="text" class="form-control">
-                                    </div>*@
-                                    @*<div class="form-item">
-                                        <label class="form-label my-3">Postcode/Zip<sup>*</sup></label>
-                                        <input type="text" class="form-control">
-                                    </div>*@
-                                    <div class="form-item">
-                                        <label class="form-label my-3">Số điện thoại<sup>*</sup></label>
-                                        <input type="tel" name="@field.GetName(x=>x.Phone)" class="form-control" required>
-                                    </div>
-                                    @*<div class="form-check my-3">
-                                        <input type="checkbox" class="form-check-input" id="Account-1" name="Accounts" value="Accounts">
-                                        <label class="form-check-label" for="Account-1">Create an account?</label>
-                                    </div>
-                                    <hr>
-                                    <div class="form-check my-3">
-                                        <input class="form-check-input" type="checkbox" id="Address-1" name="Address" value="Address">
-                                        <label class="form-check-label" for="Address-1">Ship to a different address?</label>
-                                    </div>*@
-                                    <div class="form-item my-3">
-                                        <textarea name="@field.GetName(x=>x.Note)" id="Note" class="form-control" spellcheck="false" cols="30" rows="5" placeholder="Ghi chú"></textarea>
-                                    </div>
-                                    <div class="form-item d-flex justify-content-between ">
-                                        <a href="/"><button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4" type="button">Tiếp tục mua hàng</button></a>
+                                        <div class="form-item my-3">
+                                            <textarea name="@field.GetName(x=>x.Note)" id="Note" class="form-control" spellcheck="false" cols="30" rows="5" placeholder="Ghi chú"></textarea>
+                                        </div>
+                                        <div class="form-item d-flex justify-content-between ">
+                                            <a href="/"><button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4" type="button">Tiếp tục mua hàng</button></a>
 
 
-                                        <button class="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="submit"> Đặt hàng </button>
+                                            <button class="btn border-secondary rounded-pill px-4 py-3 text-white text-uppercase mb-4 ms-4" type="submit"> Đặt hàng </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        }
                     </div>
                 </div>
 
@@ -619,6 +661,119 @@ margin: 0 auto; /* Căn giữa hình ảnh */
             });
 
         });
+        $('.quantity button').on('click', function () {
+            var button = $(this);
+            var oldValue = button.parent().parent().find('input').val();
+            if (button.hasClass('btn-plus')) {
+                var newVal = parseFloat(oldValue) + 1;
+            } else {
+                if (oldValue > 0) {
+                    var newVal = parseFloat(oldValue) - 1;
+                } else {
+                    newVal = 0;
+                }
+            }
+            button.parent().parent().find('input').val(newVal);
+        });
     </script>
+    <script>
+  $(document).ready(function () {
+          console.log("jQuery loaded:", typeof $ !== "undefined");
+          console.log("vnLocationSelector loaded:", typeof $.fn.vnLocationSelector !== "undefined");
+          console.log("Container exists:", $(".location-selector").length);
+          console.log("Saved Province:", "@Data.Customer.Provinces");
+          console.log("Saved District:", "@Data.Customer.Districts");
+          console.log("Saved Ward:", "@Data.Customer.wards");
+          console.log("Saved ProvinceId:", "@Data.Customer.ProvincesId");
+          console.log("Saved DistrictId:", "@Data.Customer.DistrictsId");
+          console.log("Saved WardId:", "@Data.Customer.wardsId");
+          $(".location-selector").vnLocationSelector({
+              provinceId: "province",
+              districtId: "districts",
+              wardId: "wards",
+              provinceNameId: "ProvinceName",
+              districtNameId: "DistrictName",
+              wardNameId: "WardName",
+              savedProvince: "@Data.Customer.ProvincesId",
+              savedDistrict: "@Data.Customer.DistrictsId",
+              savedWard: "@Data.Customer.wardsId",
+              savedProvinceName: "@Data.Customer.Provinces",
+              savedDistrictName: "@Data.Customer.Districts",
+              savedWardName: "@Data.Customer.wards"
+          });
+      });
+    </script>
+    <script>
+$(document).ready(function () {
+    $('#customProductForm').on('submit', function (e) {
+        e.preventDefault();
 
+        var productData = {
+            name: $('#customProductName').val(),
+            price: $('#customProductPrice').val(),
+            quantity: $('#customProductQuantity').val(),
+            url: $('#customProductUrl').val(),
+            imageUrl: $('#customProductImageUrl').val(),
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() // Lưu ý lấy token đúng cách
+        };
+
+        $.ajax({
+            url: '@Root.Config.Link.PageCart?add-custom',
+            method: 'POST',
+            data: productData,
+            dataType: 'json', // Quan trọng: tự động parse JSON
+            success: function (response) {
+                console.log("✔ JSON Response:", response);
+
+                if (response.success) {
+                    $('.table tbody').append(`
+                        <tr class="cart-item">
+                            <th scope="row"><img src="${productData.imageUrl || '/default-image.jpg'}" class="img-fluid me-5 rounded-circle" style="width: 80px; height: 80px;" alt=""></th>
+                            <td class="w-sm50"><p class="mb-0 mt-4">${productData.name}</p></td>
+                            <td><p class="mb-0 mt-4">${parseInt(productData.price).toLocaleString('vi-VN')} VND</p></td>
+                            <td><input type="text" name="quantity" value="${productData.quantity}" class="form-control quantity form-control-sm text-center border-0" readonly></td>
+                            <td><div class="mb-0 mt-4 rowtotal">${response.RowTotal}</div></td>
+                            <td><button data-product-id="${response.customId}" class="btn p-1 btn-md rounded-circle inject-me bg-light border mt-4"><i class="fa fa-times text-danger"></i></button></td>
+                        </tr>
+                    `);
+
+                    $('.price-sum').text(parseFloat(response.newTotal).toLocaleString('vi-VN') + ' VND');
+                    $('#cart-count').text(response.cartCount);
+                    $(".sidebar-cart-active").html(response.CartSidebar);
+
+                    $.toast({
+                        heading: 'Thông báo',
+                        text: 'Sản phẩm đã được thêm vào giỏ hàng!',
+                        position: 'bottom-center',
+                        stack: false
+                    });
+
+                    $('#customProductForm')[0].reset();
+                } else {
+                    $.toast({
+                        heading: 'Lỗi',
+                        text: response.error || 'Đã có lỗi xảy ra!',
+                        position: 'bottom-center',
+                        stack: false
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("❌ AJAX error:", error);
+                console.log("❌ Response text:", xhr.responseText);
+
+                $.toast({
+                    heading: 'ERROR',
+                    text: 'Đã có lỗi xảy ra khi gửi dữ liệu!',
+                    position: 'bottom-center',
+                    afterHidden: function () {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    });
+});
+
+    </script>
 }

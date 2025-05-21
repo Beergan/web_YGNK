@@ -14,42 +14,36 @@
             Control = InputControlType.TextBox)]
             public string Title { get; set; }
 
-            public class Infor
-            {
-                [Field(
-                Title = "Địa chỉ",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Adress { get; set; }
-                [Field(
-                Title = "Thecbe",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Thecbe { get; set; }
-                [Field(
-                Title = "Hotline",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Hotline { get; set; }
-                [Field(
-                Title = "Email",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Email { get; set; }
-                [Field(
-                Title = "Số đăng ký",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Number { get; set; }
-                [Field(
-                Title = "Giờ làm việc",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Time { get; set; }
-            }
             [Field(
-            Title = "Thông tin")]
-            public Infor _infor { get; set; }
+ Title = "Địa chỉ",
+ Required = false,
+ Control = InputControlType.TextBox)]
+            public string Adress { get; set; }
+            [Field(
+            Title = "Thecbe",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Thecbe { get; set; }
+            [Field(
+            Title = "Hotline",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Hotline { get; set; }
+            [Field(
+            Title = "Email",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Email { get; set; }
+            [Field(
+            Title = "Số đăng ký",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Number { get; set; }
+            [Field(
+            Title = "Giờ làm việc",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Time { get; set; }
         }
         [Field(
         Title = "Văn phòng Hàn Quốc")]
@@ -63,36 +57,30 @@
             Control = InputControlType.TextBox)]
             public string Title { get; set; }
 
-            public class Office
-            {
-                [Field(
-                Title = "Địa chỉ",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Adress { get; set; }
-                [Field(
-                Title = "Hotline",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Hotline { get; set; }
-                [Field(
-                Title = "Email",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Email { get; set; }
-                [Field(
-                Title = "Giờ làm việc",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Time { get; set; }
-            }
             [Field(
-        Title = "Thông tin")]
-            public KoreanOffice _koreanOffice { get; set; }
+Title = "Địa chỉ",
+Required = false,
+Control = InputControlType.TextBox)]
+            public string Adress { get; set; }
+            [Field(
+            Title = "Hotline",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Hotline { get; set; }
+            [Field(
+            Title = "Email",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Email { get; set; }
+            [Field(
+            Title = "Giờ làm việc",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Time { get; set; }
 
         }
         [Field(
-    Title = "Văn phòng Việt Nam")]
+         Title = "Văn phòng Việt Nam")]
         public KoreanVN _koreanVN { get; set; }
 
         public class PageFacebook
@@ -102,10 +90,10 @@
             Required = false,
             Control = InputControlType.TextBox)]
             public string Title { get; set; }
-          
+
         }
         [Field(
-    Title = "Page Facebook")]
+        Title = "Page Facebook")]
         public PageFacebook _pageFacebook { get; set; }
 
         public static ViewModel Default => new ViewModel
@@ -132,7 +120,6 @@
 
     Layout = IsDirectCall ? "~/_layouts/_layout.cshtml" : null;
 }
-
 <footer class="footer_wrap footer_custom footer_custom_3410 footer_custom_footer-main												">
     <div data-elementor-type="cpt_layouts" data-elementor-id="3410" class="elementor elementor-3410" data-elementor-post-type="cpt_layouts">
         <section class="elementor-section elementor-top-section elementor-element elementor-element-89e4664 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_gradient_animation_none sc_fly_static" data-id="89e4664" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
@@ -171,7 +158,18 @@
                     <div class="elementor-widget-wrap elementor-element-populated">
                         <div class="sc_layouts_item elementor-element elementor-element-275812f sc_fly_static elementor-widget elementor-widget-text-editor" data-id="275812f" data-element_type="widget" data-widget_type="text-editor.default">
                             <div class="elementor-widget-container">
-                                <p style="text-align: left;"><span style="font-size: 14pt;"><strong><span style="color: #000000;">VĂN PHÒNG TẠI HÀN QUỐC</span></strong></span></p><p><span style="color: #000000;"><i class="fa-solid fa-location-dot"></i> Địa chỉ: 서울특별시 강서구 방화동 262-27 1층 102호</span><br><span style="color: #000000;"><i class="fa-solid fa-circle-info"></i> Thông tin trên thecbe: NHB Logistics</span></p><p><span style="color: #000000;"><i class="fa-solid fa-phone"></i> Hotline: 010.2820.1264</span></p><p><span style="color: #000000;"><i class="fa-solid fa-envelope"></i> Email: sp.hiwexpress@gmail.com</span></p><p><span style="color: #000000;"><i class="fa-solid fa-feather"></i> 등록번호: 1494801039</span></p><p><span style="color: #000000;"><i class="fa-solid fa-clock"></i> Giờ làm việc: Từ 8h-17h (T7, CN nghỉ)</span></p>
+                                <p style="text-align: left;"><span style="font-size: 14pt;"><strong><span style="color: #000000;">@Data._koreanOffice.Title</span></strong></span></p>
+                                <p>
+                                    <span style="color: #000000;"><i class="fa-solid fa-location-dot"></i> Địa chỉ: @Data._koreanOffice.Adress</span>
+                                    <br>
+                                    <span style="color: #000000;"><i class="fa-solid fa-circle-info"></i> Thông tin trên thecbe: @Data._koreanOffice.Thecbe</span>
+                                </p><p><span style="color: #000000;"><i class="fa-solid fa-phone"></i> Hotline: 010.2820.1264</span></p><p>
+                                    <span style="color: #000000;"><i class="fa-solid fa-envelope"></i> Email: @Data._koreanOffice.Email</span>
+                                </p><p>
+                                    <span style="color: #000000;"><i class="fa-solid fa-feather"></i> 등록번호: @Data._koreanOffice.Number</span>
+                                </p><p>
+                                    <span style="color: #000000;"><i class="fa-solid fa-clock"></i> Giờ làm việc: @Data._koreanOffice.Time</span>
+                                </p>
                             </div>
                         </div>
                         <div class="sc_layouts_item elementor-element elementor-element-52081c4 sc_layouts_hide_on_wide sc_layouts_hide_on_desktop sc_layouts_hide_on_notebook sc_layouts_hide_on_tablet elementor-widget-divider--view-line sc_fly_static elementor-widget elementor-widget-divider" data-id="52081c4" data-element_type="widget" data-widget_type="divider.default">
@@ -188,7 +186,12 @@
                     <div class="elementor-widget-wrap elementor-element-populated">
                         <div class="sc_layouts_item elementor-element elementor-element-e33013b sc_fly_static elementor-widget elementor-widget-text-editor" data-id="e33013b" data-element_type="widget" data-widget_type="text-editor.default">
                             <div class="elementor-widget-container">
-                                <p style="text-align: left;"><span style="font-size: 14pt; color: #000000;"><strong>VĂN PHÒNG TẠI VIỆT NAM</strong></span></p><p><span style="color: #000000;"> <span class="OYPEnA font-feature-liga-off font-feature-clig-off font-feature-calt-off text-decoration-none text-strikethrough-none"><i class="fa-solid fa-location-dot"></i> Địa chỉ: 21 Phố Sa Đôi, Phường Đại Mỗ, Quận Nam Từ Liêm, Hà Nội</span>.</span></p><p><span style="color: #000000;"><i class="fa-solid fa-phone"></i> 0852.573.799 – 099.379.7777</span></p><p><span style="color: #000000;"><i class="fa-solid fa-envelope"></i> Email: sp.hiwexpress@gmail.com</span></p><p><span style="color: #000000;"><i class="fa-solid fa-clock"></i> Giờ làm việc: Từ 8h-17h (T7, CN nghỉ)</span></p>
+                                <p style="text-align: left;"><span style="font-size: 14pt; color: #000000;"><strong>@Data._koreanVN.Title</strong></span></p>
+
+                                <p><span style="color: #000000;"> <span class="OYPEnA font-feature-liga-off font-feature-clig-off font-feature-calt-off text-decoration-none text-strikethrough-none"><i class="fa-solid fa-location-dot"></i> Địa chỉ: @Data._koreanVN.Adress</span>.</span></p>
+                                <p><span style="color: #000000;"><i class="fa-solid fa-phone"></i> @Data._koreanVN.Hotline</span></p>
+                                <p><span style="color: #000000;"><i class="fa-solid fa-envelope"></i> Email: @Data._koreanVN.Email</span></p>
+                                <p><span style="color: #000000;"><i class="fa-solid fa-clock"></i> Giờ làm việc: @Data._koreanVN.Time</span></p>
                             </div>
                         </div>
                         <div class="sc_layouts_item elementor-element elementor-element-214124f sc_layouts_hide_on_wide sc_layouts_hide_on_desktop sc_layouts_hide_on_notebook sc_layouts_hide_on_tablet elementor-widget-divider--view-line sc_fly_static elementor-widget elementor-widget-divider" data-id="214124f" data-element_type="widget" data-widget_type="divider.default">
@@ -206,13 +209,11 @@
                         <div class="sc_layouts_item elementor-element elementor-element-1d9eb3a sc_fly_static elementor-widget elementor-widget-text-editor" data-id="1d9eb3a" data-element_type="widget" data-widget_type="text-editor.default">
                             <div class="elementor-widget-container">
                                 <p style="text-align: left;"><span style="color: #000000;"><strong>LIÊN HỆ CHÚNG TÔI TRÊN FANPAGE</strong></span></p>
-                                <iframe style="border: none; overflow: hidden;" src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fhieuvanchuyenhanviet&tabs&width=340&height=130&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=false&appId=883229755056523" width="340" height="130" frameborder="0" scrolling="no" allowfullscreen="allowfullscreen"></iframe>
-                                <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fnhblogistic%2F&tabs&width=340&height=130&small_header=false&adapt_container_width=false&hide_cover=false&show_facepile=false&appId" width="340" height="130" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+                                <iframe src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Ftapllogistics.vn&tabs=timeline&width=340&height=180&small_header=true&adapt_container_width=true&hide_cover=false&show_facepile=true&appId=346740084420449" width="340" height="180" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
         </section>
         <section class="elementor-section elementor-top-section elementor-element elementor-element-531224a sc_layouts_row sc_layouts_row_type_compact scheme_dark elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="531224a" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
             <div class="elementor-container elementor-column-gap-extended">
@@ -249,7 +250,7 @@
                         </div>
                         <div class="sc_layouts_item elementor-element elementor-element-0e43ad2 sc_fly_static elementor-widget elementor-widget-text-editor" data-id="0e43ad2" data-element_type="widget" data-widget_type="text-editor.default">
                             <div class="elementor-widget-container">
-                                <p style="text-align: center;"><span style="color: #ffffff;"><strong>Nhblogistics.com &#8211; Vận chuyển Hàn &#8211; Việt</strong></span></p>
+                                <p style="text-align: center;"><span style="color: #ffffff;"><strong>@Root.Config.Company.CopyrightText</strong></span></p>
                             </div>
                         </div>
                         <div class="sc_layouts_item elementor-element elementor-element-211e25b sc_fly_static elementor-widget elementor-widget-spacer" data-id="211e25b" data-element_type="widget" data-widget_type="spacer.default">
@@ -266,16 +267,27 @@
     </div>
 </footer>
 
-<a href="#" class="trx_addons_scroll_to_top trx_addons_icon-up scroll_to_top_style_default" title="Scroll to top"></a>		
+<a href="#" class="trx_addons_scroll_to_top trx_addons_icon-up scroll_to_top_style_default" title="Scroll to top"></a>
 <div id="button-contact-vr" class="">
     <div id="gom-all-in-one">
-     
+
         <div id="zalo-vr" class="button-contact">
             <div class="phone-vr">
                 <div class="phone-vr-circle-fill"></div>
                 <div class="phone-vr-img-circle">
-                    <a target="_blank" href="account">
-                        <img src="wp-content/plugins/button-contact-vr/img/zalo.png">
+                    <a target="_blank" href="tel:@Root.Config.Company.Hotline">
+                        <i class="fa-solid fa-phone text-white"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="zalo-vr" class="button-contact">
+            <div class="phone-vr">
+                <div class="phone-vr-circle-fill"></div>
+                <div class="phone-vr-img-circle">
+                    <a target="_blank" href="https://zalo.me/@Root.Config.Zalo">
+                        <img src="~/assets/wp-content/uploads/zalo.png" alt="zalo" />
                     </a>
                 </div>
             </div>

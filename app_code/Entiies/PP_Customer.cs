@@ -28,18 +28,19 @@ public class PP_Customer :EntityBase
     [Display(Name = "vi:Xã")]
     public string wards { get; set; }
     [Display(Name = "vi:Số điện thoại")]
+
+    public int ProvincesId { get; set; }
+    [Display(Name = "vi:Thành phố, Huyện")]
+    public int DistrictsId { get; set; }
+    [Display(Name = "vi:Xã")]
+    public int wardsId { get; set; }
+    [Display(Name = "vi:Số điện thoại")]
     public string Phone { get; set; }
 
     [Display(Name = "vi:Email")]
     public string Email { get; set; }
     [Display(Name = "vi:Mật khẩu")]
     public string PASSWORD { get; set; }
-    [Display(Name = "vi:Họ và Tên")]
-
-    public string IdFacebook { get; set; }
-    [Display(Name = "vi:idGoogle")]
-    public string IdGoogle { get; set; }
-
 
 
 }

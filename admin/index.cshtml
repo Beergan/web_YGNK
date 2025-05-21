@@ -19,7 +19,7 @@
     var urlStats = VisitCounter
         .UrlStats
         .OrderByDescending(t => t.Value)
-        .Select(t => new { Url = t.Key, Counter = t.Value })
+        .Select(t => new { Url = t.Key, Counter = t.Value }).Take(20)
         .ToArray();
 }
 @helper RenderVisitStatsJson()

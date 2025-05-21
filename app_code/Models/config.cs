@@ -136,7 +136,7 @@ public class Config
 	   Control = InputControlType.Image)]
 	public string BanerPost { get; set; }
 	[Field(
-	   Title = "Quảng cáo",
+	   Title = "Ảnh chia sẽ",
 	   Required = false,
 	   Control = InputControlType.Image)]
 	public string BanerNew { get; set; }

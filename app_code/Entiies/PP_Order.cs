@@ -44,4 +44,14 @@ public class PP_Order : EntityBase
 	public string Ward { get; set; }
 
 	public string DeliveryAddress { get; set; }
+
+    public int Iduser { get; set; }
+
+    public decimal Costs { get; set; }
+    public string Check1 { get; set; }
+
+    public string Check2  { get; set; }
+    public decimal AmountPaid { get; set; }
+
+    public string Image { get; set; }
 }

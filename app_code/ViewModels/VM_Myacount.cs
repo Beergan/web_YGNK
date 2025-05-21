@@ -43,4 +43,10 @@ public class VM_Myacount
     public string Status { get; set; }
     [Display(Name = "vi:Mô tả")]
     public string ProcessNote { get; set; }
+
+    public string Province { get; set; }
+
+    public string District { get; set; }
+
+    public string Ward { get; set; }
 }

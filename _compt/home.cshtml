@@ -304,7 +304,7 @@
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
             <div data-elementor-type="wp-page" data-elementor-id="3438" class="elementor elementor-3438" data-elementor-post-type="page">
                 <div class="row m-0 p-0">
-                    <div class="col-lg-12 m-0 p-0" >
+                    <div class="col-lg-12 m-0 p-0 wow zoomIn" >
                         <div class="f-carousel" id="myCarousel">
                             @foreach (var item in Data._banner.EmptyIfNull())
                             {
@@ -362,7 +362,7 @@
                                                 <div class="slider_wrap slider_engine_swiper">
                                                     <div class="slider_outer slider_swiper_outer slider_style_default slider_source_posts_post slider_outer_direction_horizontal slider_outer_multi slider_outer_nopagination slider_outer_controls slider_outer_controls_bottom slider_outer_nocentered slider_outer_overflow_hidden slider_outer_titles_center slider_outer_height_auto">
                                                         <div class="slider_container slider_swiper swiper-slider-container slider_direction_horizontal slider_nopagination slider_multi slider_type_images slider_controls slider_controls_bottom slider_nocentered slider_overflow_hidden slider_titles_center slider_resize slider_swipe slider_height_auto" data-ratio="1200:800" data-interval="7000" data-speed="600" data-effect="slide" data-pagination="bullets" data-direction="horizontal" data-slides-per-view="2" data-slides-space="50" data-slides-parallax="0" data-slides-centered="0" data-slides-overflow="0" data-mouse-wheel="0" data-autoplay="1" data-loop="1" data-free-mode="0" data-slides-min-width="220" data-slides-per-view-breakpoints="{&quot;999999&quot;:2}" data-slides-space-breakpoints="{&quot;999999&quot;:&quot;50&quot;}">
-                                                            <div class="slider-wrapper swiper-wrapper">
+                                                            <div class="slider-wrapper swiper-wrapper woww zoomIn">
                                                                 @foreach (var item in Data.Items.EmptyIfNull().Select((x, y) => new { x, y }))
                                                                 {
                                                                     <div class="slider-slide swiper-slide with_titles" data-title="@item.x.Title" style="">
@@ -414,18 +414,7 @@
                                 <div class="elementor-element elementor-element-9befc53 elementor-headline--style-rotate sc_fly_static elementor-widget elementor-widget-animated-headline" data-id="9befc53" data-element_type="widget" data-settings="{&quot;headline_style&quot;:&quot;rotate&quot;,&quot;animation_type&quot;:&quot;wave&quot;,&quot;rotating_text&quot;:&quot;UY T\u00cdN\nCHUY\u00caN NGHI\u1ec6P\nGIAO NHANH&quot;,&quot;loop&quot;:&quot;yes&quot;,&quot;rotate_iteration_delay&quot;:2500}" data-widget_type="animated-headline.default">
                                     <div class="elementor-widget-container">
                                         <h6 class="elementor-headline elementor-headline-animation-type-wave elementor-headline-letters">
-                                            <span class="elementor-headline-plain-text elementor-headline-text-wrapper">@Data._about.Title</span>
-                                            <span class="elementor-headline-dynamic-wrapper elementor-headline-text-wrapper">
-                                                <span class="elementor-headline-dynamic-text elementor-headline-text-active">
-                                                    UY&nbsp;TÍN
-                                                </span>
-                                                <span class="elementor-headline-dynamic-text">
-                                                    CHUYÊN&nbsp;NGHIỆP
-                                                </span>
-                                                <span class="elementor-headline-dynamic-text">
-                                                    GIAO&nbsp;NHANH
-                                                </span>
-                                            </span>
+                                            <span class="elementor-headline-plain-text elementor-headline-text-wrapper wow bounceInUp">@Data._about.Title</span>
                                         </h6>
                                     </div>
                                 </div>
@@ -451,7 +440,7 @@
                                                 <div data-animation-type="sequental" data-animation-stagger="" class="elementor-element elementor-element-875f625 animation_type_sequental sc_fly_static elementor-invisible elementor-widget elementor-widget-trx_sc_icons" data-id="875f625" data-element_type="widget" data-settings="{&quot;_animation&quot;:&quot;globallogistics-fadeinup&quot;,&quot;_animation_delay&quot;:100}" data-widget_type="trx_sc_icons.default">
                                                     <div class="elementor-widget-container">
                                                         <div class="sc_icons sc_icons_default sc_icons_size_small sc_align_center">
-                                                            <div class="columns_padding_bottom row ">
+                                                            <div class="columns_padding_bottom row m-0">
                                                                 @foreach (var item in Data._about._list.EmptyIfNull().Select((x, y) => new { x, y }))
                                                                 {
                                                                     <div class="col-lg-3 col-6 wow fadeInUp" data-wow-delay="1.@(item.y + 1)s" data-wow-duration="1s">
@@ -500,25 +489,25 @@
                     <div class="elementor-widget-container">
                         <div class="row">
                             <div class="col-lg-12  text-center">
-                                <h4 class="elementor-heading-title elementor-size-default">@Data._item.Title</h4>
+                                <h4 class="elementor-heading-title elementor-size-default wow fadeIn" data-wow-duration="0.4s" data-wow-delay="0.3s">@Data._item.Title</h4>
                             </div>
                         </div>
                     </div>
                 </div>
                 <section class="elementor-section elementor-top-section elementor-element elementor-element-9f06a26 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle animation_type_block sc_fly_static">
                     <div class="elementor-container elementor-column-gap-extended">
-                        <div class="row">
-                            @foreach (var item in Data._item._list.EmptyIfNull())
+                        <div class="row m-0">
+                            @foreach (var item in Data._item._list.EmptyIfNull().Select((x,y)=>  new{ x,y}))
                             {
-                                <div class="col-lg-3 col-sm-4 col-12 mb-1 wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s">
-                                    <div class="row">
+                                <div class="col-lg-3 col-sm-6 col-12 mb-1 wow fadeIn" data-wow-duration="0.@(item.y + 5)s" data-wow-delay="0.@(item.y + 5)s">
+                                    <div class="row m-0">
                                         <div class="col-lg-12">
                                             <div class="elementor-widget-container">
-                                                <img loading="lazy" decoding="async" width="800" height="800" src="@item.Image" class="attachment-large size-large wp-image-3750" alt="@item.Title">
+                                                <img loading="lazy" decoding="async" width="800" height="800" src="@item.x.Image" class="attachment-large size-large wp-image-3750" alt="@item.x.Title">
                                             </div>
                                         </div>
                                         <div class="col-lg-12 mt-2">
-                                            <h6 class="elementor-heading-title elementor-size-default">@item.Title</h6>
+                                            <h6 class="elementor-heading-title elementor-size-default">@item.x.Title</h6>
                                         </div>
                                     </div>
                                 </div>

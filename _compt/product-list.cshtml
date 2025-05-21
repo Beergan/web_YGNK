@@ -217,7 +217,7 @@ Control = InputControlType.RichTextBox)]
     Page.Keywords = Data.MetaKeywords;
 }
 
-<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal  border-bottom">
+<div class="top_panel_title sc_layouts_row m-0sc_layouts_row_type_normal   border-bottom">
     <div class="content_wrap">
         <div class="sc_layouts_column sc_layouts_column_align_center">
             <div class="sc_layouts_item">
@@ -233,110 +233,147 @@ Control = InputControlType.RichTextBox)]
         </div>
     </div>
 </div>
-<div class="page_content_wrap">
+<div class="page_content_wrap pt-lg-4 pt-3 pb-lg-4 pb-3">
     <div class="content_wrap">
-        <div class="content">
-            <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
-            <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
-                <div class="row">
-                    @foreach (var item in Data.Items.EmptyIfNull())
-                    {
-                        <div class="col-lg-3 col-sm-4 col-12">
-                            <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
-                                <div class="post_featured with_thumb hover_link">
-                                    <img fetchpriority="high" width="890" height="628" src="@item.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.Title" title="@item.Title" decoding="async">
-                                    <div class="mask"></div>
-                                    <a href="@item.Path" aria-hidden="true" class="link"></a>
-                                    <button class="add-to-cart-button  product-action-cart " data-product-id="@item.idnode" data-product-title="@item.Title">Thêm sản phẩm</button>
-                                </div>
-                                <div class="post_header entry-header">
-                                    <h4 class="post_title entry-title"><a href="@item.Path" rel="bookmark">@item.Title</a></h4>
-                                </div>
-                            </article>
-                        </div>
-                    }
-                </div>
+        <div class="row m-0">
+            <div class="col-lg-3">
+              <div class="row m-0">
+                  <div class="col-lg-12 mb-2">
+                      <form class="input-group w-100 mx-auto d-flex" action="@Root.Config.Link.PageShop" method="get">
+                          @AntiForgery.GetHtml()
+                          <input type="search" class="form-control p-3" name="keyword" value="@Request.QueryString["keyword"]" placeholder="Tìm kiếm"  aria-describedby="search-icon-1">
+                          <span id="search-icon-1" class="input-group-text p-1"><i class="fa fa-search"></i></span>
+                      </form>
+                      <div class="mb-4 mt-3">
+                          <h4>Danh mục</h4>
+                          <ul class="list-unstyled fruite-categorie">
+                              @foreach (var item in Data.cat.EmptyIfNull().Where(x => x.CategoryLevel == 2).OrderByDescending(x => x.STT).Select((x,y) => new{ x,y }))
+                              {
 
+                                  var category = Db.GetOne<PP_Category>(t => t.CategoryPath == item.x.CategoryPath);
+                                  var arrCategory = Root.CategoryIndexes[category.Id].ToList();
+                                  var count = Data.count
+                                      .EmptyIfNull()
+                                      .Count(x => arrCategory.Contains(x.catid ?? 0));
+                                  <li class="wow fadeInUp" data-wow-delay="1.@(item.y + 2)s" data-wow-duration="1s">
+                                      <div class="d-flex justify-content-between fruite-name">
+                                          <a href="@item.x.CategoryPath"><i class="fas fa-bars me-2"></i>@item.x.Title</a>
+                                          <span>(@(count))</span>
+                                      </div>
+                                  </li>
+
+                              }
+                          </ul>
+                      </div>
+                  </div>
+              </div>
             </div>
-            <nav class="navigation pagination" aria-label="Phân trang bài viết">
-                <h2 class="screen-reader-text">Phân trang bài viết</h2>
-                <div class="nav-links">
-
-                    @if (Data.CurrentPage > 2)
-                    {
-                        <a href="/@Data.CategoryPath?page=1" title="Trang đầu" class="page-numbers">
-                            <i class="fa fa-angle-double-left"></i>
-                        </a>
-                    }
-
-                    @if (Data.CurrentPage > 1)
-                    {
-                        <a href="/@Data.CategoryPath?page=@(Data.CurrentPage - 1)" class="page-numbers prev">
-                            <i class="fa fa-angle-left"></i>
-                        </a>
-                    }
-
-                    @if (Data.TotalPages > 0)
-                    {
-                        if (Data.CurrentPage > 2)
-                        {
-                            <a href="/@Data.CategoryPath?page=1" class="page-numbers">
-                                <span class="meta-nav screen-reader-text">Page </span>1
-                            </a>
-
-                            if (Data.CurrentPage > 3)
+            <div class="col-lg-9">
+                <div class="content">
+                    <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
+                    <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
+                        <div class="row m-0 wow fadeInUp" data-wow-duration="5s">
+                            @foreach (var item in Data.Items.EmptyIfNull().Select((x, y) => new { x, y }))
                             {
-                                <span class="page-numbers dots">…</span>
+                                <div class="col-lg-3  col-12 ">
+                                    <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
+                                        <div class="post_featured with_thumb hover_link mb-0">
+                                            <img fetchpriority="high" width="890" height="628" src="@item.x.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.x.Title" title="@item.x.Title" decoding="async">
+                                            <div class="mask"></div>
+                                            <a href="@item.x.Path" aria-hidden="true" class="link"></a>
+                                            <button class="add-to-cart-button  product-action-cart font-14 " data-product-id="@item.x.idnode" data-product-title="@item.x.Title"><i class="fa-solid fa-plus"></i></button>
+                                        </div>
+                                        <div class="post_header entry-header">
+                                            <h5 class="post_title entry-title text-center font-14" style="font-size:22px"><a href="@item.x.Path" rel="bookmark">@item.x.Title</a></h5>
+                                        </div>
+                                    </article>
+                                </div>
                             }
-                        }
+                        </div>
 
-                        for (int idx = (int)Math.Max(1, Data.CurrentPage - 1); idx <= Math.Min(Data.TotalPages, Data.CurrentPage + 1); idx++)
-                        {
-                            if (Data.CurrentPage == idx)
+                    </div>
+                    <nav class="navigation pagination" aria-label="Phân trang bài viết">
+                        <h2 class="screen-reader-text">Phân trang bài viết</h2>
+                        <div class="nav-links">
+
+                            @if (Data.CurrentPage > 2)
                             {
-                                <span aria-current="page" class="page-numbers current">
-                                    <span class="meta-nav screen-reader-text">Page </span>@idx
-                                </span>
-                            }
-                            else
-                            {
-                                <a class="page-numbers" href="/@Data.CategoryPath?page=@idx">
-                                    <span class="meta-nav screen-reader-text">Page </span>@idx
+                                <a href="/@Data.CategoryPath?page=1" title="Trang đầu" class="page-numbers">
+                                    <i class="fa fa-angle-double-left"></i>
                                 </a>
                             }
-                        }
 
-                        if (Data.CurrentPage < Data.TotalPages - 1)
-                        {
-                            if (Data.CurrentPage < Data.TotalPages - 2)
+                            @if (Data.CurrentPage > 1)
                             {
-                                <span class="page-numbers dots">…</span>
+                                <a href="/@Data.CategoryPath?page=@(Data.CurrentPage - 1)" class="page-numbers prev">
+                                    <i class="fa fa-angle-left"></i>
+                                </a>
                             }
 
-                            <a href="/@Data.CategoryPath?page=@Data.TotalPages" class="page-numbers">
-                                <span class="meta-nav screen-reader-text">Page </span>@Data.TotalPages
-                            </a>
-                        }
-                    }
+                            @if (Data.TotalPages > 0)
+                            {
+                                if (Data.CurrentPage > 2)
+                                {
+                                    <a href="/@Data.CategoryPath?page=1" class="page-numbers">
+                                        <span class="meta-nav screen-reader-text">Page </span>1
+                                    </a>
 
-                    @if (Data.CurrentPage < Data.TotalPages)
-                    {
-                        <a href="/@Data.CategoryPath?page=@(Data.CurrentPage + 1)" class="page-numbers next">
-                            <i class="fa fa-angle-right"></i>
-                        </a>
-                    }
+                                    if (Data.CurrentPage > 3)
+                                    {
+                                        <span class="page-numbers dots">…</span>
+                                    }
+                                }
 
-                    @if (Data.TotalPages > 2 && (Data.CurrentPage < Data.TotalPages - 1))
-                    {
-                        <a href="/@Data.CategoryPath?page=@(Data.TotalPages)" title="Trang cuối" class="page-numbers">
-                            <i class="fa fa-angle-double-right"></i>
-                        </a>
-                    }
+                                for (int idx = (int)Math.Max(1, Data.CurrentPage - 1); idx <= Math.Min(Data.TotalPages, Data.CurrentPage + 1); idx++)
+                                {
+                                    if (Data.CurrentPage == idx)
+                                    {
+                                        <span aria-current="page" class="page-numbers current">
+                                            <span class="meta-nav screen-reader-text">Page </span>@idx
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <a class="page-numbers" href="/@Data.CategoryPath?page=@idx">
+                                            <span class="meta-nav screen-reader-text">Page </span>@idx
+                                        </a>
+                                    }
+                                }
+
+                                if (Data.CurrentPage < Data.TotalPages - 1)
+                                {
+                                    if (Data.CurrentPage < Data.TotalPages - 2)
+                                    {
+                                        <span class="page-numbers dots">…</span>
+                                    }
+
+                                    <a href="/@Data.CategoryPath?page=@Data.TotalPages" class="page-numbers">
+                                        <span class="meta-nav screen-reader-text">Page </span>@Data.TotalPages
+                                    </a>
+                                }
+                            }
+
+                            @if (Data.CurrentPage < Data.TotalPages)
+                            {
+                                <a href="/@Data.CategoryPath?page=@(Data.CurrentPage + 1)" class="page-numbers next">
+                                    <i class="fa fa-angle-right"></i>
+                                </a>
+                            }
+
+                            @if (Data.TotalPages > 2 && (Data.CurrentPage < Data.TotalPages - 1))
+                            {
+                                <a href="/@Data.CategoryPath?page=@(Data.TotalPages)" title="Trang cuối" class="page-numbers">
+                                    <i class="fa fa-angle-double-right"></i>
+                                </a>
+                            }
+
+                        </div>
+                    </nav>
 
                 </div>
-            </nav>
-
+            </div>
         </div>
+
     </div>
 </div>
 <!-- Fruits Shop End-->

@@ -63,8 +63,36 @@
                                         <li class="user-menu">
                                             <i class="fa-solid fa-user"></i>
                                             <div class="user-dropdown">
-                                                <a href="/login">Đăng nhập</a>
-                                                <a href="/register">Đăng ký</a>
+                                                @if (Request.Cookies["UserId"] == null)
+                                                {
+                                                    <a href="/dang-nhap">Đăng nhập</a>
+                                                    <a href="/dang-ky">Đăng ký</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="/tai-khoan">Tài khoản</a>
+                                                }
+
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="search_modern">
+                                                <span class="search_submit"></span>
+                                                <div class="search_wrap scheme_dark">
+                                                    <div class="search_header_wrap">
+                                                        <img class="logo_image" src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle">                <a class="search_close"></a>
+                                                    </div>
+                                                    <div class="search_form_wrap">
+                                                        <form role="search" method="get" class="search_form" action="@Root.Config.Link.PageShop">
+                                                            @AntiForgery.GetHtml()
+                                                            <input type="hidden" value="" name="post_types">
+                                                            <input type="text" class="search_field" placeholder="Tìm kiếm" name="keyword" value="@Request.QueryString["keyword"]">
+                                                            <button type="submit" class="search_submit"></button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+
+                                                <div class="search_overlay scheme_dark"></div>
                                             </div>
                                         </li>
                                     </ul>
@@ -108,16 +136,42 @@
                                                 <img class="logo_image" src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle">                <a class="search_close"></a>
                                             </div>
                                             <div class="search_form_wrap">
-                                                <form role="search" method="get" class="search_form" action="https://nhblogistics.com/">
+                                                <form role="search" method="get" class="search_form" action="@Root.Config.Link.PageShop">
+                                                    @AntiForgery.GetHtml()
                                                     <input type="hidden" value="" name="post_types">
-                                                    <input type="text" class="search_field" placeholder="Type words and hit enter" value="" name="s">
+                                                    <input type="text" class="search_field" placeholder="Tìm kiếm" name="keyword" value="@Request.QueryString["keyword"]">
                                                     <button type="submit" class="search_submit"></button>
                                                 </form>
                                             </div>
                                         </div>
+
                                         <div class="search_overlay scheme_dark"></div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="menu-cart-wrapper">
+                            <div class="menu-cart-icon">
+                                <a class="cart-active">
+                                    <i class="fa-solid fa-cart-shopping"></i>
+
+                                </a>
+                                <div class="cart-count"><span class="cart-count2">@cart.GetCartLines().Sum(x => x.Quantity)</span></div>
+                            </div>
+                        </div>
+                        <div class="user-menu">
+                            <i class="fa-solid fa-user"></i>
+                            <div class="user-dropdown">
+                                @if (Request.Cookies["UserId"] == null)
+                                {
+                                    <a href="/dang-nhap">Đăng nhập</a>
+                                    <a href="/dang-ky">Đăng ký</a>
+                                }
+                                else
+                                {
+                                    <a href="/tai-khoan">Tài khoản</a>
+                                }
+
                             </div>
                         </div>
                         <div class="sc_layouts_item elementor-element elementor-element-d4f79ee sc_layouts_hide_on_mobile elementor-view-default sc_fly_static elementor-widget elementor-widget-icon" data-id="d4f79ee" data-element_type="widget" data-widget_type="icon.default">
@@ -147,7 +201,7 @@
         </div>
         <div class="menu_mobile_content_wrap content_wrap">
             <div class="menu_mobile_content_wrap_inner without_socials">
-                <nav class="menu_mobile_nav_area" itemscope="itemscope" itemtype="https://schema.org/SiteNavigationElement">
+                <nav class="menu_mobile_nav_area" itemscope="itemscope" >
                     <ul id="menu_mobile" class=" menu_mobile_nav">
                         @foreach (var item in Root.Config.MainMenus.EmptyIfNull())
                         {
@@ -184,6 +238,6 @@
         </div>
     </div>
 </div>
-<div class="sidebar-cart-active" >
+<div class="sidebar-cart-active">
     @RenderPage("/_compt/layout_sidebar.cshtml")
-    </div>
+</div>

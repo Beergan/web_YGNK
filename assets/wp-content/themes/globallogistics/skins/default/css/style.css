@@ -6200,6 +6200,7 @@ body.sc_layouts_search_opened .top_panel {
   position: absolute;
   z-index: 1;
   top: 50%;
+  width:100%!important;
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
   -ms-transform: translate(-50%, -50%);
@@ -14272,19 +14273,24 @@ button.full_post_read_complete:after {
 .nav-links-single .nav-links {
   margin-top: 0;
   text-align: left;
-  overflow: hidden;
+  overflow: hidden; 
   text-transform: none;
 }
 .nav-links-single .nav-links a {
   display: block;
 }
+@media(max-width:769px){
+    .slider_swiper {
+        height: 350px!important;
+    } 
+                        } 
 .nav-links-single .nav-links .nav-arrow-label {
-  text-transform: uppercase;
-  font-size: 13px;
-  line-height: 18px;
-  font-weight: 400;
-  display: block;
-  letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 400;
+    display: block;
+    letter-spacing: 1px;
 }
 .nav-links-single .nav-links .nav-arrow-label:before,
 .nav-links-single .nav-links .nav-arrow-label:after {

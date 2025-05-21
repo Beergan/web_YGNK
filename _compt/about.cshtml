@@ -104,16 +104,31 @@
             }
     </style>
 }
-<div class="container-fluid page-header py-5" style=" background: linear-gradient(rgba(248, 223, 173, 0.1), rgba(248, 223, 173, 0.1)), url(@Root.Config.BanerPost);">
-    <h1 class="text-center  display-6">@Data.Title</h1>
-    <ol class="breadcrumb justify-content-center mb-0">
-        <li class="breadcrumb-item"><a href="@Root.Config.MainMenus.EmptyIfNull().First().Href">@Root.Config.MainMenus.EmptyIfNull().First().Title</a></li>
-        <li class="breadcrumb-item active ">@Data.Title</li>
-    </ol>
+<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal  border-bottom">
+    <div class="content_wrap">
+        <div class="sc_layouts_column sc_layouts_column_align_center">
+            <div class="sc_layouts_item">
+                <div class="sc_layouts_title sc_align_center">
+                    <div class="sc_layouts_title_title">
+                        <h1 itemprop="headline" class="sc_layouts_title_caption">
+                            @Data.Title
+                        </h1>
+                    </div>
+                    <div class="sc_layouts_title_breadcrumbs"><div class="breadcrumbs"><a class="breadcrumbs_item home underline_hover" href="@Root.Config.MainMenus.FirstOrDefault().Href">@Root.Config.MainMenus.FirstOrDefault().Title</a><span class="breadcrumbs_delimiter"></span><span class="breadcrumbs_item current">@Data.Title</span></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="terms-container">
-    <section class="terms-content">
-        @Data.Content
-         </section>
+<div class="page_content_wrap m-0 p-0">
+    <div class="content_wrap">
+        <div class="terms-container">
+            <section class="terms-content">
+                @Data.Content
+            </section>
+        </div>
+    </div>
 </div>
+
+
 

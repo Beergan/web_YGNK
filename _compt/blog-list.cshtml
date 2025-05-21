@@ -177,7 +177,7 @@ Control = InputControlType.RichTextBox)]
     Page.Description = Data.MetaDescription;
     Page.Keywords = Data.MetaKeywords;
 }
-<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal  border-bottom">
+<div class="top_panel_title sc_layouts_row sc_layouts_row_type_normal   border-bottom">
     <div class="content_wrap">
         <div class="sc_layouts_column sc_layouts_column_align_center">
             <div class="sc_layouts_item">
@@ -193,14 +193,14 @@ Control = InputControlType.RichTextBox)]
         </div>
     </div>
 </div>
-<div class="page_content_wrap">
+<div class="page_content_wrap pt-lg-4 pt-3 pb-lg-4 pb-3">
     <div class="content_wrap">
         <div class="content">
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
-            <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
+            <div class="row m-0">
                 @foreach (var item in Data.Items.EmptyIfNull().Take(1))
                 {
-                    <div class="column-1_3">
+                    <div class="col-lg-3 col-sm-6 col-12">
                         <article class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4193 post type-post status-publish format-standard hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3">
                             <div class="post_header entry-header">
                                 <h4 class="post_title entry-title"><a href="@item.Path" rel="bookmark">@item.Title</a></h4>
@@ -209,16 +209,16 @@ Control = InputControlType.RichTextBox)]
                         </article>
                     </div>
                 }
-                @foreach (var item in Data.Items.EmptyIfNull().Skip(1))
+                @foreach (var item in Data.Items.EmptyIfNull().Skip(1).Select((x,y) => new {x,y}))
                 {
 
-                    <div class="column-1_3">
-                        <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
+                    <div class="col-lg-3 col-sm-6 col-12 ">
+                        <article class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail wow fadeInUp" data-wow-duration="0.@(item.y + 5)s" data-wow-delay="0.@(item.y + 5)s">
                             <div class="post_featured with_thumb hover_link">
-                                <img fetchpriority="high" width="890" height="628" src="@item.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.Title" title="@item.Title" decoding="async">						<div class="mask"></div>
-                                <a href="@item.Path" aria-hidden="true" class="link"></a>
+                                <img fetchpriority="high" width="890" height="628" src="@item.x.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.x.Title" title="@item.x.Title" decoding="async">						<div class="mask"></div>
+                                <a href="@item.x.Path" aria-hidden="true" class="link"></a>
                             </div>		<div class="post_header entry-header">
-                                <h4 class="post_title entry-title"><a href="@item.Path" rel="bookmark">@item.Title</a></h4>
+                                <h4 class="post_title entry-title"><a href="@item.x.Path" rel="bookmark">@item.x.Title</a></h4>
                             </div><!-- .entry-header -->
 
                         </article>

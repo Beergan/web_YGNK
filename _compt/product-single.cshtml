@@ -82,7 +82,6 @@
         model.comnet = Db.Table<PP_Comment>().Where(x => x.idproduct == model.Id && x.Status == "SUCCESS").ToArray();
         model.commenheck = Db.Table<PP_Comment>().Where(x => x.Status == "SUCCESS").ToArray();
 
-
         if (model.comnet.Count() == 0)
         {
             model.comnet = null;
@@ -340,8 +339,6 @@
                                 {
                                     <h5 class="fw-bold me-2">@Data.Price.ToString("#,##0") đ</h5>
                                 }
-
-
                             </div>
 
                             <div class="d-flex mb-4">
@@ -369,7 +366,7 @@
                             @Data.Summary
                             <div class="quantity-box mb-2">
                                 <button type="button" class="qty-btn minus">−</button>
-                                <input type="text" id="quantity" class="qty-input" value="5" min="1">
+                                <input type="text" id="quantity" class="qty-input" value="1" min="1">
                                 <button type="button" class="qty-btn plus">+</button>
                             </div>
                             <div class="d-flex ">
@@ -388,11 +385,11 @@
                                         aria-controls="nav-about" aria-selected="true">
                                     Thông tin
                                 </button>
-                                <button class="nav-link border-white border-bottom-0" type="button" role="tab"
+                                @*<button class="nav-link border-white border-bottom-0" type="button" role="tab"
                                         id="nav-mission-tab" data-bs-toggle="tab" data-bs-target="#nav-mission"
                                         aria-controls="nav-mission" aria-selected="false">
                                     Đánh giá
-                                </button>
+                                </button>*@
                             </div>
                         </nav>
                         <div class="tab-content mb-5">
@@ -425,12 +422,9 @@
                                     </div>
                                 }
                             </div>
-
-
                         </div>
                     </div>
-
-                    <!--<form action="?commet" method="post" id="commet">
+                    @*<form action="?commet" method="post" id="commet">
                     <h4 class="mb-5 fw-bold">Bình luận</h4>
                     <div class="row g-4">
                         <div class="col-lg-6">
@@ -442,13 +436,13 @@
                             <div class="border-bottom rounded">
                                 <input type="email" id="email" name="@field.GetName(x=>x.Email)" c class="form-control border-0" placeholder="Email *" required>
                             </div>
-                        </div>-->
-                    @*<div class="col-lg-12">
+                        </div>
+                    <div class="col-lg-12">
                         <div class="border-bottom rounded my-4">
                             <textarea id="subject" name="@field.GetName(x=>x.Comment)" c class="form-control border-0" cols="30" rows="8" placeholder="Bình luận *" spellcheck="false"></textarea>
                         </div>
                     </div>*@
-                    <!--<div class="col-lg-12">
+                    @*<div class="col-lg-12">
                             <div class="d-flex justify-content-between py-3 mb-5">
                                 <div class="d-flex align-items-center">
                                     <p class="mb-0 me-3">Đánh giá</p>
@@ -465,13 +459,13 @@
                             </div>
                         </div>
                     </div>
-                </form>-->
+                </form>*@
                 </div>
             </div>
             <div class="col-lg-4 col-xl-3">
                 <div class="row g-4 fruite">
                     <div class="col-lg-12 mb-2">
-                        <form class="input-group w-100 mx-auto d-flex" action="@Root.Config.Link.PageBlog" method="get">
+                        <form class="input-group w-100 mx-auto d-flex" action="@Root.Config.Link.PageShop" method="get">
                             @AntiForgery.GetHtml()
                             <input type="search" class="form-control p-3" name="keyword" placeholder="Tìm kiếm" value="@Request.QueryString["keyword"]" aria-describedby="search-icon-1">
                             <span id="search-icon-1" class="input-group-text p-3"><i class="fa fa-search"></i></span>
@@ -562,22 +556,16 @@
                             <a href="@Data.CategoryPath" class="btn border border-secondary px-4 py-3 rounded-pill  w-100">Xem thêm</a>
                         </div>
                     </div>
-                    <div class="col-lg-12">
-                        <div class="position-relative">
-                            <img src="@Root.Config.BanerNew" class="img-fluid w-100 rounded" alt="banmer">
-
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
         <h1 class="fw-bold mb-3">Sản phẩm liên quan</h1>
         <div class="vesitable">
             <div class="owl-carousel vegetable-carousel justify-content-center">
-                <div class="posts_container classic_wrap classic_3 columns_wrap columns_padding_bottom inited_open_full_post">
-                    @foreach (var item in Data.RecentItems.EmptyIfNull().Take(8))
+                <div class="row m-0">
+                    @foreach (var item in Data.RecentItems.EmptyIfNull().Take(4))
                     {
-                        <div class="column-1_4">
+                        <div class="col-lg-3  col-12">
                             <article id="post-4179" data-post-id="4179" class="post_item post_item_container post_format_standard post_layout_classic post_layout_classic_3 post-4179 post type-post status-publish format-standard has-post-thumbnail hentry category-mua-ho category-tin-tuc category-van-chuyen-duong-bien category-van-chuyen-duong-hang-khong category-van-chuyen-hiwexpress category-van-chuyen-viet-han-1 category-van-chuyen-viet-han-2 category-van-chuyen-viet-han-3 category-van-hoa-han-quoc tag-han-viet tag-viet-han">
                                 <div class="post_featured with_thumb hover_link">
                                     <img fetchpriority="high" width="890" height="628" src="@item.ImageUrl" class="attachment-globallogistics-thumb-square size-globallogistics-thumb-square wp-post-image" alt="@item.Title" title="@item.Title" decoding="async">

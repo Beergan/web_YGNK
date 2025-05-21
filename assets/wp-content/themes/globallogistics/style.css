@@ -11806,10 +11806,11 @@ body.hide_fixed_rows .sc_layouts_row_fixed_on.sc_layouts_row_fixed_with_fullscre
 header.top_panel {
     transition: all 0.3s ease-in-out;
     will-change: transform, opacity;
+    position:sticky;
 }
 
 .sticky-menu {
-    position: fixed;
+    position: fixed!important;
     top: 0;
     left: 0;
     right: 0;
@@ -11925,7 +11926,7 @@ header.top_panel {
     bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #ff6600;
+    background-color: #BA1E28;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -12275,7 +12276,7 @@ header.top_panel {
 .loading-text span {
     font-size: 3rem;
     font-weight: bold;
-    color: #ff9900;
+    color: #BF1D2A;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeInUp 0.6s forwards ease-out;
@@ -12321,7 +12322,7 @@ header.top_panel {
 /* Dropdown menu */
 .user-dropdown {
     position: absolute;
-    top: 120%;
+    top: 100%;
     right: 0;
     background: white;
     border: 1px solid #ddd;
@@ -12352,4 +12353,10 @@ header.top_panel {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+}
+.signup-form {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #fff;
 }

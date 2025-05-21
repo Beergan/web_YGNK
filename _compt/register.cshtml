@@ -28,9 +28,8 @@
     private FieldExtractor<VM_Register> field = new FieldExtractor<VM_Register>();
 }
 @{
-    var query = "dang-ky";
-
-    if (IsPost && query == "dang-ky")
+    var query = Request.Url.Query;
+    if (IsPost && query == "?register")
     {
         new Func<Action>(() =>
         {
@@ -41,10 +40,11 @@
                 Validation.RequireField(field.GetName(t => t.FullName));
                 Validation.RequireField(field.GetName(t => t.Email));
                 Validation.RequireField(field.GetName(t => t.Password));
-                Validation.RequireField(field.GetName(t => t.ConfirmPassword));
-
-
-
+                Validation.RequireField(field.GetName(t => t.Address));
+                Validation.RequireField(field.GetName(t => t.Province));
+                Validation.RequireField(field.GetName(t => t.District));
+                Validation.RequireField(field.GetName(t => t.Ward));
+                Validation.RequireField(field.GetName(t => t.Phone));
                 Validation.Add(field.GetName(t => t.Password),
                 Validator.StringLength(
                 maxLength: Int32.MaxValue,
@@ -54,12 +54,12 @@
 
                 if (!Validation.IsValid())
                 {
-                    Response.Write("Thông tin bạn nhập bị thiếu");
+                    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
                 }
 
                 if (captcha != this.Context.Session["CaptchaVerify"].ToString())
                 {
-                    Response.Write("mã capcha không hợp lệ");
+                    return AjaxResult.BadRequest("Mã ccapcha không hợp lệ");
                 }
 
 
@@ -70,9 +70,8 @@
                 var customer = Db.Table<PP_Customer>().SingleOrDefault(X => X.Email.ToLower() == email);
                 if (customer != null)
                 {
-                    Response.Write("Email này đã đăng ký");
+                    return AjaxResult.BadRequest("Email này đã đăng ký!");
 
-                    return () => Response.End();
                 }
 
                 if (pass == passconfirm)
@@ -81,20 +80,22 @@
                     model.Name = Request.Form[field.GetName(t => t.FullName)].NullIfWhiteSpace();
                     model.Email = Request.Form[field.GetName(t => t.Email)].NullIfWhiteSpace();
                     model.PASSWORD = Crypto.SHA256(Request.Form[field.GetName(t => t.Password)].NullIfWhiteSpace());
+                    model.FullName = Request.Form[field.GetName(t => t.FullName)].NullIfWhiteSpace();
+                    model.Phone = Request.Form[field.GetName(t => t.Phone)].NullIfWhiteSpace();
+                    model.Adress = Request.Form[field.GetName(t => t.Address)].NullIfWhiteSpace();
+                    model.Provinces = Request.Form[field.GetName(t => t.Province)].NullIfWhiteSpace();
+                    model.Districts = Request.Form[field.GetName(t => t.District)].NullIfWhiteSpace();
+                    model.wards = Request.Form[field.GetName(t => t.Ward)].NullIfWhiteSpace();
                     Db.Insert<PP_Customer>(model);
                     HttpContext context = HttpContext.Current;
-
                     var userId = model.Id;
 
-                    Session["username"] = userId;
-                    userId = (int)(Session["username"]);
-                    context.Session["username"] = userId;
-                    userId = (int)(Session["username"]);
-
+                    HttpCookie cookie = new HttpCookie("UserId", userId.ToString());
+                    cookie.Expires = DateTime.Now.AddDays(1);
+                    Response.Cookies.Add(cookie);
                     model.CreatedTime = DateTime.Now;
-
-
                     Response.Write("Cám ơn bạn đã đăng ký");
+                    Response.Write("redirect:/tai-khoan");
                     return () => Response.End();
                 }
                 return AjaxResult.BadRequest("Đã có lỗi xảy ra!");
@@ -125,69 +126,202 @@
 
         return model;
     });
-
+    Layout = $"~/_layouts/_layout.cshtml";
     Page.Title = Data.Title;
     Page.Description = Data.MetaDescription;
     Page.Keywords = Data.MetaKeywords;
 }
-<div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Đăng ký</h5>
-    <a class="btn-close" data-bs-dismiss="modal" aria-label="Close"></a>
-</div>
-<div class="modal-body container" style="max-width: 450px;">
-    <form id="contact-form" action="dang-ky" method="post">
-        @AntiForgery.GetHtml()
-        @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+<div class=" bg-light ">
+    <div class="container pt-2 pb-2 pb-lg-3 pt-lg-3 ">
+        <div class="row signup-form ">
+            <div class="col-lg-12">
+                <div class="modal-header">
+                    <h5 class="w-100 text-center" >ĐĂNG KÝ</h5>
+                </div>
+                <div class="modal-body container" style="max-width: 800px;">
+                    <form action="?register" class="location-selector" method="post">
+                        @AntiForgery.GetHtml()
+                        @Html.ValidationSummary(Text["", ""], excludeFieldErrors: true, htmlAttributes: null)
+                        <div class="row mb-3">
+                            <input type="hidden" name="ProvinceName" id="ProvinceName" />
+                            <input type="hidden" name="DistrictName" id="DistrictName" />
+                            <input type="hidden" name="WardName" id="WardName" />
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name"><i class="fa-regular fa-user"></i></label>
+                                    <input class="border-radius-4px  input-small" type="text" style="width: 88%" name="@field.GetName(x=>x.FullName)" aria-label="text" placeholder="Họ và tên" required="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name"><i class="fa-solid fa-envelope"></i></label>
+                                    <input class="border-radius-4px  input-small" type="email" style="width: 88%" name="@field.GetName(x=>x.Email)" placeholder="Email" required="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name"><i class="fa-solid fa-phone"></i></label>
+                                    <input class="border-radius-4px  input-small" type="number" style="width: 88%" name="@field.GetName(x=>x.Phone)" placeholder="Số điện thoại" required="">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <label for="name"><i class="fa-solid fa-location-dot"></i></label>
+                                    <input class="border-radius-4px  input-small mb-20px" name="@field.GetName(x=>x.Address)" style="width: 88%" type="text" placeholder="@(LangId == "en" ? "House number and street name" : "Số nhà/ tên đường")">
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <div class="password-wrapper position-relative">
+                                        <label for="password"><i class="fa-solid fa-circle-user"></i></label>
+                                        <input class="border-radius-4px  input-small mb-20px" style="width:88%"
+                                               id="password-input"
+                                               name="@field.GetName(x=>x.Password)"
+                                               type="password"
+                                               placeholder="@(LangId == "en" ? "House number and street name" : "Nhập mật khẩu")">
+                                        <i class="fa fa-eye toggle-password position-absolute" id="togglePassword" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-12">
+                                <div class="form-group">
+                                    <div class="password-wrapper position-relative">
+                                        <label for="password"><i class="fa-solid fa-circle-user"></i></label>
+                                        <input class="border-radius-4px  input-small mb-20px" style="width: 88%"
+                                               id="password-input1"
+                                               name="@field.GetName(x=>x.ConfirmPassword)"
+                                               type="password"
+                                               placeholder="@(LangId == "en" ? "House number and street name" : "Nhập lại mật khẩu")">
+                                        <i class="fa fa-eye toggle-password position-absolute" id="togglePassword1" style="top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mt-3">
+                                <select id="province" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Province)"></select>
+                                <small class="text-danger">@Html.ValidationMessage("province")</small>
+                            </div>
+                            <div class="col-12 col-md-4 mt-3">
+                                <select id="districts" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.District)"></select>
+                                <small class="text-danger">@Html.ValidationMessage("districts")</small>
+                            </div>
+                            <div class="col-12 col-md-4 mt-3">
+                                <select id="wards" class="form-select select-small border-radius-4px" required name="@field.GetName(x=>x.Ward)"></select>
+                                <small class="text-danger">@Html.ValidationMessage("wards")</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="mb-3 form-check ">
+                                <input type="checkbox" style="margin-left: -5px;" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">Tôi đồng ý với <a href="/dieu-khoan" class="link">điều khoản sự dụng</a></label>
+                            </div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-lg-12">
+                                <button type="submit" class="btn btn-login contact text-center register p-3">Đăng ký</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fa-regular fa-user"></i></span>
-                <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Họ và tên">
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                <input type="password" class="form-control" id="password" name="password" placeholder="Mật khẩu">
-            </div>
-        </div>
-        <div class="mb-3">
-            <div class="input-group">
-                <span class="input-group-text"><i class="fas fa-lock"></i></span>
-                <input type="password" class="form-control" id="ConfirmPassword" name="ConfirmPassword" placeholder="Mật khẩu">
-            </div>
-
-        </div>
-        <div class="row">
-            <div class="mb-3 form-check ">
-                <input type="checkbox" style="margin-left: -5px;" id="exampleCheck1">
-                <label class="form-check-label" for="exampleCheck1">Tôi đồng ý với <a href="/dieu-khoan" class="link">điều khoản sự dụng</a></label>
-            </div>
-        </div>
-        <div class="row mt-1">
-            <div class="col-lg-4 col-6">
-                <button type="submit" class="btn btn-login contact">Đăng ký</button>
-            </div>
-            <div class="col-lg-8 col-6 text-lg-end text-sm-start ">
-                <p style="padding-top: 20px;"> <a class="link" data-bs-toggle="modal" data-bs-target="#login" data-url="/_compt/login.cshtml"> Đăng nhập</a> </p>
-            </div>
-        </div>
-    </form>
-</div>
-<div class="modal-footer container" style="display: block; max-width: 450px;">
-    <p>Hoặc đăng nhập với</p>
-    <div class="row">
-        <div class="col-lg-6 col-6">
-            <button class="text-center btn-fb" onclick="loginWithFacebook()"><i class="fa-brands fa-facebook-f"></i> Facebook</button>
-        </div>
-        <div class="col-lg-6 col-6 ml-auto ">
-            <button class="text-center btn-gg" id="google-login" onclick="loginWithGoogle()"><i class="fa-brands fa-google-plus-g"></i> Google</button>
         </div>
     </div>
 </div>
 
+@section scripts{
+
+    <script>
+     $(document).ready(function () {
+         $(document).on("click", ".register", function () {
+                 event.preventDefault();
+                 Swal.fire({
+                  title: 'Nhập mã captcha',
+            input: 'text',
+            inputAttributes: {
+	            autocapitalize: 'off'
+            },
+            imageUrl: '/captcha.ashx',
+            imageWidth: 300,
+            imageHeight: 150,
+                  showCancelButton: true,
+                  confirmButtonText: 'Ok',
+                     showLoaderOnConfirm: true,
+                  preConfirm: (value) => {
+                   $("input[name='captcha']", this).val(value);
+                         return value;
+                  },
+                  allowOutsideClick: () => !Swal.isLoading()
+                 }).then((result) => {
+                  if (!result.isConfirmed)
+                   return;
+
+                     Swal.fire({
+	            title: 'Xin chờ đợi!',
+	            html: 'Hệ thống đang ghi nhận thông tin ..',
+	            didOpen: () => { Swal.showLoading(); },
+                     });
+
+                     $.post(window.location.pathname + "?register",
+                     {
+                         __RequestVerificationToken: "@Root.AntiForgeryTokenForAjaxPost()",
+                         @field.GetName(x=>x.FullName): $("input[name='@field.GetName(x=>x.FullName)']").val(),
+                         @field.GetName(x=>x.Address): $("input[name='@field.GetName(x=>x.Address)']").val(),
+                         @field.GetName(x=>x.Province): $("select[name='@field.GetName(x=>x.Province)']").val(),
+                         @field.GetName(x=>x.District): $("select[name='@field.GetName(x=>x.District)']").val(),
+                         @field.GetName(x=>x.Ward): $("select[name='@field.GetName(x=>x.Ward)']").val(),
+                         @field.GetName(x=>x.Phone): $("input[name='@field.GetName(x=>x.Phone)']").val(),
+                         @field.GetName(x=>x.Password): $("input[name='@field.GetName(x=>x.Password)']").val(),
+                         @field.GetName(x=>x.ConfirmPassword): $("input[name='@field.GetName(x=>x.ConfirmPassword)']").val(),
+                         @field.GetName(x=>x.Email): $("input[name='@field.GetName(x=>x.Email)']").val(),
+                         captcha: result.value
+                     },
+                         function (data) {
+                             if (typeof data === "string" && data.startsWith("redirect:")) {
+                                 const redirectUrl = data.replace("redirect:", "").trim();
+                                 window.location.href = redirectUrl;
+                             } else {
+                                 Swal.fire({
+                                     title: 'Thông báo',
+                                     text: data,
+                                     icon: 'success'
+                                 });
+                             }
+            })
+            .fail(function (error) {
+	            Swal.fire({
+		            title: 'Thôi xong!',
+		            text: error.responseText,
+		            type: "error"
+	            });
+            });
+                 })
+             });
+     });
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".location-selector").vnLocationSelector({
+                provinceId: "province",
+                districtId: "districts",
+                wardId: "wards",
+                provinceNameId: "ProvinceName",
+                districtNameId: "DistrictName",
+                wardNameId: "WardName",
+                savedProvince: null, // Không có dữ liệu
+                savedDistrict: null,
+                savedWard: null,
+                savedProvinceName: "",
+                savedDistrictName: "",
+                savedWardName: ""
+            });
+
+            // Toggle password visibility
+            $('.toggle-password').on('click', function () {
+                const passwordField = $(this).prev('input');
+                const type = passwordField.attr('type') === 'password' ? 'text' : 'password';
+                passwordField.attr('type', type);
+                $(this).toggleClass('fa-eye fa-eye-slash');
+            });
+        });
+    </script>
+
+}
