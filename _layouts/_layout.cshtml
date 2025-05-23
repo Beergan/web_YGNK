@@ -756,7 +756,7 @@
         }
 
         .elementor-3413 .elementor-element.elementor-element-a22dd0e .logo_image {
-            max-height: 54px;
+            max-height: 62px;
         }
 
         .elementor-3413 .elementor-element.elementor-element-e3bdce2 > .elementor-container > .elementor-column > .elementor-widget-wrap {
@@ -1085,10 +1085,6 @@
             <div class="close-popup-vr">x</div>
         </div>
     </div>
-
-    <!-- Add custom css and js -->
-    <!-- end Add custom css and js -->
-    <!-- popup showroom -->
     <div id="popup-showroom-vr">
         <div class="bg-popup-vr"></div>
         <div class="content-popup-vr" id="loco-" style=" ">
@@ -1100,11 +1096,13 @@
         </div>
     </div>
     @*--Contact form---*@
-
+    <script src="~/assets/wp-content/themes/globallogistics/js/owl.carousel.js"></script>
+    <script src="~/assets/wp-content/themes/globallogistics/js/owl.carousel.min.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/auto.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.thumbs.umd.js"></script>
     <script src="~/assets/wp-content/themes/globallogistics/skins/default/carousel.umd.js"></script>
-
+    <link href="~/assets/wp-content/themes/globallogistics/skins/default/owl.carousel.css" rel="stylesheet" />
+    <link href="~/assets/wp-content/themes/globallogistics/skins/default/owl.theme.default.min.css" rel="stylesheet" />
     <script>
         window.addEventListener("load", function () {
             const loadingScreen = document.getElementById("loading-screen");
@@ -1273,31 +1271,31 @@
     </script>
 
     @*<script type='text/javascript'>
-        const lazyloadRunObserver = () => {
-            const lazyloadBackgrounds = document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`);
-            const lazyloadBackgroundObserver = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        let lazyloadBackground = entry.target;
-                        if (lazyloadBackground) {
-                            lazyloadBackground.classList.add('e-lazyloaded');
+            const lazyloadRunObserver = () => {
+                const lazyloadBackgrounds = document.querySelectorAll(`.e-con.e-parent:not(.e-lazyloaded)`);
+                const lazyloadBackgroundObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            let lazyloadBackground = entry.target;
+                            if (lazyloadBackground) {
+                                lazyloadBackground.classList.add('e-lazyloaded');
+                            }
+                            lazyloadBackgroundObserver.unobserve(entry.target);
                         }
-                        lazyloadBackgroundObserver.unobserve(entry.target);
-                    }
+                    });
+                }, { rootMargin: '200px 0px 200px 0px' });
+                lazyloadBackgrounds.forEach((lazyloadBackground) => {
+                    lazyloadBackgroundObserver.observe(lazyloadBackground);
                 });
-            }, { rootMargin: '200px 0px 200px 0px' });
-            lazyloadBackgrounds.forEach((lazyloadBackground) => {
-                lazyloadBackgroundObserver.observe(lazyloadBackground);
+            };
+            const events = [
+                'DOMContentLoaded',
+                'elementor/lazyload/observe',
+            ];
+            events.forEach((event) => {
+                document.addEventListener(event, lazyloadRunObserver);
             });
-        };
-        const events = [
-            'DOMContentLoaded',
-            'elementor/lazyload/observe',
-        ];
-        events.forEach((event) => {
-            document.addEventListener(event, lazyloadRunObserver);
-        });
-    </script>*@
+        </script>*@
     <script>
         function miniCart() {
             var navbarTrigger = $('.cart-active'),
@@ -1323,7 +1321,7 @@
             miniCart();
         });
     </script>
-   
+
     <script>
         (function ($) {
             const cache = {
@@ -1373,7 +1371,7 @@
                 console.log("Populating provinces:", provinces);
                 $province.empty().append(`<option value="">${i18n.selectProvince}</option>`);
                 provinces.forEach(p => {
-                    $province.append(`<option value="${p.code}">${p.name}</option>`);
+                    $province.append(`<option value="${p.code}">${p.name_with_type}</option>`);
                 });
 
                 if (selectedProvince && selectedProvince !== "0") {
@@ -1395,7 +1393,7 @@
                 console.log("Populating districts:", districts);
                 $district.empty().append(`<option value="">${i18n.selectDistrict}</option>`);
                 districts.forEach(d => {
-                    $district.append(`<option value="${d.code}">${d.name}</option>`);
+                    $district.append(`<option value="${d.code}">${d.name_with_type}</option>`);
                 });
 
                 if (selectedDistrict && selectedDistrict !== "0") {
@@ -1417,7 +1415,7 @@
                 console.log("Populating wards:", wards);
                 $ward.empty().append(`<option value="">${i18n.selectWard}</option>`);
                 wards.forEach(w => {
-                    $ward.append(`<option value="${w.code}">${w.name}</option>`);
+                    $ward.append(`<option value="${w.code}">${w.name_with_type}</option>`);
                 });
 
                 if (selectedWard && selectedWard !== "0") {
@@ -1546,7 +1544,7 @@
 
                         toggleLoading($container, true);
                         $.ajax({
-                            url: `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceId}`,
+                            url: `https://vn-public-apis.fpo.vn/districts/getByProvince?provinceCode=${provinceId}&limit=-1`,
                             method: "GET",
                             timeout: 5000,
                             success: function (response) {
@@ -1600,7 +1598,7 @@
 
                         toggleLoading($container, true);
                         $.ajax({
-                            url: `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtId}`,
+                            url: `https://vn-public-apis.fpo.vn/wards/getByDistrict?districtCode=${districtId}&limit=-1`,
                             method: "GET",
                             timeout: 5000,
                             success: function (response) {
@@ -1659,7 +1657,7 @@
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         });
     </script>
-  
+
 
 </body>
 </html>

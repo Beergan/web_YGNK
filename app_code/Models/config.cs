@@ -22,7 +22,6 @@ public class Config
         this.GoogleGtag = "1234";
         this.LinkFacebook = "https://facebook.com";
         this.LinkInstagram = "https://www.instagram.com";
-        this.LinkGoogle = "https://www.google.com";
         this.Company = new CompanyInfo
         {
                           
@@ -70,24 +69,23 @@ public class Config
        Required = false,
        Control = InputControlType.TextBox)]
     public string LinkFacebook { get; set; }
-
+    [Field(
+       Title = "Link Instagram",
+       Required = false,
+       Control = InputControlType.TextBox)]
+    public string LinkInstagram { get; set; }
+    
     [Field(
        Title = "Link twitter",
        Required = false,
        Control = InputControlType.TextBox)]
     public string LinkTwitter { get; set; }
-
     [Field(
-      Title = "Link Titok",
-      Required = false,
-      Control = InputControlType.TextBox)]
-    public string Titok { get; set; }
+   Title = "Link KakaoTalk",
+   Required = false,
+   Control = InputControlType.TextBox)]
+    public string LinkKakaoTalk { get; set; }
 
-    [Field(
-      Title = "Link youtube",
-      Required = false,
-      Control = InputControlType.TextBox)]
-    public string LinkYoutube { get; set; }
 
     [Field(
      Title = "Link Zalo",
@@ -95,40 +93,12 @@ public class Config
      Control = InputControlType.TextBox)]
     public string Zalo { get; set; }
 
-	[Field(
-	 Title = "Link Zalo phụ",
-	 Required = false,
-	 Control = InputControlType.TextBox)]
-	public string Zalo2 { get; set; }
-	[Field(
- Title = "Link Shoppe",
- Required = false,
- Control = InputControlType.TextBox)]
-	public string Shopee { get; set; }
 
 	[Field(
     Title = "Link Map",
     Required = false,
     Control = InputControlType.TextBox)]
     public string LinkMap { get; set; }
-
-    [Field(
-       Title = "Link linkedin",
-       Required = false,
-       Control = InputControlType.TextBox)]
-    public string LinkLinkedin { get; set; }
-
-    [Field(
-       Title = "Link instagram",
-       Required = false,
-       Control = InputControlType.TextBox)]
-    public string LinkInstagram { get; set; }
-
-    [Field(
-       Title = "Link google",
-       Required = false,
-       Control = InputControlType.TextBox)]
-    public string LinkGoogle { get; set; }
 
 	[Field(
 	   Title = "Baner",

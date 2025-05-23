@@ -52,10 +52,10 @@
                 errorMessage: Text["Password must be at least 6 characters.", "Mật khẩu phải gồm ít nhất 6 ký tự."]));
 
 
-                if (!Validation.IsValid())
-                {
-                    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
-                }
+                //if (!Validation.IsValid())
+                //{
+                //    return AjaxResult.BadRequest("Hãy nhập đầy đủ thông tin!");
+                //}
 
                 if (captcha != this.Context.Session["CaptchaVerify"].ToString())
                 {
@@ -83,9 +83,12 @@
                     model.FullName = Request.Form[field.GetName(t => t.FullName)].NullIfWhiteSpace();
                     model.Phone = Request.Form[field.GetName(t => t.Phone)].NullIfWhiteSpace();
                     model.Adress = Request.Form[field.GetName(t => t.Address)].NullIfWhiteSpace();
-                    model.Provinces = Request.Form[field.GetName(t => t.Province)].NullIfWhiteSpace();
-                    model.Districts = Request.Form[field.GetName(t => t.District)].NullIfWhiteSpace();
-                    model.wards = Request.Form[field.GetName(t => t.Ward)].NullIfWhiteSpace();
+                    model.Provinces = Request.Form["ProvinceName"].NullIfWhiteSpace();
+                    model.Districts = Request.Form["DistrictName"].NullIfWhiteSpace();
+                    model.wards = Request.Form["WardName"].NullIfWhiteSpace();
+                    model.ProvincesId = Request.Form[field.GetName(t => t.Province)].AsInt();
+                    model.DistrictsId = Request.Form[field.GetName(t => t.District)].AsInt();
+                    model.wardsId = Request.Form[field.GetName(t => t.Ward)].AsInt();
                     Db.Insert<PP_Customer>(model);
                     HttpContext context = HttpContext.Current;
                     var userId = model.Id;

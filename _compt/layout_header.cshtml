@@ -192,12 +192,12 @@
 <div class="menu_mobile_overlay scheme_dark"></div>
 <div class="menu_mobile menu_mobile_fullscreen scheme_dark">
     <div class="menu_mobile_inner with_widgets">
-        <div class="menu_mobile_header_wrap">
-            <a class="sc_layouts_logo" href="index.htm">
-                <img src="@Root.Config.Logo" srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle" width="451" height="95">
+        <div class="menu_mobile_header_wrap pl-1 pt-3 pr-1">
+            <a class="sc_layouts_logo" href="/" style="width: 290px">
+                <img src="@Root.Config.Logo"  srcset="@Root.Config.Logo" alt="@Root.Config.WebTitle" width="451" height="95">
             </a>
 
-            <a class="menu_mobile_close menu_button_close" tabindex="0"><span class="menu_button_close_text">Close</span><span class="menu_button_close_icon"></span></a>
+            <a class="menu_mobile_close menu_button_close" tabindex="0"><span class="menu_button_close_text">  </span><span class="menu_button_close_icon"></span></a>
         </div>
         <div class="menu_mobile_content_wrap content_wrap">
             <div class="menu_mobile_content_wrap_inner without_socials">
@@ -205,8 +205,8 @@
                     <ul id="menu_mobile" class=" menu_mobile_nav">
                         @foreach (var item in Root.Config.MainMenus.EmptyIfNull())
                         {
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-373">
-                                <a href="@item.Href" aria-current="page" title="@item.Title"><span>@item.Title</span></a>
+                            <li class="menu-item menu-item-type-custom ml-2 menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item-373">
+                                <a class="text-black-50" href="@item.Href" aria-current="page" title="@item.Title"><span>@item.Title</span></a>
                             </li>
                         }
                     </ul>

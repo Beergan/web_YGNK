@@ -10105,7 +10105,7 @@ body.mobile_layout.menu_side_right .menu_side_wrap .menu_side_button:hover {
   text-align: center;
   overflow: hidden;
   color: var(--theme-color-alter_text);
-  background-color: var(--theme-color-alter_bg_color);
+  background-color: white;
 }
 .menu_mobile .menu_mobile_header_wrap {
   position: absolute;

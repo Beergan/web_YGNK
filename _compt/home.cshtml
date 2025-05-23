@@ -34,6 +34,48 @@
         Title = "Baner")]
         public Baner[] _banner { get; set; }
 
+        public class AboutUs
+        {
+            [Field(
+            Title = "Tiêu đề",
+            Required = false,
+            Control = InputControlType.TextBox)]
+            public string Title { get; set; }
+
+            [Field(
+            Title = "Mô tả",
+            Required = false,
+            Control = InputControlType.RichTextBox)]
+            public string Content { get; set; }
+
+            [Field(
+          Title = "Hình 1 (320x180)",
+          Required = false,
+          Control = InputControlType.Image)]
+            public string Iamge1 { get; set; }
+
+            [Field(
+          Title = "Hình 2 (150x250)",
+          Required = false,
+          Control = InputControlType.Image)]
+            public string Iamge2 { get; set; }
+
+            [Field(
+          Title = "Hình 3 (140x190)",
+          Required = false,
+          Control = InputControlType.Image)]
+            public string Iamge3 { get; set; }
+
+            [Field(
+          Title = "Hình 4 (176x120)",
+          Required = false,
+          Control = InputControlType.Image)]
+            public string Iamge4 { get; set; }
+        }
+        [Field(
+Title = "Giới thiệu về chúng tôi")]
+        public AboutUs _aboutUs { get; set; }
+
         public class News
         {
             [Field(
@@ -61,11 +103,6 @@
             Control = InputControlType.TextBox)]
             public string Title { get; set; }
 
-            [Field(
-            Title = "Đường dẫn tin tức",
-            Required = false,
-            Control = InputControlType.Link)]
-            public string Link { get; set; }
 
             public class List
             {
@@ -142,12 +179,6 @@
                 Required = false,
                 Control = InputControlType.Image)]
                 public string Image { get; set; }
-
-                [Field(
-                Title = "Mô tả",
-                Required = false,
-                Control = InputControlType.TextBox)]
-                public string Content { get; set; }
             }
             [Field(
             Title = "Danh sách")]
@@ -355,7 +386,7 @@
         <div class="content">
             <a id="content_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
             <div data-elementor-type="wp-page" data-elementor-id="3438" class="elementor elementor-3438" data-elementor-post-type="page">
-                <div class="row m-0 p-0">
+                <div class="row m-0 p-0 border-bottom">
                     <div class="col-lg-12 m-0 p-0 wow zoomIn">
                         <div class="f-carousel" id="myCarousel">
                             @foreach (var item in Data._banner.EmptyIfNull())
@@ -383,63 +414,25 @@
                         </div>
                     </div>
                 </section>
-                <section class="elementor-section elementor-top-section elementor-element elementor-element-6ba8477 elementor-section-height-min-height elementor-section-boxed elementor-section-height-default elementor-section-items-middle sc_gradient_animation_none sc_fly_static" data-id="6ba8477" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;gradient&quot;}">
-                    <div class="elementor-container elementor-column-gap-extended">
-                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-a26d4e7 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="a26d4e7" data-element_type="column">
-                            <div class="elementor-widget-wrap elementor-element-populated">
-                                <div class="elementor-element elementor-element-4a5479a sc_fly_static elementor-widget elementor-widget-heading" data-id="4a5479a" data-element_type="widget" data-widget_type="heading.default">
-                                    <div class="elementor-widget-container">
-                                        <h3 class="elementor-heading-title elementor-size-default wow fadeInUp" data-wow-delay="1s" data-wow-duration="1s">@Data._news.Title</h3>
-                                    </div>
+                <section class="container"  style="max-width:1290px;">
+                    <div class="row m-0">
+                        <div class="col-lg-12 mb-lg-4 mb-2">
+                            <h2>@Data._aboutUs.Title</h2>
+                        </div>
+                        <div class="col-lg-6 col-12 col-sm-6">
+                            <div class="row m-0">
+
+                                <div class="col-lg-12">
+                                    @Data._aboutUs.Content
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </section>
-                <section class="elementor-section elementor-top-section elementor-element elementor-element-16dd839 elementor-section-boxed elementor-section-height-default elementor-section-height-default sc_fly_static" data-id="16dd839" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
-                    <div class="elementor-container elementor-column-gap-default">
-                        <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-0eaaa40 sc_content_align_inherit sc_layouts_column_icons_position_left sc_fly_static" data-id="0eaaa40" data-element_type="column">
-                            <div class="elementor-widget-wrap elementor-element-populated">
-                                <div class="elementor-element elementor-element-9746bf0 sc_height_tiny sc_fly_static elementor-widget elementor-widget-spacer" data-id="9746bf0" data-element_type="widget" data-widget_type="spacer.default">
-                                    <div class="elementor-widget-container">
-                                        <div class="elementor-spacer">
-                                            <div class="elementor-spacer-inner"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="elementor-element elementor-element-a80745d sc_fly_static elementor-widget elementor-widget-trx_widget_slider" data-id="a80745d" data-element_type="widget" data-widget_type="trx_widget_slider.default">
-                                    <div class="elementor-widget-container">
-                                        <div class="widget_area sc_widget_slider">
-                                            <aside class="widget widget_slider">
-                                                <div class="slider_wrap slider_engine_swiper">
-                                                    <div class="slider_outer slider_swiper_outer slider_style_default slider_source_posts_post slider_outer_direction_horizontal slider_outer_multi slider_outer_nopagination slider_outer_controls slider_outer_controls_bottom slider_outer_nocentered slider_outer_overflow_hidden slider_outer_titles_center slider_outer_height_auto">
-                                                        <div class="slider_container slider_swiper swiper-slider-container slider_direction_horizontal slider_nopagination slider_multi slider_type_images slider_controls slider_controls_bottom slider_nocentered slider_overflow_hidden slider_titles_center slider_resize slider_swipe slider_height_auto" data-ratio="1200:800" data-interval="7000" data-speed="600" data-effect="slide" data-pagination="bullets" data-direction="horizontal" data-slides-per-view="2" data-slides-space="50" data-slides-parallax="0" data-slides-centered="0" data-slides-overflow="0" data-mouse-wheel="0" data-autoplay="1" data-loop="1" data-free-mode="0" data-slides-min-width="220" data-slides-per-view-breakpoints="{&quot;999999&quot;:2}" data-slides-space-breakpoints="{&quot;999999&quot;:&quot;50&quot;}">
-                                                            <div class="slider-wrapper swiper-wrapper woww zoomIn">
-                                                                @foreach (var item in Data.Items.EmptyIfNull().Select((x, y) => new { x, y }))
-                                                                {
-                                                                    <div class="slider-slide swiper-slide with_titles" data-title="@item.x.Title" style="">
-                                                                        <img decoding="async" src="@item.x.ImageUrl" alt="@item.x.ImageUrl">
-                                                                        <div class="slide_info slide_info_small">
-                                                                            <h3 class="slide_title">
-                                                                                <a href="@item.x.Path">@item.x.Title</a>
-                                                                            </h3>
-                                                                            <div class="slide_number">0@(item.y + 1)</div>
-                                                                        </div>
-                                                                        <a href="@item.x.Path" class="slide_link"></a>
-                                                                    </div>
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                        <div class="slider_controls_wrap slider_arrows_wrap">
-                                                            <a class="slider_prev slider_arrow_default swiper-button-prev" href="#"></a>
-                                                            <a class="slider_next slider_arrow_default swiper-button-next" href="#"></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </aside>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div class="col-lg-6 col-12 col-sm-6 ">
+                            <div class="box-about">
+                                <img src="@Data._aboutUs.Iamge1" title="@Root.Config.WebTitle" alt="@Root.Config.WebTitle" class="image1-about" />
+                                <img src="@Data._aboutUs.Iamge2" title="@Root.Config.WebTitle" alt="@Root.Config.WebTitle" class="image2-about" />
+                                <img src="@Data._aboutUs.Iamge3" title="@Root.Config.WebTitle" alt="@Root.Config.WebTitle" class="image3-about" />
+                                <img src="@Data._aboutUs.Iamge4" title="@Root.Config.WebTitle" alt="@Root.Config.WebTitle" class="image4-about" />
                             </div>
                         </div>
                     </div>
@@ -658,32 +651,25 @@
                                 </div>
                                 <div class="elementor-element elementor-element-0f19b32 elementor-arrows-yes elementor-pagination-type-bullets elementor-review--has-separator elementor--star-style-star_fontawesome sc_fly_static elementor-widget elementor-widget-reviews" data-id="0f19b32" data-element_type="widget" data-settings="{&quot;show_arrows&quot;:&quot;yes&quot;,&quot;pagination&quot;:&quot;bullets&quot;,&quot;speed&quot;:500,&quot;autoplay&quot;:&quot;yes&quot;,&quot;autoplay_speed&quot;:5000,&quot;loop&quot;:&quot;yes&quot;,&quot;pause_on_hover&quot;:&quot;yes&quot;,&quot;pause_on_interaction&quot;:&quot;yes&quot;,&quot;space_between&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_tablet&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]},&quot;space_between_mobile&quot;:{&quot;unit&quot;:&quot;px&quot;,&quot;size&quot;:10,&quot;sizes&quot;:[]}}" data-widget_type="reviews.default">
                                     <div class="elementor-widget-container">
-                                        <div class="f-carousel1" id="myCarousel1" style="background-color:white">
+                                        <div class="owl-carousel owl-theme">
                                             @foreach (var item in Data._comment._list.EmptyIfNull())
                                             {
-                                                <div class="f-carousel__slide">
-                                                    <div class="elementor-testimonial elementor-repeater-item-6b985f7">
-                                                        <div class="elementor-testimonial__header">
-                                                            <div class="elementor-testimonial__image">
-                                                                <img decoding="async" src="@item.Image" alt="@item.Title">
-                                                            </div>
-                                                            <cite class="elementor-testimonial__cite">
-                                                                <span class="elementor-testimonial__name">@item.Title</span>
-                                                                <div class="elementor-star-rating">
-                                                                    @for (int i = 0; i < item.Star; i++)
-                                                                    {
-                                                                        <i class="elementor-star-full">&#xE934;</i>
-                                                                    }
+                                                <div class="item">
+                                                     <div class="row m-0 align-items-end">
+                                                        <div class="col-lg-12 p-0">
+                                                            <div class="row m-0  row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 text-center">
+                                                                <div class="col ">
+                                                                    <div class=" bg-orange rounded p-1 position-relative">
+                                                                        <p class="text-start bg-white p-2 mb-0">
+                                                                           @item.Content
+                                                                        </p>
+                                                                        <i class="fas fa-quote-right position-absolute text-secondary" style="position: absolute; bottom: -5px; right: 8px; font-size: 27px;"></i>
+                                                                    </div>
+                                                                    <div class="mt-3 d-flex">
+                                                                        <img src="@item.Image" alt="@item.Title" style="width:60px; height:60px;" class="rounded-circle" width="60" height="60">
+                                                                        <h6 class="fw-bold ml-3 mt-2">@item.Title</h6>
+                                                                    </div>
                                                                 </div>
-                                                                <span class="elementor-testimonial__title">@item.TagName</span>
-                                                            </cite>
-                                                            <div class="elementor-testimonial__icon elementor-icon elementor-icon-facebook" aria-label="Read More">
-                                                                <i aria-hidden="true" class="fab fa-facebook"></i>
-                                                            </div>
-                                                        </div>
-                                                        <div class="elementor-testimonial__content">
-                                                            <div class="elementor-testimonial__text">
-                                                                @item.Content
                                                             </div>
                                                         </div>
                                                     </div>
@@ -719,6 +705,26 @@
 <a id="footer_skip_link_anchor" class="globallogistics_skip_link_anchor" href="#"></a>
 @section scripts{
     <script>
+        $('.owl-carousel').owlCarousel({
+            loop: true,
+            margin: 10,
+            autoplayTimeout: 2000,    
+            autoplayHoverPause: true, 
+            nav: true,
+            responsive: {
+                0: {
+                    items: 1
+                },
+                600: {
+                    items: 2
+                },
+                1000: {
+                    items: 4
+                }
+            }
+        })
+    </script>
+    <script>
         new Carousel(document.getElementById("myCarousel"), {
             Autoplay: {
                 timeout: 2000
@@ -726,13 +732,7 @@
         }, {
             Autoplay
         });
-        new Carousel(document.getElementById("myCarousel1"), {
-            Autoplay: {
-                timeout: 2000
-            }
-        }, {
-            Autoplay
-        });
+       
     </script>
     <script type="text/javascript">
         function setREVStartSize(e) {
@@ -778,4 +778,33 @@
                 console.log("Failure at Presize of Slider:" + e)
             }
         };</script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const aboutBox = document.querySelector('.box-about');
+            const images = [
+                document.querySelector('.image1-about'),
+                document.querySelector('.image2-about'),
+                document.querySelector('.image3-about'),
+                document.querySelector('.image4-about'),
+            ];
+
+            const revealImages = () => {
+                const rect = aboutBox.getBoundingClientRect();
+                if (rect.top < window.innerHeight - 100) { // Đã gần đến vùng hiển thị
+                    images.forEach((img, index) => {
+                        setTimeout(() => {
+                            img.classList.add('show');
+                        }, index * 400); // delay giữa ảnh: 400ms
+                    });
+                    window.removeEventListener('scroll', revealImages); // chỉ chạy 1 lần
+                }
+            };
+
+            // Delay ban đầu 1s nếu muốn hiệu ứng tự động sau 1 giây không cần cuộn
+            setTimeout(revealImages, 1000);
+
+            // Thêm scroll listener
+            window.addEventListener('scroll', revealImages);
+        });
+    </script>
 } 
